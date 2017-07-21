@@ -171,11 +171,11 @@ static inline __attribute__((always_inline)) float FusionFastInverseSqrt(const f
  * @return Sum of vectorA and vectorB.
  */
 static inline __attribute__((always_inline)) FusionVector3 FusionVectorAdd(const FusionVector3 vectorA, const FusionVector3 vectorB) {
-    FusionVector3 result;
-    result.axis.x = vectorA.axis.x + vectorB.axis.x;
-    result.axis.y = vectorA.axis.y + vectorB.axis.y;
-    result.axis.z = vectorA.axis.z + vectorB.axis.z;
-    return result;
+    FusionVector3 resultAdd;
+    resultAdd.axis.x = vectorA.axis.x + vectorB.axis.x;
+    resultAdd.axis.y = vectorA.axis.y + vectorB.axis.y;
+    resultAdd.axis.z = vectorA.axis.z + vectorB.axis.z;
+    return resultAdd;
 }
 
 /**
@@ -185,11 +185,11 @@ static inline __attribute__((always_inline)) FusionVector3 FusionVectorAdd(const
  * @return vectorB subtracted from vectorA.
  */
 static inline __attribute__((always_inline)) FusionVector3 FusionVectorSubtract(const FusionVector3 vectorA, const FusionVector3 vectorB) {
-    FusionVector3 result;
-    result.axis.x = vectorA.axis.x - vectorB.axis.x;
-    result.axis.y = vectorA.axis.y - vectorB.axis.y;
-    result.axis.z = vectorA.axis.z - vectorB.axis.z;
-    return result;
+    FusionVector3 resultSubtract;
+    resultSubtract.axis.x = vectorA.axis.x - vectorB.axis.x;
+    resultSubtract.axis.y = vectorA.axis.y - vectorB.axis.y;
+    resultSubtract.axis.z = vectorA.axis.z - vectorB.axis.z;
+    return resultSubtract;
 }
 
 /**
@@ -199,11 +199,11 @@ static inline __attribute__((always_inline)) FusionVector3 FusionVectorSubtract(
  * @return Vector multiplied by scalar.
  */
 static inline __attribute__((always_inline)) FusionVector3 FusionVectorMultiplyScalar(const FusionVector3 vector, const float scalar) {
-    FusionVector3 result;
-    result.axis.x = vector.axis.x * scalar;
-    result.axis.y = vector.axis.y * scalar;
-    result.axis.z = vector.axis.z * scalar;
-    return result;
+    FusionVector3 resultMultiplyScalar;
+    resultMultiplyScalar.axis.x = vector.axis.x * scalar;
+    resultMultiplyScalar.axis.y = vector.axis.y * scalar;
+    resultMultiplyScalar.axis.z = vector.axis.z * scalar;
+    return resultMultiplyScalar;
 }
 
 /**
@@ -215,11 +215,11 @@ static inline __attribute__((always_inline)) FusionVector3 FusionVectorMultiplyS
 static inline __attribute__((always_inline)) FusionVector3 FusionVectorCrossProduct(const FusionVector3 vectorA, const FusionVector3 vectorB) {
 #define A vectorA.axis // define shorthand labels for more readable code
 #define B vectorB.axis
-    FusionVector3 result;
-    result.axis.x = A.y * B.z - A.z * B.y;
-    result.axis.y = A.z * B.x - A.x * B.z;
-    result.axis.z = A.x * B.y - A.y * B.x;
-    return result;
+    FusionVector3 resultCrossProduct;
+    resultCrossProduct.axis.x = A.y * B.z - A.z * B.y;
+    resultCrossProduct.axis.y = A.z * B.x - A.x * B.z;
+    resultCrossProduct.axis.z = A.x * B.y - A.y * B.x;
+    return resultCrossProduct;
 #undef A // undefine shorthand labels
 #undef B
 }

@@ -113,7 +113,7 @@ void FusionAhrsInitialise(FusionAhrs * const fusionAhrs, const float gain, const
  * @param fusionAhrs Address of the FusionAhrs structure.
  * @param gyroscope Gyroscope measurement in degrees per second.
  * @param accelerometer Accelerometer measurement in g.
- * @param magnetometer Magnetometer measurement in any calibrated units.
+ * @param magnetometer Magnetometer measurement in uT.
  * @param samplePeriod Sample period in seconds.
  */
 void FusionAhrsUpdate(FusionAhrs * const fusionAhrs, const FusionVector3 gyroscope, const FusionVector3 accelerometer, const FusionVector3 magnetometer, const float samplePeriod) {
