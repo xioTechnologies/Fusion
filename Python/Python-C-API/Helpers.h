@@ -4,44 +4,45 @@
 #include <numpy/arrayobject.h>
 #include <Python.h>
 #include <stdio.h>
+#include <string.h>
 
 #define PARSE_TUPLE(args, format, ...) (PyArg_ParseTuple(args, format, __VA_ARGS__) == 0 ? create_parse_tuple_error_string(format) : NULL)
+
+static void concatenate(char *const destination, const size_t destination_size, const char *const source) {
+    strncat(destination, source, destination_size - strlen(destination) - 1);
+}
 
 static char *const create_parse_tuple_error_string(const char *format) {
     static char string[256] = "Arguments are not (";
 
     while (*format != '\0') {
-        char new_string[sizeof(string)];
-
         switch (*format) {
             case 'I':
-                snprintf(new_string, sizeof(new_string), "%s%s", string, "unsigned int");
+                concatenate(string, sizeof(string), "unsigned int");
                 break;
             case 'O':
-                snprintf(new_string, sizeof(new_string), "%s%s", string, "numpy.array");
+                concatenate(string, sizeof(string), "numpy.array");
                 break;
             case 'f':
-                snprintf(new_string, sizeof(new_string), "%s%s", string, "float");
+                concatenate(string, sizeof(string), "float");
                 break;
             case 'l':
-                snprintf(new_string, sizeof(new_string), "%s%s", string, "long int");
+                concatenate(string, sizeof(string), "long int");
                 break;
             default:
-                snprintf(new_string, sizeof(new_string), "%s%s", string, "unknown type");
+                concatenate(string, sizeof(string), "unknown type");
                 break;
         }
-        snprintf(string, sizeof(string), "%s", new_string);
 
         do {
             format++;
         } while (*format == '!');
 
         if (*format != '\0') {
-            snprintf(new_string, sizeof(new_string), "%s%s", string, ", ");
+            concatenate(string, sizeof(string), ", ");
         } else {
-            snprintf(new_string, sizeof(new_string), "%s%s", string, ")");
+            concatenate(string, sizeof(string), ")");
         }
-        snprintf(string, sizeof(string), "%s", new_string);
     }
     return string;
 }
