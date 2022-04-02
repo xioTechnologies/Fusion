@@ -3,6 +3,7 @@
 
 #include <numpy/arrayobject.h>
 #include <Python.h>
+#include <stdio.h>
 #include <string.h>
 
 #define PARSE_TUPLE(args, format, ...) (PyArg_ParseTuple(args, format, __VA_ARGS__) == 0 ? create_parse_tuple_error_string(format) : NULL)
