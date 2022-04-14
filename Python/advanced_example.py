@@ -49,7 +49,7 @@ for index in range(len(timestamp)):
                                 ahrs_flags.acceleration_rejection_warning,
                                 ahrs_flags.acceleration_rejection_timeout,
                                 ahrs_flags.magnetic_rejection_warning,
-                                ahrs_flags.magnetic_rejection_timout])
+                                ahrs_flags.magnetic_rejection_timeout])
 
 
 def plot_bool(axis, x, y, label):

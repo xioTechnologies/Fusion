@@ -39,7 +39,7 @@ static PyGetSetDef flags_get_set[] = {
         {"acceleration_rejection_warning", (getter) flags_get_acceleration_rejection_warning, NULL, "", NULL},
         {"acceleration_rejection_timeout", (getter) flags_get_acceleration_rejection_timeout, NULL, "", NULL},
         {"magnetic_rejection_warning",     (getter) flags_get_magnetic_rejection_warning,     NULL, "", NULL},
-        {"magnetic_rejection_timout",      (getter) flags_get_magnetic_rejection_timeout,     NULL, "", NULL},
+        {"magnetic_rejection_timeout",     (getter) flags_get_magnetic_rejection_timeout,     NULL, "", NULL},
         {NULL}  /* sentinel */
 };
 
