@@ -248,7 +248,7 @@ void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector 
  * @return Quaternion describing the sensor relative to the Earth.
  */
 FusionQuaternion FusionAhrsGetQuaternion(const FusionAhrs *const ahrs) {
-    return FusionQuaternionConjugate(ahrs->quaternion);
+    return ahrs->quaternion;
 }
 
 /**

@@ -441,9 +441,9 @@ static inline FusionEuler FusionQuaternionToEuler(const FusionQuaternion quatern
 #define Q quaternion.element
     const float qwqwMinusHalf = Q.w * Q.w - 0.5f; // calculate common terms to avoid repeated operations
     FusionEuler euler;
-    euler.angle.roll = FusionRadiansToDegrees(atan2f(Q.y * Q.z - Q.w * Q.x, qwqwMinusHalf + Q.z * Q.z));
-    euler.angle.pitch = FusionRadiansToDegrees(-1.0f * asinf(2.0f * (Q.x * Q.z + Q.w * Q.y)));
-    euler.angle.yaw = FusionRadiansToDegrees(atan2f(Q.x * Q.y - Q.w * Q.z, qwqwMinusHalf + Q.x * Q.x));
+    euler.angle.roll = FusionRadiansToDegrees(-1.0f * atan2f(Q.y * Q.z - Q.w * Q.x, qwqwMinusHalf + Q.z * Q.z));
+    euler.angle.pitch = FusionRadiansToDegrees(asinf(2.0f * (Q.x * Q.z + Q.w * Q.y)));
+    euler.angle.yaw = FusionRadiansToDegrees(-1.0f * atan2f(Q.x * Q.y - Q.w * Q.z, qwqwMinusHalf + Q.x * Q.x));
     return euler;
 #undef Q
 }
