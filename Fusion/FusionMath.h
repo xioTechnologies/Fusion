@@ -348,20 +348,6 @@ static inline FusionQuaternion FusionQuaternionMultiplyVector(const FusionQuater
 }
 
 /**
- * @brief Returns the quaternion conjugate.
- * @param quaternion Quaternion.
- * @return Quaternion conjugate.
- */
-static inline FusionQuaternion FusionQuaternionConjugate(const FusionQuaternion quaternion) {
-    FusionQuaternion conjugate;
-    conjugate.element.w = quaternion.element.w;
-    conjugate.element.x = -1.0f * quaternion.element.x;
-    conjugate.element.y = -1.0f * quaternion.element.y;
-    conjugate.element.z = -1.0f * quaternion.element.z;
-    return conjugate;
-}
-
-/**
  * @brief Returns the normalised quaternion.
  * @param quaternion Quaternion.
  * @return Normalised quaternion.
@@ -420,13 +406,13 @@ static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion quate
     const float qyqz = Q.y * Q.z;
     FusionMatrix matrix;
     matrix.element.xx = 2.0f * (qwqw - 0.5f + Q.x * Q.x);
-    matrix.element.xy = 2.0f * (qxqy + qwqz);
-    matrix.element.xz = 2.0f * (qxqz - qwqy);
-    matrix.element.yx = 2.0f * (qxqy - qwqz);
+    matrix.element.xy = 2.0f * (qxqy - qwqz);
+    matrix.element.xz = 2.0f * (qxqz + qwqy);
+    matrix.element.yx = 2.0f * (qxqy + qwqz);
     matrix.element.yy = 2.0f * (qwqw - 0.5f + Q.y * Q.y);
-    matrix.element.yz = 2.0f * (qyqz + qwqx);
-    matrix.element.zx = 2.0f * (qxqz + qwqy);
-    matrix.element.zy = 2.0f * (qyqz - qwqx);
+    matrix.element.yz = 2.0f * (qyqz - qwqx);
+    matrix.element.zx = 2.0f * (qxqz - qwqy);
+    matrix.element.zy = 2.0f * (qyqz + qwqx);
     matrix.element.zz = 2.0f * (qwqw - 0.5f + Q.z * Q.z);
     return matrix;
 #undef Q
@@ -439,11 +425,11 @@ static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion quate
  */
 static inline FusionEuler FusionQuaternionToEuler(const FusionQuaternion quaternion) {
 #define Q quaternion.element
-    const float qwqwMinusHalf = Q.w * Q.w - 0.5f; // calculate common terms to avoid repeated operations
+    const float halfMinusQySquared = 0.5f - Q.y * Q.y; // calculate common terms to avoid repeated operations
     FusionEuler euler;
-    euler.angle.roll = FusionRadiansToDegrees(atan2f(Q.y * Q.z - Q.w * Q.x, qwqwMinusHalf + Q.z * Q.z));
-    euler.angle.pitch = FusionRadiansToDegrees(-1.0f * asinf(2.0f * (Q.x * Q.z + Q.w * Q.y)));
-    euler.angle.yaw = FusionRadiansToDegrees(atan2f(Q.x * Q.y - Q.w * Q.z, qwqwMinusHalf + Q.x * Q.x));
+    euler.angle.roll = FusionRadiansToDegrees(atan2f(Q.w * Q.x + Q.y * Q.z, halfMinusQySquared - Q.x * Q.x));
+    euler.angle.pitch = FusionRadiansToDegrees(asinf(2.0f * (Q.w * Q.y - Q.z * Q.x)));
+    euler.angle.yaw = FusionRadiansToDegrees(atan2f(Q.w * Q.z + Q.x * Q.y, halfMinusQySquared - Q.z * Q.z));
     return euler;
 #undef Q
 }
