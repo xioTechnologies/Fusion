@@ -89,8 +89,8 @@ i<sub>c</sub> = Ms(i<sub>u</sub> - b)
 - i<sub>c</sub> is the calibrated inertial measurement and `return` value
 - i<sub>u</sub> is the uncalibrated inertial measurement and `uncalibrated` argument
 - M is the misalignment matrix and `misalignment` argument
-- s is the axis sensitivities and `sensitivity` argument
-- b is the axis offsets and `offset` argument
+- s is the sensitivity diagonal matrix and `sensitivity` argument
+- b is the offset vector and `offset` argument
 
 ### Magnetic calibration
 
@@ -101,7 +101,7 @@ m<sub>c</sub> = Sm<sub>u</sub> - h
 - m<sub>c</sub> is the calibrated magnetometer measurement and `return` value
 - m<sub>u</sub> is the uncalibrated magnetometer measurement and `uncalibrated` argument
 - S is the soft iron matrix and `softIronMatrix` argument
-- h is the hard iron offset and `hardIronOffset` argument
+- h is the hard iron vector and `hardIronOffset` argument
 
 ## Fast inverse square root
 
