@@ -101,7 +101,7 @@ m<sub>c</sub> = Sm<sub>u</sub> - h
 - m<sub>c</sub> is the calibrated magnetometer measurement and `return` value
 - m<sub>u</sub> is the uncalibrated magnetometer measurement and `uncalibrated` argument
 - S is the soft iron matrix and `softIronMatrix` argument
-- h is the hard iron vector and `hardIronOffset` argument
+- h is the hard iron offset vector and `hardIronOffset` argument
 
 ## Fast inverse square root
 
