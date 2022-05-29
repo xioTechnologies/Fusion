@@ -126,7 +126,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     if (FusionVectorIsZero(accelerometer) == false) {
 
         // Enter acceleration recovery state if acceleration rejection times out
-        if (ahrs->accelerationRejectionTimer >= ahrs->settings.rejectionTimeout) {
+        if (ahrs->accelerationRejectionTimer > ahrs->settings.rejectionTimeout) {
             const FusionQuaternion quaternion = ahrs->quaternion;
             FusionAhrsReset(ahrs);
             ahrs->quaternion = quaternion;
@@ -154,7 +154,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
 
         // Set to compass heading if magnetic rejection times out
         ahrs->magneticRejectionTimeout = false;
-        if (ahrs->magneticRejectionTimer >= ahrs->settings.rejectionTimeout) {
+        if (ahrs->magneticRejectionTimer > ahrs->settings.rejectionTimeout) {
             FusionAhrsSetHeading(ahrs, FusionCompassCalculateHeading(halfGravity, magnetometer));
             ahrs->magneticRejectionTimer = 0;
             ahrs->magneticRejectionTimeout = true;
