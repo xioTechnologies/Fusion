@@ -301,14 +301,13 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
  * @return AHRS algorithm internal states.
  */
 FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahrs) {
-    const float rejectionTimeoutReciprocal = 1.0f / (float) ahrs->settings.rejectionTimeout;
     const FusionAhrsInternalStates internalStates = {
             .accelerationError = FusionRadiansToDegrees(FusionAsin(2.0f * FusionVectorMagnitude(ahrs->halfAccelerometerFeedback))),
             .accelerometerIgnored = ahrs->accelerometerIgnored,
-            .accelerationRejectionTimer = (float) ahrs->accelerationRejectionTimer * rejectionTimeoutReciprocal,
+            .accelerationRejectionTimer = ahrs->settings.rejectionTimeout == 0 ? 0.0f : (float) ahrs->accelerationRejectionTimer / (float) ahrs->settings.rejectionTimeout,
             .magneticError = FusionRadiansToDegrees(FusionAsin(2.0f * FusionVectorMagnitude(ahrs->halfMagnetometerFeedback))),
             .magnetometerIgnored = ahrs->magnetometerIgnored,
-            .magneticRejectionTimer = (float) ahrs->magneticRejectionTimer * rejectionTimeoutReciprocal,
+            .magneticRejectionTimer = ahrs->settings.rejectionTimeout == 0 ? 0.0f : (float) ahrs->magneticRejectionTimer / (float) ahrs->settings.rejectionTimeout,
     };
     return internalStates;
 }
