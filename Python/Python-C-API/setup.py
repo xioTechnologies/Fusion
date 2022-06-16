@@ -22,7 +22,7 @@ ext_modules = Extension("imufusion", ["imufusion.c",
 github_url = "https://github.com/xioTechnologies/Fusion"
 
 setup(name="imufusion",
-      version="1.0.3",
+      version="1.0.4",
       author="x-io Technologies Limited",
       author_email="info@x-io.co.uk",
       url=github_url,
