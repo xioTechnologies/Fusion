@@ -65,7 +65,8 @@ typedef union {
 } FusionMatrix;
 
 /**
- * @brief Euler angles.
+ * @brief Euler angles.  Roll, pitch, and yaw correspond to rotations around
+ * X, Y, and Z respectively.
  */
 typedef union {
     float array[3];
@@ -437,7 +438,7 @@ static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion quate
 }
 
 /**
- * @brief Converts a quaternion to Euler angles in degrees.
+ * @brief Converts a quaternion to ZYX Euler angles in degrees.
  * @param quaternion Quaternion.
  * @return Euler angles in degrees.
  */
