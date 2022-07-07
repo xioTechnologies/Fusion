@@ -12,10 +12,10 @@ if len(sys.argv) == 1:  # if this script was called without arguments
     sys.argv.append("install")
     sys.argv.append("--user")
 
-ext_modules = Extension("imufusion", ["imufusion.c",
-                                      "../../Fusion/FusionAhrs.c",
-                                      "../../Fusion/FusionCompass.c",
-                                      "../../Fusion/FusionOffset.c"],
+ext_modules = Extension("imufusion", ["Python/Python-C-API/imufusion.c",
+                                      "Fusion/FusionAhrs.c",
+                                      "Fusion/FusionCompass.c",
+                                      "Fusion/FusionOffset.c"],
                         include_dirs=[numpy.get_include()],
                         libraries=(["m"] if "linux" in sys.platform else []))  # link math library for Linux
 
