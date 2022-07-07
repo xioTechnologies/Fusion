@@ -255,7 +255,7 @@ FusionQuaternion FusionAhrsGetQuaternion(const FusionAhrs *const ahrs) {
  * @brief Returns the linear acceleration measurement equal to the accelerometer
  * measurement with the 1 g of gravity removed.
  * @param ahrs AHRS algorithm structure.
- * @return Linear acceleration measurement.
+ * @return Linear acceleration measurement in g.
  */
 FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
@@ -273,7 +273,7 @@ FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
  * @brief Returns the Earth acceleration measurement equal to accelerometer
  * measurement in the Earth coordinate frame with the 1 g of gravity removed.
  * @param ahrs AHRS algorithm structure.
- * @return Earth acceleration measurement.
+ * @return Earth acceleration measurement in g.
  */
 FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
