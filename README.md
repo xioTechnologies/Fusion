@@ -1,12 +1,12 @@
 [![Tags](https://img.shields.io/github/v/tag/xioTechnologies/Fusion.svg)](https://github.com/xioTechnologies/Fusion/tags/)
-[![Build](https://img.shields.io/github/workflow/status/xioTechnologies/Fusion/CI.svg)](https://github.com/xioTechnologies/Fusion/actions/workflows/main.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/xioTechnologies/Fusion/main.yml?branch=main)](https://github.com/xioTechnologies/Fusion/actions/workflows/main.yml)
 [![Pypi](https://img.shields.io/pypi/v/imufusion.svg)](https://pypi.org/project/imufusion/)
 [![Python](https://img.shields.io/pypi/pyversions/imufusion.svg)](https://pypi.org/project/imufusion/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Fusion
 
-Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems.  Fusion is a C library but is also available as the Python package [imufusion](https://pypi.org/project/imufusion/).  Two example Python scripts, [simple_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/simple_example.py) and [advanced_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/advanced_example.py) are provided with example sensor data to demonstrate use of the package.
+Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems.  Fusion is a C library but is also available as the Python package, [imufusion](https://pypi.org/project/imufusion/).  Two example Python scripts, [simple_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/simple_example.py) and [advanced_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/advanced_example.py) are provided with example sensor data to demonstrate use of the package.
 
 ## AHRS algorithm
 
