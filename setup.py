@@ -32,5 +32,6 @@ setup(name="imufusion",
       license="MIT",
       classifiers=["Programming Language :: Python :: 3.8",
                    "Programming Language :: Python :: 3.9",
-                   "Programming Language :: Python :: 3.10"],  # versions shown by pyversions badge in README
+                   "Programming Language :: Python :: 3.10",
+                   "Programming Language :: Python :: 3.11"],  # versions shown by pyversions badge in README
       ext_modules=[ext_modules])
