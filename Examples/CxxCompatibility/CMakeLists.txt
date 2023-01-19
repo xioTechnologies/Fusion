@@ -1,5 +1,5 @@
 # !!! WARNING !!! This project force to use the C++ compiler. It can be only compiled when you pass the
-# C++ compatibility flag `-DCXX_COMPATIBILITY_ENABLED=ON` to the CMake command.
+# C++ compatibility flag `-DFUSION_CXX_COMPATIBILITY_ENABLED=ON` to the CMake command.
 # This code example is the same as the `Simple-Example` project. It only tests the possibility to compile by C++ compiler.
 
 set(APP_NAME "Simple-Example-CxxComp")

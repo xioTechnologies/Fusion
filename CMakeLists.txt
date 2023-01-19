@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.15)
 project(Fusion)
 
 # Add C++ compatibility option (default: OFF).
-# Can be enabled by passing `-DCXX_COMPATIBILITY_ENABLED=ON` to CMake.
-option(CXX_COMPATIBILITY_ENABLED "Enable C++ code compatibility" OFF)
-add_definitions(-DCXX_COMPATIBILITY=$<BOOL:${CXX_COMPATIBILITY_ENABLED}>)
+# Can be enabled by passing `-DFUSION_CXX_COMPATIBILITY_ENABLED=ON` to CMake.
+option(FUSION_CXX_COMPATIBILITY_ENABLED "Enable C++ code compatibility" OFF)
+add_definitions(-DFUSION_CXX_COMPATIBILITY=$<BOOL:${FUSION_CXX_COMPATIBILITY_ENABLED}>)
 
 add_subdirectory("Fusion")
 add_subdirectory("Examples/Advanced")
