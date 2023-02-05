@@ -7,7 +7,7 @@
 
 int main() {
 
-    // Define calibration (replace with actual calibration data)
+    // Define calibration (replace with actual calibration data if available)
     const FusionMatrix gyroscopeMisalignment = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     const FusionVector gyroscopeSensitivity = {1.0f, 1.0f, 1.0f};
     const FusionVector gyroscopeOffset = {0.0f, 0.0f, 0.0f};
