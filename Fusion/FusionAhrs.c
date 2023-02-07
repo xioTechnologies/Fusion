@@ -285,12 +285,11 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
     const float qxqy = Q.x * Q.y;
     const float qxqz = Q.x * Q.z;
     const float qyqz = Q.y * Q.z;
-    const FusionVector earthAcceleration = {
+    return (FusionVector) {
             .axis.x = 2.0f * ((qwqw - 0.5f + Q.x * Q.x) * A.x + (qxqy - qwqz) * A.y + (qxqz + qwqy) * A.z),
             .axis.y = 2.0f * ((qxqy + qwqz) * A.x + (qwqw - 0.5f + Q.y * Q.y) * A.y + (qyqz - qwqx) * A.z),
             .axis.z = (2.0f * ((qxqz - qwqy) * A.x + (qyqz + qwqx) * A.y + (qwqw - 0.5f + Q.z * Q.z) * A.z)) - 1.0f,
     }; // rotation matrix multiplied with the accelerometer, with 1 g subtracted
-    return earthAcceleration;
 #undef Q
 #undef A
 }
@@ -301,7 +300,7 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
  * @return AHRS algorithm internal states.
  */
 FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahrs) {
-    const FusionAhrsInternalStates internalStates = {
+    return (FusionAhrsInternalStates) {
             .accelerationError = FusionRadiansToDegrees(FusionAsin(2.0f * FusionVectorMagnitude(ahrs->halfAccelerometerFeedback))),
             .accelerometerIgnored = ahrs->accelerometerIgnored,
             .accelerationRejectionTimer = ahrs->settings.rejectionTimeout == 0 ? 0.0f : (float) ahrs->accelerationRejectionTimer / (float) ahrs->settings.rejectionTimeout,
@@ -309,7 +308,6 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
             .magnetometerIgnored = ahrs->magnetometerIgnored,
             .magneticRejectionTimer = ahrs->settings.rejectionTimeout == 0 ? 0.0f : (float) ahrs->magneticRejectionTimer / (float) ahrs->settings.rejectionTimeout,
     };
-    return internalStates;
 }
 
 /**
@@ -319,14 +317,13 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
  */
 FusionAhrsFlags FusionAhrsGetFlags(FusionAhrs *const ahrs) {
     const unsigned int warningTimeout = ahrs->settings.rejectionTimeout / 4;
-    const FusionAhrsFlags flags = {
+    return (FusionAhrsFlags) {
             .initialising = ahrs->initialising,
             .accelerationRejectionWarning = ahrs->accelerationRejectionTimer > warningTimeout,
             .accelerationRejectionTimeout = ahrs->accelerationRejectionTimeout,
             .magneticRejectionWarning = ahrs->magneticRejectionTimer > warningTimeout,
             .magneticRejectionTimeout = ahrs->magneticRejectionTimeout,
     };
-    return flags;
 }
 
 /**
