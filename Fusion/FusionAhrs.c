@@ -315,7 +315,7 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
  * @param ahrs AHRS algorithm structure.
  * @return AHRS algorithm flags.
  */
-FusionAhrsFlags FusionAhrsGetFlags(FusionAhrs *const ahrs) {
+FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
     const unsigned int warningTimeout = ahrs->settings.rejectionTimeout / 4;
     return (FusionAhrsFlags) {
             .initialising = ahrs->initialising,

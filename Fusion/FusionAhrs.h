@@ -94,7 +94,7 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs);
 
 FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahrs);
 
-FusionAhrsFlags FusionAhrsGetFlags(FusionAhrs *const ahrs);
+FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs);
 
 void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading);
 
