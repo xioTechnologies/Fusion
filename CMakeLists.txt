@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(FusionMain)
+project(Fusion)
 
 # Add C++ compatibility option (default: OFF).
 # Can be enabled by passing `-DFUSION_CXX_COMPATIBILITY_ENABLED=ON` to CMake.
