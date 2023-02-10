@@ -199,11 +199,11 @@ static inline bool FusionVectorIsZero(const FusionVector vector) {
  * @return Sum of two vectors.
  */
 static inline FusionVector FusionVectorAdd(const FusionVector vectorA, const FusionVector vectorB) {
-    const FusionVector result = {.axis = {
-            .x = vectorA.axis.x + vectorB.axis.x,
-            .y = vectorA.axis.y + vectorB.axis.y,
-            .z = vectorA.axis.z + vectorB.axis.z,
-    }};
+    const FusionVector result = {
+            .axis.x = vectorA.axis.x + vectorB.axis.x,
+            .axis.y = vectorA.axis.y + vectorB.axis.y,
+            .axis.z = vectorA.axis.z + vectorB.axis.z,
+    };
     return result;
 }
 
