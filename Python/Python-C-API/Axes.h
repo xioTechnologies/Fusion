@@ -9,9 +9,9 @@
 
 static PyObject *axes_swap(PyObject *self, PyObject *args) {
     PyArrayObject *input_array;
-    FusionAxesAlignment alignment;
+    int alignment;
 
-    const char *error = PARSE_TUPLE(args, "O!l", &PyArray_Type, &input_array, &alignment);
+    const char *error = PARSE_TUPLE(args, "O!i", &PyArray_Type, &input_array, &alignment);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -26,7 +26,7 @@ static PyObject *axes_swap(PyObject *self, PyObject *args) {
     }
 
     FusionVector *const output_vector = malloc(sizeof(FusionVector));
-    *output_vector = FusionAxesSwap(input_vector, alignment);
+    *output_vector = FusionAxesSwap(input_vector, (FusionAxesAlignment) alignment);
 
     const npy_intp dims[] = {3};
     PyObject *output_array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, output_vector->array);
