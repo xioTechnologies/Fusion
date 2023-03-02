@@ -58,6 +58,9 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddIntConstant(module, "ALIGNMENT_NZNXPY", FusionAxesAlignmentNZNXPY) == 0) &&
         (PyModule_AddIntConstant(module, "ALIGNMENT_NZNYNX", FusionAxesAlignmentNZNYNX) == 0) &&
         (PyModule_AddIntConstant(module, "ALIGNMENT_NZPXNY", FusionAxesAlignmentNZPXNY) == 0) &&
+        (PyModule_AddIntConstant(module, "CONVENTION_NWU", FusionConventionNwu) == 0) &&
+        (PyModule_AddIntConstant(module, "CONVENTION_ENU", FusionConventionEnu) == 0) &&
+        (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
         (PyModule_AddFunctions(module, axes_methods) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&

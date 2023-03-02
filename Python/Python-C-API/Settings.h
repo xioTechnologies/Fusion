@@ -13,7 +13,7 @@ typedef struct {
 static PyObject *settings_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     Settings *const self = (Settings *) subtype->tp_alloc(subtype, 0);
 
-    const char *const error = PARSE_TUPLE(args, "fffI", &self->settings.gain, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.rejectionTimeout);
+    const char *const error = PARSE_TUPLE(args, "ifffI", &self->settings.convention, &self->settings.gain, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.rejectionTimeout);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -23,6 +23,21 @@ static PyObject *settings_new(PyTypeObject *subtype, PyObject *args, PyObject *k
 
 static void settings_free(Settings *self) {
     Py_TYPE(self)->tp_free(self);
+}
+
+static PyObject *settings_get_convention(Settings *self) {
+    return Py_BuildValue("l", self->settings.convention);
+}
+
+static int settings_set_convention(Settings *self, PyObject *value, void *closure) {
+    const FusionConvention convention = (FusionConvention) PyFloat_AsDouble(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    self->settings.convention = convention;
+    return 0;
 }
 
 static PyObject *settings_get_gain(Settings *self) {
@@ -86,6 +101,7 @@ static int settings_set_rejection_timeout(Settings *self, PyObject *value, void 
 }
 
 static PyGetSetDef settings_get_set[] = {
+        {"convention",             (getter) settings_get_convention,             (setter) settings_set_convention,             "", NULL},
         {"gain",                   (getter) settings_get_gain,                   (setter) settings_set_gain,                   "", NULL},
         {"acceleration_rejection", (getter) settings_get_acceleration_rejection, (setter) settings_set_acceleration_rejection, "", NULL},
         {"magnetic_rejection",     (getter) settings_get_magnetic_rejection,     (setter) settings_set_magnetic_rejection,     "", NULL},

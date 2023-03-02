@@ -17,7 +17,8 @@ magnetometer = data[:, 7:10]
 offset = imufusion.Offset(sample_rate)
 ahrs = imufusion.Ahrs()
 
-ahrs.settings = imufusion.Settings(0.5,  # gain
+ahrs.settings = imufusion.Settings(imufusion.CONVENTION_NWU,  # convention
+                                   0.5,  # gain
                                    10,  # acceleration rejection
                                    20,  # magnetic rejection
                                    5 * sample_rate)  # rejection timeout = 5 seconds

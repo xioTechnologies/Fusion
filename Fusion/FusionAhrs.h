@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 // Includes
 
+#include "FusionConvention.h"
 #include "FusionMath.h"
 #include <stdbool.h>
 
@@ -21,6 +22,7 @@
  * @brief AHRS algorithm settings.
  */
 typedef struct {
+    FusionConvention convention;
     float gain;
     float accelerationRejection;
     float magneticRejection;
