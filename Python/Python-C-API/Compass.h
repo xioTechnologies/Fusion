@@ -8,10 +8,11 @@
 #include <stdlib.h>
 
 static PyObject *compass_calculate_heading(PyObject *self, PyObject *args) {
+    FusionConvention convention;
     PyArrayObject *accelerometer_array;
     PyArrayObject *magnetometer_array;
 
-    const char *error = PARSE_TUPLE(args, "O!O!", &PyArray_Type, &accelerometer_array, &PyArray_Type, &magnetometer_array);
+    const char *error = PARSE_TUPLE(args, "iO!O!", &convention, &PyArray_Type, &accelerometer_array, &PyArray_Type, &magnetometer_array);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -32,7 +33,7 @@ static PyObject *compass_calculate_heading(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    return Py_BuildValue("f", FusionCompassCalculateHeading(accelerometer_vector, magnetometer_vector));
+    return Py_BuildValue("f", FusionCompassCalculateHeading(convention, accelerometer_vector, magnetometer_vector));
 }
 
 static PyMethodDef compass_methods[] = {

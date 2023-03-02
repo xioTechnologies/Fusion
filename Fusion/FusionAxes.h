@@ -178,7 +178,7 @@ static inline FusionVector FusionAxesSwap(const FusionVector sensor, const Fusio
             result.axis.z = -sensor.axis.y;
             return result;
     }
-    return sensor;
+    return sensor; // avoid compiler warning
 }
 
 #endif

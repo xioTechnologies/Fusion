@@ -26,6 +26,7 @@ int main() {
 
     // Set AHRS algorithm settings
     const FusionAhrsSettings settings = {
+            .convention = FusionConventionNwu,
             .gain = 0.5f,
             .accelerationRejection = 10.0f,
             .magneticRejection = 20.0f,
