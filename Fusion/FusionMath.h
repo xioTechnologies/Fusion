@@ -281,6 +281,16 @@ static inline FusionVector FusionVectorCrossProduct(const FusionVector vectorA, 
 }
 
 /**
+ * @brief Returns the dot product.
+ * @param vectorA Vector A.
+ * @param vectorB Vector B.
+ * @return Dot product.
+ */
+static inline float FusionVectorDotProduct(const FusionVector vectorA, const FusionVector vectorB) {
+    return FusionVectorSum(FusionVectorHadamardProduct(vectorA, vectorB));
+}
+
+/**
  * @brief Returns the vector magnitude squared.
  * @param vector Vector.
  * @return Vector magnitude squared.

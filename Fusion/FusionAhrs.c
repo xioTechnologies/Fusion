@@ -33,6 +33,8 @@ static FusionVector HalfGravity(const FusionAhrs *const ahrs);
 
 static FusionVector HalfMagnetic(const FusionAhrs *const ahrs);
 
+static FusionVector Feedback(const FusionVector sensor, const FusionVector reference);
+
 //------------------------------------------------------------------------------
 // Functions
 
@@ -140,7 +142,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         }
 
         // Calculate accelerometer feedback scaled by 0.5
-        ahrs->halfAccelerometerFeedback = FusionVectorCrossProduct(FusionVectorNormalise(accelerometer), halfGravity);
+        ahrs->halfAccelerometerFeedback = Feedback(FusionVectorNormalise(accelerometer), halfGravity);
 
         // Ignore accelerometer if acceleration distortion detected
         if ((ahrs->initialising == true) || (FusionVectorMagnitudeSquared(ahrs->halfAccelerometerFeedback) <= ahrs->settings.accelerationRejection)) {
@@ -169,7 +171,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         const FusionVector halfMagnetic = HalfMagnetic(ahrs);
 
         // Calculate magnetometer feedback scaled by 0.5
-        ahrs->halfMagnetometerFeedback = FusionVectorCrossProduct(FusionVectorNormalise(FusionVectorCrossProduct(halfGravity, magnetometer)), halfMagnetic);
+        ahrs->halfMagnetometerFeedback = Feedback(FusionVectorNormalise(FusionVectorCrossProduct(halfGravity, magnetometer)), halfMagnetic);
 
         // Ignore magnetometer if magnetic distortion detected
         if ((ahrs->initialising == true) || (FusionVectorMagnitudeSquared(ahrs->halfMagnetometerFeedback) <= ahrs->settings.magneticRejection)) {
@@ -260,6 +262,19 @@ static FusionVector HalfMagnetic(const FusionAhrs *const ahrs) {
     }
     return FUSION_VECTOR_ZERO; // avoid compiler warning
 #undef Q
+}
+
+/**
+ * @brief Returns the feedback.
+ * @param sensor Sensor.
+ * @param reference Reference.
+ * @return Feedback.
+ */
+static FusionVector Feedback(const FusionVector sensor, const FusionVector reference) {
+    if (FusionVectorDotProduct(sensor, reference) < 0.0f) { // if error is >90 degrees
+        return FusionVectorNormalise(FusionVectorCrossProduct(sensor, reference));
+    }
+    return FusionVectorCrossProduct(sensor, reference);
 }
 
 /**
