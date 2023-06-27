@@ -41,6 +41,17 @@ static PyObject *ahrs_get_quaternion(Ahrs *self) {
     return quaternion_from(&quaternion);
 }
 
+static int ahrs_set_quaternion(Ahrs *self, PyObject *value, void *closure) {
+    if (PyObject_IsInstance(value, (PyObject *) &quaternion_object) == false) {
+        static char string[64];
+        snprintf(string, sizeof(string), "Value type is not %s", quaternion_object.tp_name);
+        PyErr_SetString(PyExc_TypeError, string);
+        return -1;
+    }
+    FusionAhrsSetQuaternion(&self->ahrs, ((Quaternion *) value)->quaternion);
+    return 0;
+}
+
 static PyObject *ahrs_get_linear_acceleration(Ahrs *self) {
     FusionVector *const linear_acceleration = malloc(sizeof(FusionVector));
     *linear_acceleration = FusionAhrsGetLinearAcceleration(&self->ahrs);
@@ -191,13 +202,13 @@ static int ahrs_set_heading(Ahrs *self, PyObject *value, void *closure) {
 }
 
 static PyGetSetDef ahrs_get_set[] = {
-        {"settings", NULL, (setter) ahrs_set_settings,                       "", NULL},
-        {"quaternion",          (getter) ahrs_get_quaternion,          NULL, "", NULL},
-        {"linear_acceleration", (getter) ahrs_get_linear_acceleration, NULL, "", NULL},
-        {"earth_acceleration",  (getter) ahrs_get_earth_acceleration,  NULL, "", NULL},
-        {"internal_states",     (getter) ahrs_get_internal_states,     NULL, "", NULL},
-        {"flags",               (getter) ahrs_get_flags,               NULL, "", NULL},
-        {"heading",  NULL, (setter) ahrs_set_heading,                        "", NULL},
+        {"settings", NULL,                                    (setter) ahrs_set_settings,   "", NULL},
+        {"quaternion",          (getter) ahrs_get_quaternion, (setter) ahrs_set_quaternion, "", NULL},
+        {"linear_acceleration", (getter) ahrs_get_linear_acceleration, NULL,                "", NULL},
+        {"earth_acceleration",  (getter) ahrs_get_earth_acceleration,  NULL,                "", NULL},
+        {"internal_states",     (getter) ahrs_get_internal_states,     NULL,                "", NULL},
+        {"flags",               (getter) ahrs_get_flags,               NULL,                "", NULL},
+        {"heading",  NULL,                                    (setter) ahrs_set_heading,    "", NULL},
         {NULL}  /* sentinel */
 };
 

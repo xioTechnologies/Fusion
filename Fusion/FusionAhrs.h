@@ -90,6 +90,8 @@ void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector 
 
 FusionQuaternion FusionAhrsGetQuaternion(const FusionAhrs *const ahrs);
 
+void FusionAhrsSetQuaternion(FusionAhrs *const ahrs, const FusionQuaternion quaternion);
+
 FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs);
 
 FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs);
