@@ -23,7 +23,7 @@ ext_modules = Extension("imufusion", ["Python/Python-C-API/imufusion.c",
                         libraries=(["m"] if "linux" in sys.platform else []))  # link math library for Linux
 
 setup(name="imufusion",
-      version="1.1.0",
+      version="1.1.1",
       description="Fusion Python package",
       long_description="See [github](" + github_url + ") for documentation and examples.",
       long_description_content_type='text/markdown',
