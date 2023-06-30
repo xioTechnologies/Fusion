@@ -335,6 +335,15 @@ FusionQuaternion FusionAhrsGetQuaternion(const FusionAhrs *const ahrs) {
 }
 
 /**
+ * @brief Sets the quaternion describing the sensor relative to the Earth.
+ * @param ahrs AHRS algorithm structure.
+ * @param quaternion Quaternion describing the sensor relative to the Earth.
+ */
+void FusionAhrsSetQuaternion(FusionAhrs *const ahrs, const FusionQuaternion quaternion) {
+    ahrs->quaternion = quaternion;
+}
+
+/**
  * @brief Returns the linear acceleration measurement equal to the accelerometer
  * measurement with the 1 g of gravity removed.
  * @param ahrs AHRS algorithm structure.
