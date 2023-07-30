@@ -38,13 +38,13 @@ The algorithm provides three outputs: quaternion, linear acceleration, and Earth
 
 The AHRS algorithm settings are defined by the `FusionAhrsSettings` structure and set using the `FusionAhrsSetSettings` function.
 
-| Setting                 | Description                                                                                                                                                                                                   |
-|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `convention`            | Earth axes convention (NWD, ENU, or NED).                                                                                                                                                                     |
-| `gain`                  | Determines the influence of the gyroscope relative to other sensors.  A value of 0.5 is appropriate for most applications.                                                                                    |
-| `accelerationRejection` | Threshold (in degrees) used by the acceleration rejection feature.  A value of zero will disable this feature.  A value of 10 degrees is appropriate for most applications.                                   |
-| `magneticRejection`     | Threshold (in degrees) used by the magnetic rejection feature.  A value of zero will disable the feature. A value of 20 degrees is appropriate for most applications.                                         |
-| `rejectionTimeout`      | Acceleration and magnetic rejection timeout period (in samples).  A value of zero will disable the acceleration and magnetic rejection features.  A period of 5 seconds is appropriate for most applications. |
+| Setting                 | Description                                                                                                                                                                                                                   |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `convention`            | Earth axes convention (NWD, ENU, or NED).                                                                                                                                                                                     |
+| `gain`                  | Determines the influence of the gyroscope relative to other sensors.  A value of zero will disable initialisation and the acceleration and magnetic rejection features.  A value of 0.5 is appropriate for most applications. |
+| `accelerationRejection` | Threshold (in degrees) used by the acceleration rejection feature.  A value of zero will disable this feature.  A value of 10 degrees is appropriate for most applications.                                                   |
+| `magneticRejection`     | Threshold (in degrees) used by the magnetic rejection feature.  A value of zero will disable the feature. A value of 20 degrees is appropriate for most applications.                                                         |
+| `rejectionTimeout`      | Acceleration and magnetic rejection timeout period (in samples).  A value of zero will disable the acceleration and magnetic rejection features.  A period of 5 seconds is appropriate for most applications.                 |
 
 ### Algorithm internal states
 

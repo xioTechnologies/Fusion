@@ -82,17 +82,13 @@ void FusionAhrsReset(FusionAhrs *const ahrs) {
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings) {
     ahrs->settings.convention = settings->convention;
     ahrs->settings.gain = settings->gain;
-    if ((settings->accelerationRejection == 0.0f) || (settings->rejectionTimeout == 0)) {
-        ahrs->settings.accelerationRejection = FLT_MAX;
-    } else {
-        ahrs->settings.accelerationRejection = powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
-    }
-    if ((settings->magneticRejection == 0.0f) || (settings->rejectionTimeout == 0)) {
-        ahrs->settings.magneticRejection = FLT_MAX;
-    } else {
-        ahrs->settings.magneticRejection = powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
-    }
+    ahrs->settings.accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
+    ahrs->settings.magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
     ahrs->settings.rejectionTimeout = settings->rejectionTimeout;
+    if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0)) {
+        ahrs->settings.accelerationRejection = FLT_MAX;
+        ahrs->settings.magneticRejection = FLT_MAX;
+    }
     if (ahrs->initialising == false) {
         ahrs->rampedGain = ahrs->settings.gain;
     }
@@ -117,7 +113,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     // Ramp down gain during initialisation
     if (ahrs->initialising == true) {
         ahrs->rampedGain -= ahrs->rampedGainStep * deltaTime;
-        if (ahrs->rampedGain < ahrs->settings.gain) {
+        if ((ahrs->rampedGain < ahrs->settings.gain) || (ahrs->settings.gain == 0.0f)) {
             ahrs->rampedGain = ahrs->settings.gain;
             ahrs->initialising = false;
             ahrs->accelerationRejectionTimeout = false;
