@@ -17,7 +17,6 @@ jobs:
         target: # [ os, cibuildwheel-platform ]
           - [ macos-latest, macosx_x86_64 ]
           - [ macos-latest, macosx_arm64 ]
-          - [ ubuntu-latest, manylinux_i686 ]
           - [ ubuntu-latest, manylinux_aarch64 ]
           - [ ubuntu-latest, manylinux_x86_64 ]
           - [ windows-latest, win_amd64 ]
@@ -37,7 +36,6 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -U urllib3 requests
           python -m pip install twine
 
       - if: matrix.target[0] == 'ubuntu-latest'
@@ -47,7 +45,7 @@ jobs:
           platforms: all
 
       - name: Build wheel
-        uses: pypa/cibuildwheel@v2.12.3
+        uses: pypa/cibuildwheel@v2.14.1
         env:
           CIBW_ARCHS: all
           CIBW_BUILD: ${{ matrix.python-version }}${{ matrix.target[1] }}
