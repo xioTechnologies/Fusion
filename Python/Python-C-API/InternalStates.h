@@ -22,8 +22,8 @@ static PyObject *internal_states_get_accelerometer_ignored(InternalStates *self)
     return build_bool(self->internal_states.accelerometerIgnored);
 }
 
-static PyObject *internal_states_get_acceleration_rejection_timer(InternalStates *self) {
-    return Py_BuildValue("f", self->internal_states.accelerationRejectionTimer);
+static PyObject *internal_states_get_acceleration_recovery_trigger(InternalStates *self) {
+    return Py_BuildValue("f", self->internal_states.accelerationRecoveryTrigger);
 }
 
 static PyObject *internal_states_get_magnetic_error(InternalStates *self) {
@@ -34,17 +34,17 @@ static PyObject *internal_states_get_magnetometer_ignored(InternalStates *self) 
     return build_bool(self->internal_states.magnetometerIgnored);
 }
 
-static PyObject *internal_states_get_magnetic_rejection_timer(InternalStates *self) {
-    return Py_BuildValue("f", self->internal_states.magneticRejectionTimer);
+static PyObject *internal_states_get_magnetic_recovery_trigger(InternalStates *self) {
+    return Py_BuildValue("f", self->internal_states.magneticRecoveryTrigger);
 }
 
 static PyGetSetDef internal_states_get_set[] = {
-        {"acceleration_error",           (getter) internal_states_get_acceleration_error,           NULL, "", NULL},
-        {"accelerometer_ignored",        (getter) internal_states_get_accelerometer_ignored,        NULL, "", NULL},
-        {"acceleration_rejection_timer", (getter) internal_states_get_acceleration_rejection_timer, NULL, "", NULL},
-        {"magnetic_error",               (getter) internal_states_get_magnetic_error,               NULL, "", NULL},
-        {"magnetometer_ignored",         (getter) internal_states_get_magnetometer_ignored,         NULL, "", NULL},
-        {"magnetic_rejection_timer",     (getter) internal_states_get_magnetic_rejection_timer,     NULL, "", NULL},
+        {"acceleration_error",            (getter) internal_states_get_acceleration_error,            NULL, "", NULL},
+        {"accelerometer_ignored",         (getter) internal_states_get_accelerometer_ignored,         NULL, "", NULL},
+        {"acceleration_recovery_trigger", (getter) internal_states_get_acceleration_recovery_trigger, NULL, "", NULL},
+        {"magnetic_error",                (getter) internal_states_get_magnetic_error,                NULL, "", NULL},
+        {"magnetometer_ignored",          (getter) internal_states_get_magnetometer_ignored,          NULL, "", NULL},
+        {"magnetic_recovery_trigger",     (getter) internal_states_get_magnetic_recovery_trigger,     NULL, "", NULL},
         {NULL}  /* sentinel */
 };
 

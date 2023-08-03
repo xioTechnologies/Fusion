@@ -13,7 +13,7 @@ typedef struct {
 static PyObject *settings_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     Settings *const self = (Settings *) subtype->tp_alloc(subtype, 0);
 
-    const char *const error = PARSE_TUPLE(args, "ifffI", &self->settings.convention, &self->settings.gain, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.rejectionTimeout);
+    const char *const error = PARSE_TUPLE(args, "ifffI", &self->settings.convention, &self->settings.gain, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.recoveryTriggerPeriod);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -85,27 +85,27 @@ static int settings_set_magnetic_rejection(Settings *self, PyObject *value, void
     return 0;
 }
 
-static PyObject *settings_get_rejection_timeout(Settings *self) {
-    return Py_BuildValue("I", self->settings.rejectionTimeout);
+static PyObject *settings_get_recovery_trigger_period(Settings *self) {
+    return Py_BuildValue("I", self->settings.recoveryTriggerPeriod);
 }
 
-static int settings_set_rejection_timeout(Settings *self, PyObject *value, void *closure) {
-    const unsigned int rejection_timeout = (unsigned int) PyFloat_AsDouble(value);
+static int settings_set_recovery_trigger_period(Settings *self, PyObject *value, void *closure) {
+    const unsigned int recovery_trigger_period = (unsigned int) PyFloat_AsDouble(value);
 
     if (PyErr_Occurred()) {
         return -1;
     }
 
-    self->settings.rejectionTimeout = rejection_timeout;
+    self->settings.recoveryTriggerPeriod = recovery_trigger_period;
     return 0;
 }
 
 static PyGetSetDef settings_get_set[] = {
-        {"convention",             (getter) settings_get_convention,             (setter) settings_set_convention,             "", NULL},
-        {"gain",                   (getter) settings_get_gain,                   (setter) settings_set_gain,                   "", NULL},
-        {"acceleration_rejection", (getter) settings_get_acceleration_rejection, (setter) settings_set_acceleration_rejection, "", NULL},
-        {"magnetic_rejection",     (getter) settings_get_magnetic_rejection,     (setter) settings_set_magnetic_rejection,     "", NULL},
-        {"rejection_timeout",      (getter) settings_get_rejection_timeout,      (setter) settings_set_rejection_timeout,      "", NULL},
+        {"convention",              (getter) settings_get_convention,              (setter) settings_set_convention,              "", NULL},
+        {"gain",                    (getter) settings_get_gain,                    (setter) settings_set_gain,                    "", NULL},
+        {"acceleration_rejection",  (getter) settings_get_acceleration_rejection,  (setter) settings_set_acceleration_rejection,  "", NULL},
+        {"magnetic_rejection",      (getter) settings_get_magnetic_rejection,      (setter) settings_set_magnetic_rejection,      "", NULL},
+        {"recovery_trigger_period", (getter) settings_get_recovery_trigger_period, (setter) settings_set_recovery_trigger_period, "", NULL},
         {NULL}  /* sentinel */
 };
 

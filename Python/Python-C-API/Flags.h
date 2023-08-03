@@ -18,28 +18,18 @@ static PyObject *flags_get_initialising(Flags *self) {
     return build_bool(self->flags.initialising);
 }
 
-static PyObject *flags_get_acceleration_rejection_warning(Flags *self) {
-    return build_bool(self->flags.accelerationRejectionWarning);
+static PyObject *flags_get_acceleration_recovery(Flags *self) {
+    return build_bool(self->flags.accelerationRecovery);
 }
 
-static PyObject *flags_get_acceleration_rejection_timeout(Flags *self) {
-    return build_bool(self->flags.accelerationRejectionTimeout);
-}
-
-static PyObject *flags_get_magnetic_rejection_warning(Flags *self) {
-    return build_bool(self->flags.magneticRejectionWarning);
-}
-
-static PyObject *flags_get_magnetic_rejection_timeout(Flags *self) {
-    return build_bool(self->flags.magneticRejectionTimeout);
+static PyObject *flags_get_magnetic_recovery(Flags *self) {
+    return build_bool(self->flags.magneticRecovery);
 }
 
 static PyGetSetDef flags_get_set[] = {
-        {"initialising",                   (getter) flags_get_initialising,                   NULL, "", NULL},
-        {"acceleration_rejection_warning", (getter) flags_get_acceleration_rejection_warning, NULL, "", NULL},
-        {"acceleration_rejection_timeout", (getter) flags_get_acceleration_rejection_timeout, NULL, "", NULL},
-        {"magnetic_rejection_warning",     (getter) flags_get_magnetic_rejection_warning,     NULL, "", NULL},
-        {"magnetic_rejection_timeout",     (getter) flags_get_magnetic_rejection_timeout,     NULL, "", NULL},
+        {"initialising",          (getter) flags_get_initialising,          NULL, "", NULL},
+        {"acceleration_recovery", (getter) flags_get_acceleration_recovery, NULL, "", NULL},
+        {"magnetic_recovery",     (getter) flags_get_magnetic_recovery,     NULL, "", NULL},
         {NULL}  /* sentinel */
 };
 
