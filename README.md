@@ -101,7 +101,7 @@ i<sub>c</sub> = Ms(i<sub>u</sub> - b)
 
 The `FusionCalibrationMagnetic` function applies magnetometer calibration parameters using the calibration model:
 
-m<sub>c</sub> = Sm<sub>u</sub> - h
+m<sub>c</sub> = S(m<sub>u</sub> - h)
 
 - m<sub>c</sub> is the calibrated magnetometer measurement and `return` value
 - m<sub>u</sub> is the uncalibrated magnetometer measurement and `uncalibrated` argument
