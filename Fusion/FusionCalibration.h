@@ -35,7 +35,7 @@ static inline FusionVector FusionCalibrationInertial(const FusionVector uncalibr
  * @return Calibrated measurement.
  */
 static inline FusionVector FusionCalibrationMagnetic(const FusionVector uncalibrated, const FusionMatrix softIronMatrix, const FusionVector hardIronOffset) {
-    return FusionVectorSubtract(FusionMatrixMultiplyVector(softIronMatrix, uncalibrated), hardIronOffset);
+    return FusionMatrixMultiplyVector(softIronMatrix, FusionVectorSubtract(uncalibrated, hardIronOffset));
 }
 
 #endif
