@@ -19,8 +19,9 @@ ahrs = imufusion.Ahrs()
 
 ahrs.settings = imufusion.Settings(imufusion.CONVENTION_NWU,  # convention
                                    0.5,  # gain
+                                   2000,  # gyroscope range
                                    10,  # acceleration rejection
-                                   20,  # magnetic rejection
+                                   10,  # magnetic rejection
                                    5 * sample_rate)  # recovery trigger period = 5 seconds
 
 # Process sensor data
@@ -28,7 +29,7 @@ delta_time = numpy.diff(timestamp, prepend=timestamp[0])
 
 euler = numpy.empty((len(timestamp), 3))
 internal_states = numpy.empty((len(timestamp), 6))
-flags = numpy.empty((len(timestamp), 3))
+flags = numpy.empty((len(timestamp), 4))
 
 for index in range(len(timestamp)):
     gyroscope[index] = offset.update(gyroscope[index])
@@ -47,6 +48,7 @@ for index in range(len(timestamp)):
 
     ahrs_flags = ahrs.flags
     flags[index] = numpy.array([ahrs_flags.initialising,
+                                ahrs_flags.angular_rate_recovery,
                                 ahrs_flags.acceleration_recovery,
                                 ahrs_flags.magnetic_recovery])
 
@@ -60,7 +62,7 @@ def plot_bool(axis, x, y, label):
 
 
 # Plot Euler angles
-figure, axes = pyplot.subplots(nrows=10, sharex=True, gridspec_kw={"height_ratios": [6, 1, 2, 1, 1, 1, 2, 1, 1, 1]})
+figure, axes = pyplot.subplots(nrows=11, sharex=True, gridspec_kw={"height_ratios": [6, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1]})
 
 figure.suptitle("Euler angles, internal states, and flags")
 
@@ -74,33 +76,36 @@ axes[0].legend()
 # Plot initialising flag
 plot_bool(axes[1], timestamp, flags[:, 0], "Initialising")
 
+# Plot angular rate recovery flag
+plot_bool(axes[2], timestamp, flags[:, 1], "Angular rate recovery")
+
 # Plot acceleration rejection internal states and flags
-axes[2].plot(timestamp, internal_states[:, 0], "tab:olive", label="Acceleration error")
-axes[2].set_ylabel("Degrees")
-axes[2].grid()
-axes[2].legend()
+axes[3].plot(timestamp, internal_states[:, 0], "tab:olive", label="Acceleration error")
+axes[3].set_ylabel("Degrees")
+axes[3].grid()
+axes[3].legend()
 
-plot_bool(axes[3], timestamp, internal_states[:, 1], "Accelerometer ignored")
+plot_bool(axes[4], timestamp, internal_states[:, 1], "Accelerometer ignored")
 
-axes[4].plot(timestamp, internal_states[:, 2], "tab:orange", label="Acceleration recovery trigger")
-axes[4].grid()
-axes[4].legend()
+axes[5].plot(timestamp, internal_states[:, 2], "tab:orange", label="Acceleration recovery trigger")
+axes[5].grid()
+axes[5].legend()
 
-plot_bool(axes[5], timestamp, flags[:, 1], "Acceleration recovery")
+plot_bool(axes[6], timestamp, flags[:, 2], "Acceleration recovery")
 
 # Plot magnetic rejection internal states and flags
-axes[6].plot(timestamp, internal_states[:, 3], "tab:olive", label="Magnetic error")
-axes[6].set_ylabel("Degrees")
-axes[6].grid()
-axes[6].legend()
+axes[7].plot(timestamp, internal_states[:, 3], "tab:olive", label="Magnetic error")
+axes[7].set_ylabel("Degrees")
+axes[7].grid()
+axes[7].legend()
 
-plot_bool(axes[7], timestamp, internal_states[:, 4], "Magnetometer ignored")
+plot_bool(axes[8], timestamp, internal_states[:, 4], "Magnetometer ignored")
 
-axes[8].plot(timestamp, internal_states[:, 5], "tab:orange", label="Magnetic recovery trigger")
-axes[8].grid()
-axes[8].legend()
+axes[9].plot(timestamp, internal_states[:, 5], "tab:orange", label="Magnetic recovery trigger")
+axes[9].grid()
+axes[9].legend()
 
-plot_bool(axes[9], timestamp, flags[:, 2], "Magnetic recovery")
+plot_bool(axes[10], timestamp, flags[:, 3], "Magnetic recovery")
 
 if len(sys.argv) == 1:  # don't show plots when script run by CI
     pyplot.show()

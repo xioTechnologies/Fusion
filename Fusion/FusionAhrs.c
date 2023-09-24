@@ -47,6 +47,7 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
     const FusionAhrsSettings settings = {
             .convention = FusionConventionNwu,
             .gain = 0.5f,
+            .gyroscopeRange = 0.0f,
             .accelerationRejection = 90.0f,
             .magneticRejection = 90.0f,
             .recoveryTriggerPeriod = 0,
@@ -65,6 +66,7 @@ void FusionAhrsReset(FusionAhrs *const ahrs) {
     ahrs->accelerometer = FUSION_VECTOR_ZERO;
     ahrs->initialising = true;
     ahrs->rampedGain = INITIAL_GAIN;
+    ahrs->angularRateRecovery = false;
     ahrs->halfAccelerometerFeedback = FUSION_VECTOR_ZERO;
     ahrs->halfMagnetometerFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = false;
@@ -83,12 +85,13 @@ void FusionAhrsReset(FusionAhrs *const ahrs) {
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings) {
     ahrs->settings.convention = settings->convention;
     ahrs->settings.gain = settings->gain;
+    ahrs->settings.gyroscopeRange = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
     ahrs->settings.accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
     ahrs->settings.magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
     ahrs->settings.recoveryTriggerPeriod = settings->recoveryTriggerPeriod;
     ahrs->accelerationRecoveryTimeout = ahrs->settings.recoveryTriggerPeriod;
     ahrs->magneticRecoveryTimeout = ahrs->settings.recoveryTriggerPeriod;
-    if ((settings->gain == 0.0f) || (settings->recoveryTriggerPeriod == 0)) {
+    if ((settings->gain == 0.0f) || (settings->recoveryTriggerPeriod == 0)) { // disable acceleration and magnetic rejection features if gain is zero
         ahrs->settings.accelerationRejection = FLT_MAX;
         ahrs->settings.magneticRejection = FLT_MAX;
     }
@@ -113,12 +116,21 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     // Store accelerometer
     ahrs->accelerometer = accelerometer;
 
+    // Reinitialise if gyroscope range exceeded
+    if ((fabs(gyroscope.axis.x) > ahrs->settings.gyroscopeRange) || (fabs(gyroscope.axis.y) > ahrs->settings.gyroscopeRange) || (fabs(gyroscope.axis.z) > ahrs->settings.gyroscopeRange)) {
+        const FusionQuaternion quaternion = ahrs->quaternion;
+        FusionAhrsReset(ahrs);
+        ahrs->quaternion = quaternion;
+        ahrs->angularRateRecovery = true;
+    }
+
     // Ramp down gain during initialisation
     if (ahrs->initialising == true) {
         ahrs->rampedGain -= ahrs->rampedGainStep * deltaTime;
         if ((ahrs->rampedGain < ahrs->settings.gain) || (ahrs->settings.gain == 0.0f)) {
             ahrs->rampedGain = ahrs->settings.gain;
             ahrs->initialising = false;
+            ahrs->angularRateRecovery = false;
         }
     }
 
@@ -461,6 +473,7 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
 FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
     const FusionAhrsFlags flags = {
             .initialising = ahrs->initialising,
+            .angularRateRecovery = ahrs->angularRateRecovery,
             .accelerationRecovery = ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryTimeout,
             .magneticRecovery= ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryTimeout,
     };

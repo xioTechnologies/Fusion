@@ -18,6 +18,10 @@ static PyObject *flags_get_initialising(Flags *self) {
     return build_bool(self->flags.initialising);
 }
 
+static PyObject *flags_get_angular_rate_recovery(Flags *self) {
+    return build_bool(self->flags.angularRateRecovery);
+}
+
 static PyObject *flags_get_acceleration_recovery(Flags *self) {
     return build_bool(self->flags.accelerationRecovery);
 }
@@ -28,6 +32,7 @@ static PyObject *flags_get_magnetic_recovery(Flags *self) {
 
 static PyGetSetDef flags_get_set[] = {
         {"initialising",          (getter) flags_get_initialising,          NULL, "", NULL},
+        {"angular_rate_recovery", (getter) flags_get_angular_rate_recovery, NULL, "", NULL},
         {"acceleration_recovery", (getter) flags_get_acceleration_recovery, NULL, "", NULL},
         {"magnetic_recovery",     (getter) flags_get_magnetic_recovery,     NULL, "", NULL},
         {NULL}  /* sentinel */
