@@ -13,7 +13,7 @@ typedef struct {
 static PyObject *settings_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     Settings *const self = (Settings *) subtype->tp_alloc(subtype, 0);
 
-    const char *const error = PARSE_TUPLE(args, "ifffI", &self->settings.convention, &self->settings.gain, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.recoveryTriggerPeriod);
+    const char *const error = PARSE_TUPLE(args, "iffffI", &self->settings.convention, &self->settings.gain, &self->settings.gyroscopeRange, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.recoveryTriggerPeriod);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -52,6 +52,21 @@ static int settings_set_gain(Settings *self, PyObject *value, void *closure) {
     }
 
     self->settings.gain = gain;
+    return 0;
+}
+
+static PyObject *settings_get_gyroscope_range(Settings *self) {
+    return Py_BuildValue("f", self->settings.gyroscopeRange);
+}
+
+static int settings_set_gyroscope_range(Settings *self, PyObject *value, void *closure) {
+    const float gyroscope_range = (float) PyFloat_AsDouble(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    self->settings.gyroscopeRange = gyroscope_range;
     return 0;
 }
 
@@ -103,6 +118,7 @@ static int settings_set_recovery_trigger_period(Settings *self, PyObject *value,
 static PyGetSetDef settings_get_set[] = {
         {"convention",              (getter) settings_get_convention,              (setter) settings_set_convention,              "", NULL},
         {"gain",                    (getter) settings_get_gain,                    (setter) settings_set_gain,                    "", NULL},
+        {"gyroscope_range",         (getter) settings_get_gyroscope_range,         (setter) settings_set_gyroscope_range,         "", NULL},
         {"acceleration_rejection",  (getter) settings_get_acceleration_rejection,  (setter) settings_set_acceleration_rejection,  "", NULL},
         {"magnetic_rejection",      (getter) settings_get_magnetic_rejection,      (setter) settings_set_magnetic_rejection,      "", NULL},
         {"recovery_trigger_period", (getter) settings_get_recovery_trigger_period, (setter) settings_set_recovery_trigger_period, "", NULL},

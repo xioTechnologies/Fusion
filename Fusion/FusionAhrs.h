@@ -24,6 +24,7 @@
 typedef struct {
     FusionConvention convention;
     float gain;
+    float gyroscopeRange;
     float accelerationRejection;
     float magneticRejection;
     unsigned int recoveryTriggerPeriod;
@@ -40,6 +41,7 @@ typedef struct {
     bool initialising;
     float rampedGain;
     float rampedGainStep;
+    bool angularRateRecovery;
     FusionVector halfAccelerometerFeedback;
     FusionVector halfMagnetometerFeedback;
     bool accelerometerIgnored;
@@ -67,6 +69,7 @@ typedef struct {
  */
 typedef struct {
     bool initialising;
+    bool angularRateRecovery;
     bool accelerationRecovery;
     bool magneticRecovery;
 } FusionAhrsFlags;

@@ -28,8 +28,9 @@ int main() {
     const FusionAhrsSettings settings = {
             .convention = FusionConventionNwu,
             .gain = 0.5f,
+            .gyroscopeRange = 2000.0f, /* replace this with actual gyroscope range in degrees/s */
             .accelerationRejection = 10.0f,
-            .magneticRejection = 20.0f,
+            .magneticRejection = 10.0f,
             .recoveryTriggerPeriod = 5 * SAMPLE_RATE, /* 5 seconds */
     };
     FusionAhrsSetSettings(&ahrs, &settings);

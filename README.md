@@ -18,7 +18,11 @@ The algorithm calculates the orientation as the integration of the gyroscope sum
 
 ### Initialisation
 
-Initialisation occurs when the algorithm starts for the first time.  During initialisation, the acceleration and magnetic rejection features are disabled and the gain is ramped down from 10 to the final value over a 3 second period.  This allows the measurement of orientation to rapidly converges from an arbitrary initial value to the value indicated by the sensors.  The algorithm outputs should be regarded as unreliable during initialisation.
+Initialisation occurs when the algorithm starts for the first time and during angular rate recovery.  During initialisation, the acceleration and magnetic rejection features are disabled and the gain is ramped down from 10 to the final value over a 3 second period.  This allows the measurement of orientation to rapidly converge from an arbitrary initial value to the value indicated by the sensors.
+
+### Angular rate recovery
+
+Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery.  Angular rate recovery is activated when the angular rate exceeds the 98% of the gyroscope measurement range and equivalent to a reinitialisation of the algorithm. 
 
 ### Acceleration rejection
 
@@ -38,13 +42,14 @@ The algorithm provides three outputs: quaternion, linear acceleration, and Earth
 
 The AHRS algorithm settings are defined by the `FusionAhrsSettings` structure and set using the `FusionAhrsSetSettings` function.
 
-| Setting                 | Description                                                                                                                                                                                                                   |
-|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `convention`            | Earth axes convention (NWD, ENU, or NED).                                                                                                                                                                                     |
-| `gain`                  | Determines the influence of the gyroscope relative to other sensors.  A value of zero will disable initialisation and the acceleration and magnetic rejection features.  A value of 0.5 is appropriate for most applications. |
-| `accelerationRejection` | Threshold (in degrees) used by the acceleration rejection feature.  A value of zero will disable this feature.  A value of 10 degrees is appropriate for most applications.                                                   |
-| `magneticRejection`     | Threshold (in degrees) used by the magnetic rejection feature.  A value of zero will disable the feature. A value of 10 degrees is appropriate for most applications.                                                         |
-| `recoveryTriggerPeriod` | Acceleration and magnetic recovery trigger period (in samples).  A value of zero will disable the acceleration and magnetic rejection features.  A period of 5 seconds is appropriate for most applications.                  |
+| Setting                 | Description                                                                                                                                                                                                                                                  |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `convention`            | Earth axes convention (NWD, ENU, or NED).                                                                                                                                                                                                                    |
+| `gain`                  | Determines the influence of the gyroscope relative to other sensors.  A value of zero will disable initialisation and the acceleration and magnetic rejection features.  A value of 0.5 is appropriate for most applications.                                |
+| `gyroscopeRange`        | Gyroscope range (in degrees pe second).  Angular rate recovery will activate if the gyroscope measurement exceeds 98% of this value.  A value of zero will disable this feature.  The value should be set to the range specified in the gyroscope datasheet. |
+| `accelerationRejection` | Threshold (in degrees) used by the acceleration rejection feature.  A value of zero will disable this feature.  A value of 10 degrees is appropriate for most applications.                                                                                  |
+| `magneticRejection`     | Threshold (in degrees) used by the magnetic rejection feature.  A value of zero will disable the feature. A value of 10 degrees is appropriate for most applications.                                                                                        |
+| `recoveryTriggerPeriod` | Acceleration and magnetic recovery trigger period (in samples).  A value of zero will disable the acceleration and magnetic rejection features.  A period of 5 seconds is appropriate for most applications.                                                 |
 
 ### Algorithm internal states
 
@@ -66,6 +71,7 @@ The AHRS algorithm flags are defined by the `FusionAhrsFlags` structure and obta
 | Flag                   | Description                                |
 |------------------------|--------------------------------------------|
 | `initialising`         | `true` if the algorithm is initialising.   |
+| `angularRateRecovery`  | `true` if angular rate recovery is active. |
 | `accelerationRecovery` | `true` if acceleration recovery is active. |
 | `magneticRecovery`     | `true` if a magnetic recovery is active.   |
 
