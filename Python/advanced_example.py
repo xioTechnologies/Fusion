@@ -107,5 +107,4 @@ axes[9].legend()
 
 plot_bool(axes[10], timestamp, flags[:, 3], "Magnetic recovery")
 
-if len(sys.argv) == 1:  # don't show plots when script run by CI
-    pyplot.show()
+pyplot.show(block="no_block" not in sys.argv)  # don't block when script run by CI

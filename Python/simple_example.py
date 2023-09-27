@@ -47,5 +47,4 @@ axes[2].set_ylabel("Degrees")
 axes[2].grid()
 axes[2].legend()
 
-if len(sys.argv) == 1:  # don't show plots when script run by CI
-    pyplot.show()
+pyplot.show(block="no_block" not in sys.argv)  # don't block when script run by CI
