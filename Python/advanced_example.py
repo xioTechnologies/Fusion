@@ -1,7 +1,6 @@
 import imufusion
 import matplotlib.pyplot as pyplot
 import numpy
-import sys
 
 # Import sensor data
 data = numpy.genfromtxt("sensor_data.csv", delimiter=",", skip_header=1)
@@ -107,5 +106,4 @@ axes[9].legend()
 
 plot_bool(axes[10], timestamp, flags[:, 3], "Magnetic recovery")
 
-if len(sys.argv) == 1:  # don't show plots when script run by CI
-    pyplot.show()
+pyplot.show()
