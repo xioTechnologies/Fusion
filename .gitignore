@@ -1,2 +1,7 @@
 .idea
 cmake-build-debug
+
+__pycache__/
+build/
+dist/
+imufusion.egg-info/
