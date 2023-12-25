@@ -38,7 +38,7 @@ static void quaternion_free(Quaternion *self) {
     Py_TYPE(self)->tp_free(self);
 }
 
-static PyObject *quaternion_get_array(Quaternion *self) {
+static PyObject *quaternion_get_wxyz(Quaternion *self) {
     const npy_intp dims[] = {4};
     return PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->quaternion.array);
 }
@@ -80,11 +80,11 @@ static PyObject *quaternion_to_euler(Quaternion *self, PyObject *args) {
 }
 
 static PyGetSetDef quaternion_get_set[] = {
-        {"array", (getter) quaternion_get_array, NULL, "", NULL},
-        {"w",     (getter) quaternion_get_w,     NULL, "", NULL},
-        {"x",     (getter) quaternion_get_x,     NULL, "", NULL},
-        {"y",     (getter) quaternion_get_y,     NULL, "", NULL},
-        {"z",     (getter) quaternion_get_z,     NULL, "", NULL},
+        {"wxyz", (getter) quaternion_get_wxyz, NULL, "", NULL},
+        {"w",    (getter) quaternion_get_w,    NULL, "", NULL},
+        {"x",    (getter) quaternion_get_x,    NULL, "", NULL},
+        {"y",    (getter) quaternion_get_y,    NULL, "", NULL},
+        {"z",    (getter) quaternion_get_z,    NULL, "", NULL},
         {NULL}  /* sentinel */
 };
 
