@@ -79,7 +79,7 @@ plot_bool(axes[1], timestamp, flags[:, 0], "Initialising")
 # Plot angular rate recovery flag
 plot_bool(axes[2], timestamp, flags[:, 1], "Angular rate recovery")
 
-# Plot acceleration rejection internal states and flags
+# Plot acceleration rejection internal states and flag
 axes[3].plot(timestamp, internal_states[:, 0], "tab:olive", label="Acceleration error")
 axes[3].set_ylabel("Degrees")
 axes[3].grid()
@@ -93,7 +93,7 @@ axes[5].legend()
 
 plot_bool(axes[6], timestamp, flags[:, 2], "Acceleration recovery")
 
-# Plot magnetic rejection internal states and flags
+# Plot magnetic rejection internal states and flag
 axes[7].plot(timestamp, internal_states[:, 3], "tab:olive", label="Magnetic error")
 axes[7].set_ylabel("Degrees")
 axes[7].grid()
