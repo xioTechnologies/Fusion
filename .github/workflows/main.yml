@@ -53,9 +53,11 @@ jobs:
           CIBW_BEFORE_TEST: pip install numpy matplotlib
           CIBW_TEST_COMMAND: cd {project}/Python && python advanced_example.py no_block && python simple_example.py no_block
           CIBW_TEST_COMMAND_WINDOWS: cd /D {project}/Python && python advanced_example.py no_block && python simple_example.py no_block
+          CIBW_TEST_SKIP: "*-macosx_arm64" # fix CI warning
 
       - uses: actions/upload-artifact@v3
         with:
+          name: artifacts
           path: wheelhouse/*
 
   build_sdist:
@@ -79,6 +81,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
+          name: artifacts
           path: dist/*
 
   publish:
@@ -89,6 +92,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
+          name: artifacts
           path: artifacts
 
       - name: Install dependencies
