@@ -125,7 +125,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     }
 
     // Ramp down gain during initialisation
-    if (ahrs->initialising == true) {
+    if (ahrs->initialising) {
         ahrs->rampedGain -= ahrs->rampedGainStep * deltaTime;
         if ((ahrs->rampedGain < ahrs->settings.gain) || (ahrs->settings.gain == 0.0f)) {
             ahrs->rampedGain = ahrs->settings.gain;
@@ -146,7 +146,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         ahrs->halfAccelerometerFeedback = Feedback(FusionVectorNormalise(accelerometer), halfGravity);
 
         // Don't ignore accelerometer if acceleration error below threshold
-        if ((ahrs->initialising == true) || ((FusionVectorMagnitudeSquared(ahrs->halfAccelerometerFeedback) <= ahrs->settings.accelerationRejection))) {
+        if (ahrs->initialising || ((FusionVectorMagnitudeSquared(ahrs->halfAccelerometerFeedback) <= ahrs->settings.accelerationRejection))) {
             ahrs->accelerometerIgnored = false;
             ahrs->accelerationRecoveryTrigger -= 9;
         } else {
@@ -180,7 +180,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         ahrs->halfMagnetometerFeedback = Feedback(FusionVectorNormalise(FusionVectorCrossProduct(halfGravity, magnetometer)), halfMagnetic);
 
         // Don't ignore magnetometer if magnetic error below threshold
-        if ((ahrs->initialising == true) || ((FusionVectorMagnitudeSquared(ahrs->halfMagnetometerFeedback) <= ahrs->settings.magneticRejection))) {
+        if (ahrs->initialising || ((FusionVectorMagnitudeSquared(ahrs->halfMagnetometerFeedback) <= ahrs->settings.magneticRejection))) {
             ahrs->magnetometerIgnored = false;
             ahrs->magneticRecoveryTrigger -= 9;
         } else {
@@ -327,7 +327,7 @@ void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector g
     FusionAhrsUpdate(ahrs, gyroscope, accelerometer, FUSION_VECTOR_ZERO, deltaTime);
 
     // Zero heading during initialisation
-    if (ahrs->initialising == true) {
+    if (ahrs->initialising) {
         FusionAhrsSetHeading(ahrs, 0.0f);
     }
 }
