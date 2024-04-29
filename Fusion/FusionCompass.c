@@ -41,6 +41,8 @@ float FusionCompassCalculateHeading(const FusionConvention convention, const Fus
             const FusionVector north = FusionVectorNormalise(FusionVectorCrossProduct(west, up));
             return FusionRadiansToDegrees(atan2f(west.axis.x, north.axis.x));
         }
+        default:
+            break;
     }
     return 0; // avoid compiler warning
 }

@@ -241,6 +241,8 @@ static inline FusionVector HalfGravity(const FusionAhrs *const ahrs) {
             }}; // third column of transposed rotation matrix scaled by -0.5
             return halfGravity;
         }
+        default:
+            break;
     }
     return FUSION_VECTOR_ZERO; // avoid compiler warning
 #undef Q
@@ -278,6 +280,8 @@ static inline FusionVector HalfMagnetic(const FusionAhrs *const ahrs) {
             }}; // second column of transposed rotation matrix scaled by -0.5
             return halfMagnetic;
         }
+        default:
+            break;
     }
     return FUSION_VECTOR_ZERO; // avoid compiler warning
 #undef Q
@@ -404,6 +408,8 @@ FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
         case FusionConventionNed: {
             return FusionVectorAdd(ahrs->accelerometer, gravity);
         }
+        default:
+            break;
     }
     return FUSION_VECTOR_ZERO; // avoid compiler warning
 #undef Q
@@ -441,6 +447,8 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
             break;
         case FusionConventionNed:
             accelerometer.axis.z += 1.0f;
+            break;
+        default:
             break;
     }
     return accelerometer;
