@@ -10,7 +10,7 @@
 
 #include <float.h> // FLT_MAX
 #include "FusionAhrs.h"
-#include <math.h> // atan2f, cosf, powf, sinf
+#include <math.h> // atan2f, cosf, fabsf, powf, sinf
 
 //------------------------------------------------------------------------------
 // Definitions
@@ -117,7 +117,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     ahrs->accelerometer = accelerometer;
 
     // Reinitialise if gyroscope range exceeded
-    if ((fabs(gyroscope.axis.x) > ahrs->settings.gyroscopeRange) || (fabs(gyroscope.axis.y) > ahrs->settings.gyroscopeRange) || (fabs(gyroscope.axis.z) > ahrs->settings.gyroscopeRange)) {
+    if ((fabsf(gyroscope.axis.x) > ahrs->settings.gyroscopeRange) || (fabsf(gyroscope.axis.y) > ahrs->settings.gyroscopeRange) || (fabsf(gyroscope.axis.z) > ahrs->settings.gyroscopeRange)) {
         const FusionQuaternion quaternion = ahrs->quaternion;
         FusionAhrsReset(ahrs);
         ahrs->quaternion = quaternion;
