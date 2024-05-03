@@ -31,9 +31,7 @@ setup(name="imufusion",
       author="x-io Technologies Limited",
       author_email="info@x-io.co.uk",
       license="MIT",
-      classifiers=["Programming Language :: Python :: 3.8",
-                   "Programming Language :: Python :: 3.9",
-                   "Programming Language :: Python :: 3.10",
+      classifiers=["Programming Language :: Python :: 3.10",
                    "Programming Language :: Python :: 3.11",
                    "Programming Language :: Python :: 3.12"],  # versions shown by pyversions badge in README
       ext_modules=[ext_modules])
