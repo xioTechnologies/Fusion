@@ -1,17 +1,17 @@
 import imufusion
-import matplotlib.pyplot as pyplot
-import numpy
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
 
 # Import sensor data
-data = numpy.genfromtxt("sensor_data.csv", delimiter=",", skip_header=1)
+data = np.genfromtxt("sensor_data.csv", delimiter=",", skip_header=1)
 
 timestamp = data[:, 0]
 gyroscope = data[:, 1:4]
 accelerometer = data[:, 4:7]
 
 # Plot sensor data
-_, axes = pyplot.subplots(nrows=3, sharex=True)
+_, axes = plt.subplots(nrows=3, sharex=True)
 
 axes[0].plot(timestamp, gyroscope[:, 0], "tab:red", label="X")
 axes[0].plot(timestamp, gyroscope[:, 1], "tab:green", label="Y")
@@ -31,7 +31,7 @@ axes[1].legend()
 
 # Process sensor data
 ahrs = imufusion.Ahrs()
-euler = numpy.empty((len(timestamp), 3))
+euler = np.empty((len(timestamp), 3))
 
 for index in range(len(timestamp)):
     ahrs.update_no_magnetometer(gyroscope[index], accelerometer[index], 1 / 100)  # 100 Hz sample rate
@@ -47,4 +47,4 @@ axes[2].set_ylabel("Degrees")
 axes[2].grid()
 axes[2].legend()
 
-pyplot.show(block="no_block" not in sys.argv)  # don't block when script run by CI
+plt.show(block="no_block" not in sys.argv)  # don't block when script run by CI

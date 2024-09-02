@@ -1,10 +1,10 @@
 import imufusion
-import matplotlib.pyplot as pyplot
-import numpy
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
 
 # Import sensor data
-data = numpy.genfromtxt("sensor_data.csv", delimiter=",", skip_header=1)
+data = np.genfromtxt("sensor_data.csv", delimiter=",", skip_header=1)
 
 sample_rate = 100  # 100 Hz
 
@@ -17,19 +17,21 @@ magnetometer = data[:, 7:10]
 offset = imufusion.Offset(sample_rate)
 ahrs = imufusion.Ahrs()
 
-ahrs.settings = imufusion.Settings(imufusion.CONVENTION_NWU,  # convention
-                                   0.5,  # gain
-                                   2000,  # gyroscope range
-                                   10,  # acceleration rejection
-                                   10,  # magnetic rejection
-                                   5 * sample_rate)  # recovery trigger period = 5 seconds
+ahrs.settings = imufusion.Settings(
+    imufusion.CONVENTION_NWU,  # convention
+    0.5,  # gain
+    2000,  # gyroscope range
+    10,  # acceleration rejection
+    10,  # magnetic rejection
+    5 * sample_rate,  # recovery trigger period = 5 seconds
+)
 
 # Process sensor data
-delta_time = numpy.diff(timestamp, prepend=timestamp[0])
+delta_time = np.diff(timestamp, prepend=timestamp[0])
 
-euler = numpy.empty((len(timestamp), 3))
-internal_states = numpy.empty((len(timestamp), 6))
-flags = numpy.empty((len(timestamp), 4))
+euler = np.empty((len(timestamp), 3))
+internal_states = np.empty((len(timestamp), 6))
+flags = np.empty((len(timestamp), 4))
 
 for index in range(len(timestamp)):
     gyroscope[index] = offset.update(gyroscope[index])
@@ -39,30 +41,38 @@ for index in range(len(timestamp)):
     euler[index] = ahrs.quaternion.to_euler()
 
     ahrs_internal_states = ahrs.internal_states
-    internal_states[index] = numpy.array([ahrs_internal_states.acceleration_error,
-                                          ahrs_internal_states.accelerometer_ignored,
-                                          ahrs_internal_states.acceleration_recovery_trigger,
-                                          ahrs_internal_states.magnetic_error,
-                                          ahrs_internal_states.magnetometer_ignored,
-                                          ahrs_internal_states.magnetic_recovery_trigger])
+    internal_states[index] = np.array(
+        [
+            ahrs_internal_states.acceleration_error,
+            ahrs_internal_states.accelerometer_ignored,
+            ahrs_internal_states.acceleration_recovery_trigger,
+            ahrs_internal_states.magnetic_error,
+            ahrs_internal_states.magnetometer_ignored,
+            ahrs_internal_states.magnetic_recovery_trigger,
+        ]
+    )
 
     ahrs_flags = ahrs.flags
-    flags[index] = numpy.array([ahrs_flags.initialising,
-                                ahrs_flags.angular_rate_recovery,
-                                ahrs_flags.acceleration_recovery,
-                                ahrs_flags.magnetic_recovery])
+    flags[index] = np.array(
+        [
+            ahrs_flags.initialising,
+            ahrs_flags.angular_rate_recovery,
+            ahrs_flags.acceleration_recovery,
+            ahrs_flags.magnetic_recovery,
+        ]
+    )
 
 
 def plot_bool(axis, x, y, label):
     axis.plot(x, y, "tab:cyan", label=label)
-    pyplot.sca(axis)
-    pyplot.yticks([0, 1], ["False", "True"])
+    plt.sca(axis)
+    plt.yticks([0, 1], ["False", "True"])
     axis.grid()
     axis.legend()
 
 
 # Plot Euler angles
-figure, axes = pyplot.subplots(nrows=11, sharex=True, gridspec_kw={"height_ratios": [6, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1]})
+figure, axes = plt.subplots(nrows=11, sharex=True, gridspec_kw={"height_ratios": [6, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1]})
 
 figure.suptitle("Euler angles, internal states, and flags")
 
@@ -107,4 +117,4 @@ axes[9].legend()
 
 plot_bool(axes[10], timestamp, flags[:, 3], "Magnetic recovery")
 
-pyplot.show(block="no_block" not in sys.argv)  # don't block when script run by CI
+plt.show(block="no_block" not in sys.argv)  # don't block when script run by CI
