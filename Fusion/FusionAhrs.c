@@ -380,38 +380,43 @@ void FusionAhrsSetQuaternion(FusionAhrs *const ahrs, const FusionQuaternion quat
 }
 
 /**
- * @brief Returns the linear acceleration measurement equal to the accelerometer
- * measurement with the 1 g of gravity removed.
+ * @brief Returns the direction of gravity in the sensor coordinate frame.
  * @param ahrs AHRS algorithm structure.
- * @return Linear acceleration measurement in g.
+ * @return Direction of gravity in the sensor coordinate frame.
  */
-FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
+FusionVector FusionAhrsGetGravity(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
-
-    // Calculate gravity in the sensor coordinate frame
     const FusionVector gravity = {.axis = {
             .x = 2.0f * (Q.x * Q.z - Q.w * Q.y),
             .y = 2.0f * (Q.y * Q.z + Q.w * Q.x),
             .z = 2.0f * (Q.w * Q.w - 0.5f + Q.z * Q.z),
     }}; // third column of transposed rotation matrix
-
-    // Remove gravity from accelerometer measurement
-    switch (ahrs->settings.convention) {
-        case FusionConventionNwu:
-        case FusionConventionEnu: {
-            return FusionVectorSubtract(ahrs->accelerometer, gravity);
-        }
-        case FusionConventionNed: {
-            return FusionVectorAdd(ahrs->accelerometer, gravity);
-        }
-    }
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
+    return gravity;
 #undef Q
 }
 
 /**
+ * @brief Returns the linear acceleration measurement equal to the accelerometer
+ * measurement with gravity removed.
+ * @param ahrs AHRS algorithm structure.
+ * @return Linear acceleration measurement in g.
+ */
+FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
+    switch (ahrs->settings.convention) {
+        case FusionConventionNwu:
+        case FusionConventionEnu: {
+            return FusionVectorSubtract(ahrs->accelerometer, FusionAhrsGetGravity(ahrs));
+        }
+        case FusionConventionNed: {
+            return FusionVectorAdd(ahrs->accelerometer, FusionAhrsGetGravity(ahrs));
+        }
+    }
+    return FUSION_VECTOR_ZERO; // avoid compiler warning
+}
+
+/**
  * @brief Returns the Earth acceleration measurement equal to accelerometer
- * measurement in the Earth coordinate frame with the 1 g of gravity removed.
+ * measurement in the Earth coordinate frame with gravity removed.
  * @param ahrs AHRS algorithm structure.
  * @return Earth acceleration measurement in g.
  */
