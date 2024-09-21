@@ -21,7 +21,7 @@ jobs:
           - [ ubuntu-latest, manylinux_x86_64 ]
           - [ windows-latest, win_amd64 ]
 
-        python-version: [ "cp310-", "cp311-", "cp312-" ]
+        python-version: [ "cp38-", "cp39-", "cp310-", "cp311-", "cp312-" ]
 
     steps:
       - uses: actions/checkout@v4

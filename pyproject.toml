@@ -9,7 +9,9 @@ description = "Fusion Python package"
 readme = { text = "See [github](https://github.com/xioTechnologies/Fusion) for documentation and examples.", content-type = "text/markdown" }
 authors = [{ name = "x-io Technologies Limited", email = "info@x-io.co.uk" }]
 license = { file = "LICENSE.md" }
-classifiers = ["Programming Language :: Python :: 3.10",
+classifiers = ["Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12"] # versions shown by pyversions badge in README
 
