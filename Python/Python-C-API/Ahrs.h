@@ -52,6 +52,16 @@ static int ahrs_set_quaternion(Ahrs *self, PyObject *value, void *closure) {
     return 0;
 }
 
+static PyObject *ahrs_get_gravity(Ahrs *self) {
+    FusionVector *const gravity = malloc(sizeof(FusionVector));
+    *gravity = FusionAhrsGetGravity(&self->ahrs);
+
+    const npy_intp dims[] = {3};
+    PyObject *array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, gravity->array);
+    PyArray_ENABLEFLAGS((PyArrayObject *) array, NPY_ARRAY_OWNDATA);
+    return array;
+}
+
 static PyObject *ahrs_get_linear_acceleration(Ahrs *self) {
     FusionVector *const linear_acceleration = malloc(sizeof(FusionVector));
     *linear_acceleration = FusionAhrsGetLinearAcceleration(&self->ahrs);
@@ -204,6 +214,7 @@ static int ahrs_set_heading(Ahrs *self, PyObject *value, void *closure) {
 static PyGetSetDef ahrs_get_set[] = {
         {"settings", NULL,                                    (setter) ahrs_set_settings,   "", NULL},
         {"quaternion",          (getter) ahrs_get_quaternion, (setter) ahrs_set_quaternion, "", NULL},
+        {"gravity",             (getter) ahrs_get_gravity,             NULL,                "", NULL},
         {"linear_acceleration", (getter) ahrs_get_linear_acceleration, NULL,                "", NULL},
         {"earth_acceleration",  (getter) ahrs_get_earth_acceleration,  NULL,                "", NULL},
         {"internal_states",     (getter) ahrs_get_internal_states,     NULL,                "", NULL},
