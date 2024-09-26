@@ -40,7 +40,10 @@ static void quaternion_free(Quaternion *self) {
 
 static PyObject *quaternion_get_wxyz(Quaternion *self) {
     const npy_intp dims[] = {4};
-    return PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->quaternion.array);
+    PyObject* array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->quaternion.array);
+    Py_INCREF(self);
+    PyArray_SetBaseObject((PyArrayObject *) array, self);
+    return array;
 }
 
 static PyObject *quaternion_get_w(Quaternion *self) {
