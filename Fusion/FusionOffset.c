@@ -9,7 +9,7 @@
 // Includes
 
 #include "FusionOffset.h"
-#include <math.h> // fabsf
+#include <math.h>
 
 //------------------------------------------------------------------------------
 // Definitions

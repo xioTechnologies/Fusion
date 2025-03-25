@@ -10,7 +10,7 @@
 
 #include "FusionAxes.h"
 #include "FusionCompass.h"
-#include <math.h> // atan2f
+#include <math.h>
 
 //------------------------------------------------------------------------------
 // Functions

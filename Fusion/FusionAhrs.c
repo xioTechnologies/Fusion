@@ -8,9 +8,9 @@
 //------------------------------------------------------------------------------
 // Includes
 
-#include <float.h> // FLT_MAX
+#include <float.h>
 #include "FusionAhrs.h"
-#include <math.h> // atan2f, cosf, fabsf, powf, sinf
+#include <math.h>
 
 //------------------------------------------------------------------------------
 // Definitions
