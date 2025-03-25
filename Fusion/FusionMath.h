@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 // Includes
 
-#include <math.h> // M_PI, sqrtf, atan2f, asinf
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 
