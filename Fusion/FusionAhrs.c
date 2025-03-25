@@ -57,7 +57,7 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Resets the AHRS algorithm.  This is equivalent to reinitialising the
+ * @brief Resets the AHRS algorithm. This is equivalent to reinitialising the
  * algorithm while maintaining the current settings.
  * @param ahrs AHRS algorithm structure.
  */
@@ -487,7 +487,7 @@ FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
 
 /**
  * @brief Sets the heading of the orientation measurement provided by the AHRS
- * algorithm.  This function can be used to reset drift in heading when the AHRS
+ * algorithm. This function can be used to reset drift in heading when the AHRS
  * algorithm is being used without a magnetometer.
  * @param ahrs AHRS algorithm structure.
  * @param heading Heading angle in degrees.
