@@ -65,7 +65,7 @@ typedef union {
 } FusionMatrix;
 
 /**
- * @brief Euler angles.  Roll, pitch, and yaw correspond to rotations around
+ * @brief Euler angles. Roll, pitch, and yaw correspond to rotations around
  * X, Y, and Z respectively.
  */
 typedef union {
@@ -362,9 +362,9 @@ static inline FusionQuaternion FusionQuaternionMultiply(const FusionQuaternion q
 }
 
 /**
- * @brief Returns the multiplication of a quaternion with a vector.  This is a
+ * @brief Returns the multiplication of a quaternion with a vector. This is a
  * normal quaternion multiplication where the vector is treated a
- * quaternion with a W element value of zero.  The quaternion is post-
+ * quaternion with a W element value of zero. The quaternion is post-
  * multiplied by the vector.
  * @param quaternion Quaternion.
  * @param vector Vector.

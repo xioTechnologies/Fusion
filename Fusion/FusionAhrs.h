@@ -31,7 +31,7 @@ typedef struct {
 } FusionAhrsSettings;
 
 /**
- * @brief AHRS algorithm structure.  Structure members are used internally and
+ * @brief AHRS algorithm structure. Structure members are used internally and
  * must not be accessed by the application.
  */
 typedef struct {

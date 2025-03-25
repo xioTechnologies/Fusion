@@ -17,7 +17,7 @@
 // Definitions
 
 /**
- * @brief Gyroscope offset algorithm structure.  Structure members are used
+ * @brief Gyroscope offset algorithm structure. Structure members are used
  * internally and must not be accessed by the application.
  */
 typedef struct {
