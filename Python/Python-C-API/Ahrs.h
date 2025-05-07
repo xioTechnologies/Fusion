@@ -178,7 +178,10 @@ static PyObject *ahrs_update_batch(Ahrs *self, PyObject *args) {
         return NULL;
     }
     
+    npy_intp quaternion_dims[2] = { n, 4 };
     npy_intp dims[2] = { n, 3 };
+    PyObject *quaternion_array = PyArray_SimpleNew(2, quaternion_dims, NPY_FLOAT);
+    float *quaternion_data = (float *) PyArray_DATA((PyArrayObject *)quaternion_array);
     PyObject *euler_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
     float *euler_data = (float *) PyArray_DATA((PyArrayObject *)euler_array);
     PyObject *earth_accel_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
@@ -190,6 +193,7 @@ static PyObject *ahrs_update_batch(Ahrs *self, PyObject *args) {
     float *dt_data = (float *) PyArray_DATA(delta_time_array);
     
     FusionVector gyro_vec, accel_vec, mag_vec, earth_accel;
+    FusionQuaternion quaternion;
     FusionEuler euler;
 
     for (npy_intp i = 0; i < n; i++) {
@@ -202,9 +206,14 @@ static PyObject *ahrs_update_batch(Ahrs *self, PyObject *args) {
         float dt = dt_data[i];
         
         FusionAhrsUpdate(&self->ahrs, gyro_vec, accel_vec, mag_vec, dt);
-        
-        euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&self->ahrs));
+        quaternion = FusionAhrsGetQuaternion(&self->ahrs);
+        euler = FusionQuaternionToEuler(quaternion);
         earth_accel = FusionAhrsGetEarthAcceleration(&self->ahrs);
+
+        quaternion_data[i * 4 + 0] = quaternion.element.w;
+        quaternion_data[i * 4 + 1] = quaternion.element.x;
+        quaternion_data[i * 4 + 2] = quaternion.element.y;
+        quaternion_data[i * 4 + 3] = quaternion.element.z;
 
         euler_data[i * 3 + 0] = euler.angle.roll;
         euler_data[i * 3 + 1] = euler.angle.pitch;
@@ -215,9 +224,10 @@ static PyObject *ahrs_update_batch(Ahrs *self, PyObject *args) {
         earth_accel_data[i * 3 + 2] = earth_accel.axis.z;
     }
 
-    PyObject *result = PyTuple_New(2);
-    PyTuple_SET_ITEM(result, 0, euler_array);
-    PyTuple_SET_ITEM(result, 1, earth_accel_array);
+    PyObject *result = PyDict_New();
+    PyDict_SetItemString(result, "quaternion", quaternion_array);
+    PyDict_SetItemString(result, "euler", euler_array);
+    PyDict_SetItemString(result, "earth_acceleration", earth_accel_array);
 
     return result;
 }
@@ -288,7 +298,10 @@ static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
         return NULL;
     }
     
+    npy_intp quaternion_dims[2] = { n, 4 };
     npy_intp dims[2] = { n, 3 };
+    PyObject *quaternion_array = PyArray_SimpleNew(2, quaternion_dims, NPY_FLOAT);
+    float *quaternion_data = (float *) PyArray_DATA((PyArrayObject *)quaternion_array);
     PyObject *euler_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
     float *euler_data = (float *) PyArray_DATA((PyArrayObject *)euler_array);
     PyObject *earth_accel_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
@@ -299,6 +312,7 @@ static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
     float *dt_data = (float *) PyArray_DATA(delta_time_array);
     
     FusionVector gyro_vec, accel_vec, earth_accel;
+    FusionQuaternion quaternion;
     FusionEuler euler;
     
     for (npy_intp i = 0; i < n; i++) {
@@ -310,10 +324,15 @@ static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
         float dt = dt_data[i];
         
         FusionAhrsUpdateNoMagnetometer(&self->ahrs, gyro_vec, accel_vec, dt);
-        
-        euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&self->ahrs));
+        quaternion = FusionAhrsGetQuaternion(&self->ahrs);
+        euler = FusionQuaternionToEuler(quaternion);
         earth_accel = FusionAhrsGetEarthAcceleration(&self->ahrs);
-        
+
+        quaternion_data[i * 4 + 0] = quaternion.element.w;
+        quaternion_data[i * 4 + 1] = quaternion.element.x;
+        quaternion_data[i * 4 + 2] = quaternion.element.y;
+        quaternion_data[i * 4 + 3] = quaternion.element.z;
+
         euler_data[i * 3 + 0] = euler.angle.roll;
         euler_data[i * 3 + 1] = euler.angle.pitch;
         euler_data[i * 3 + 2] = euler.angle.yaw;
@@ -323,9 +342,10 @@ static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
         earth_accel_data[i * 3 + 2] = earth_accel.axis.z;
     }
 
-    PyObject *result = PyTuple_New(2);
-    PyTuple_SET_ITEM(result, 0, euler_array);
-    PyTuple_SET_ITEM(result, 1, earth_accel_array);
+    PyObject *result = PyDict_New();
+    PyDict_SetItemString(result, "quaternion", quaternion_array);
+    PyDict_SetItemString(result, "euler", euler_array);
+    PyDict_SetItemString(result, "earth_acceleration", earth_accel_array);
 
     return result;
 }
