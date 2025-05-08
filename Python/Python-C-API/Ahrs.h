@@ -181,10 +181,25 @@ static PyObject *ahrs_update_batch(Ahrs *self, PyObject *args) {
     npy_intp quaternion_dims[2] = { n, 4 };
     npy_intp dims[2] = { n, 3 };
     PyObject *quaternion_array = PyArray_SimpleNew(2, quaternion_dims, NPY_FLOAT);
+    if (!quaternion_array) {
+      PyErr_NoMemory();
+      return NULL;
+    }
     float *quaternion_data = (float *) PyArray_DATA((PyArrayObject *)quaternion_array);
     PyObject *euler_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!euler_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      return NULL;
+    }
     float *euler_data = (float *) PyArray_DATA((PyArrayObject *)euler_array);
     PyObject *earth_accel_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!earth_accel_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      Py_DECREF(euler_array);
+      return NULL;
+    }
     float *earth_accel_data = (float *) PyArray_DATA((PyArrayObject *)earth_accel_array);
     
     float *gyro_data = (float *) PyArray_DATA(gyroscope_array);
@@ -301,10 +316,25 @@ static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
     npy_intp quaternion_dims[2] = { n, 4 };
     npy_intp dims[2] = { n, 3 };
     PyObject *quaternion_array = PyArray_SimpleNew(2, quaternion_dims, NPY_FLOAT);
+    if (!quaternion_array) {
+      PyErr_NoMemory();
+      return NULL;
+    }
     float *quaternion_data = (float *) PyArray_DATA((PyArrayObject *)quaternion_array);
     PyObject *euler_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!euler_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      return NULL;
+    }
     float *euler_data = (float *) PyArray_DATA((PyArrayObject *)euler_array);
     PyObject *earth_accel_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!earth_accel_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      Py_DECREF(euler_array);
+      return NULL;
+    }
     float *earth_accel_data = (float *) PyArray_DATA((PyArrayObject *)earth_accel_array);
     
     float *gyro_data = (float *) PyArray_DATA(gyroscope_array);
