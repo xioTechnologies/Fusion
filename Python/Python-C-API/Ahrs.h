@@ -309,7 +309,7 @@ static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
     npy_intp n = PyArray_SIZE(gyroscope_array) / 3;
     if ((PyArray_SIZE(accelerometer_array) / 3) != n ||
         (PyArray_SIZE(delta_time_array)) != n) {
-        PyErr_SetString(PyExc_ValueError, "모든 입력 배열의 크기가 일치해야 합니다.");
+        PyErr_SetString(PyExc_ValueError, "All input arrays must have the same size.");
         return NULL;
     }
     
