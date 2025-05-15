@@ -240,9 +240,27 @@ static PyObject *ahrs_update_batch(Ahrs *self, PyObject *args) {
     }
 
     PyObject *result = PyDict_New();
-    PyDict_SetItemString(result, "quaternion", quaternion_array);
-    PyDict_SetItemString(result, "euler", euler_array);
-    PyDict_SetItemString(result, "earth_acceleration", earth_accel_array);
+    if (!result) {
+        PyErr_NoMemory();
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        return NULL;
+    }
+
+    if (PyDict_SetItemString(result, "quaternion", quaternion_array) < 0 ||
+        PyDict_SetItemString(result, "euler", euler_array) < 0 ||
+        PyDict_SetItemString(result, "earth_acceleration", earth_accel_array) < 0) {
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        Py_DECREF(result);
+        return NULL;
+    }
+
+    Py_DECREF(quaternion_array);
+    Py_DECREF(euler_array);
+    Py_DECREF(earth_accel_array);
 
     return result;
 }
@@ -373,9 +391,27 @@ static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
     }
 
     PyObject *result = PyDict_New();
-    PyDict_SetItemString(result, "quaternion", quaternion_array);
-    PyDict_SetItemString(result, "euler", euler_array);
-    PyDict_SetItemString(result, "earth_acceleration", earth_accel_array);
+    if (!result) {
+        PyErr_NoMemory();
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        return NULL;
+    }
+
+    if (PyDict_SetItemString(result, "quaternion", quaternion_array) < 0 ||
+        PyDict_SetItemString(result, "euler", euler_array) < 0 ||
+        PyDict_SetItemString(result, "earth_acceleration", earth_accel_array) < 0) {
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        Py_DECREF(result);
+        return NULL;
+    }
+
+    Py_DECREF(quaternion_array);
+    Py_DECREF(euler_array);
+    Py_DECREF(earth_accel_array);
 
     return result;
 }
