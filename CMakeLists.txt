@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(Fusion)
 
 option(FUSION_BUILD_EXAMPLES "Build examples" TRUE)
-option(FUSION_BUILD_PYTHON_API "Build Python C API" $<Config:Debug>)
+option(FUSION_BUILD_PYTHON_API "Build Python C API" TRUE) 
 
 add_subdirectory("Fusion")
 if (FUSION_BUILD_EXAMPLES)
