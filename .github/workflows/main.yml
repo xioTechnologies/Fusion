@@ -60,8 +60,8 @@ jobs:
           CIBW_ARCHS: all
           CIBW_BUILD: ${{ matrix.python-version }}${{ matrix.target[1] }}
           CIBW_BEFORE_TEST: pip install matplotlib
-          CIBW_TEST_COMMAND: cd {project}/Python && python advanced_example.py no_block && python simple_example.py no_block
-          CIBW_TEST_COMMAND_WINDOWS: cd /D {project}/Python && python advanced_example.py no_block && python simple_example.py no_block
+          CIBW_TEST_COMMAND: cd {project}/Python && python advanced_example.py dont_block && python simple_example.py dont_block
+          CIBW_TEST_COMMAND_WINDOWS: cd /D {project}/Python && python advanced_example.py dont_block && python simple_example.py dont_block
           CIBW_TEST_SKIP: "*-macosx_arm64" # fix CI warning
 
       - uses: actions/upload-artifact@v4

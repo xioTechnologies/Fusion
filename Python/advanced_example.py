@@ -117,4 +117,4 @@ axes[9].legend()
 
 plot_bool(axes[10], timestamp, flags[:, 3], "Magnetic recovery")
 
-plt.show(block="no_block" not in sys.argv)  # don't block when script run by CI
+plt.show(block="dont_block" not in sys.argv)  # don't block when script run by CI
