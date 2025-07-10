@@ -137,6 +137,135 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
     return Py_None;
 }
 
+static PyObject *ahrs_update_batch(Ahrs *self, PyObject *args) {
+    PyArrayObject *gyroscope_array;
+    PyArrayObject *accelerometer_array;
+    PyArrayObject *magnetometer_array;
+    PyArrayObject *delta_time_array;
+    
+    const char *error = PARSE_TUPLE(args, "O!O!O!O!", 
+                                    &PyArray_Type, &gyroscope_array, 
+                                    &PyArray_Type, &accelerometer_array, 
+                                    &PyArray_Type, &magnetometer_array,
+                                    &PyArray_Type, &delta_time_array);
+    if (error != NULL) {
+        PyErr_SetString(PyExc_TypeError, error);
+        return NULL;
+    }
+
+    if (PyArray_TYPE(gyroscope_array) != NPY_FLOAT) {
+        PyErr_SetString(PyExc_TypeError, "gyroscope array must be np.float32");
+        return NULL;
+    }
+    if (PyArray_TYPE(accelerometer_array) != NPY_FLOAT) {
+        PyErr_SetString(PyExc_TypeError, "accelerometer array must be np.float32");
+        return NULL;
+    }
+    if (PyArray_TYPE(magnetometer_array) != NPY_FLOAT) {
+        PyErr_SetString(PyExc_TypeError, "magnetometer array must be np.float32");
+        return NULL;
+    }
+    if (PyArray_TYPE(delta_time_array) != NPY_FLOAT) {
+        PyErr_SetString(PyExc_TypeError, "delta_time array must be np.float32");
+        return NULL;
+    }
+    
+    npy_intp n = PyArray_SIZE(gyroscope_array) / 3;
+    if ((PyArray_SIZE(accelerometer_array) / 3) != n ||
+        (PyArray_SIZE(magnetometer_array) / 3) != n ||
+        (PyArray_SIZE(delta_time_array)) != n) {
+        PyErr_SetString(PyExc_ValueError, "모든 입력 배열의 크기가 일치해야 합니다.");
+        return NULL;
+    }
+    
+    npy_intp quaternion_dims[2] = { n, 4 };
+    npy_intp dims[2] = { n, 3 };
+    PyObject *quaternion_array = PyArray_SimpleNew(2, quaternion_dims, NPY_FLOAT);
+    if (!quaternion_array) {
+      PyErr_NoMemory();
+      return NULL;
+    }
+    float *quaternion_data = (float *) PyArray_DATA((PyArrayObject *)quaternion_array);
+    PyObject *euler_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!euler_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      return NULL;
+    }
+    float *euler_data = (float *) PyArray_DATA((PyArrayObject *)euler_array);
+    PyObject *earth_accel_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!earth_accel_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      Py_DECREF(euler_array);
+      return NULL;
+    }
+    float *earth_accel_data = (float *) PyArray_DATA((PyArrayObject *)earth_accel_array);
+    
+    float *gyro_data = (float *) PyArray_DATA(gyroscope_array);
+    float *accel_data = (float *) PyArray_DATA(accelerometer_array);
+    float *mag_data = (float *) PyArray_DATA(magnetometer_array);
+    float *dt_data = (float *) PyArray_DATA(delta_time_array);
+    
+    FusionVector gyro_vec, accel_vec, mag_vec, earth_accel;
+    FusionQuaternion quaternion;
+    FusionEuler euler;
+
+    for (npy_intp i = 0; i < n; i++) {
+        for (int j = 0; j < 3; j++) {
+            gyro_vec.array[j] = gyro_data[i * 3 + j];
+            accel_vec.array[j] = accel_data[i * 3 + j];
+            mag_vec.array[j]   = mag_data[i * 3 + j];
+        }
+        
+        float dt = dt_data[i];
+        
+        FusionAhrsUpdate(&self->ahrs, gyro_vec, accel_vec, mag_vec, dt);
+        quaternion = FusionAhrsGetQuaternion(&self->ahrs);
+        euler = FusionQuaternionToEuler(quaternion);
+        earth_accel = FusionAhrsGetEarthAcceleration(&self->ahrs);
+
+        quaternion_data[i * 4 + 0] = quaternion.element.w;
+        quaternion_data[i * 4 + 1] = quaternion.element.x;
+        quaternion_data[i * 4 + 2] = quaternion.element.y;
+        quaternion_data[i * 4 + 3] = quaternion.element.z;
+
+        euler_data[i * 3 + 0] = euler.angle.roll;
+        euler_data[i * 3 + 1] = euler.angle.pitch;
+        euler_data[i * 3 + 2] = euler.angle.yaw;
+
+        earth_accel_data[i * 3 + 0] = earth_accel.axis.x;
+        earth_accel_data[i * 3 + 1] = earth_accel.axis.y;
+        earth_accel_data[i * 3 + 2] = earth_accel.axis.z;
+    }
+
+    PyObject *result = PyDict_New();
+    if (!result) {
+        PyErr_NoMemory();
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        return NULL;
+    }
+
+    if (PyDict_SetItemString(result, "quaternion", quaternion_array) < 0 ||
+        PyDict_SetItemString(result, "euler", euler_array) < 0 ||
+        PyDict_SetItemString(result, "earth_acceleration", earth_accel_array) < 0) {
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        Py_DECREF(result);
+        return NULL;
+    }
+
+    Py_DECREF(quaternion_array);
+    Py_DECREF(euler_array);
+    Py_DECREF(earth_accel_array);
+
+    return result;
+}
+
+
 static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
     PyArrayObject *gyroscope_array;
     PyArrayObject *accelerometer_array;
@@ -167,6 +296,126 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
     Py_INCREF(Py_None);
     return Py_None;
 }
+
+
+static PyObject *ahrs_update_no_magnetometer_batch(Ahrs *self, PyObject *args) {
+    PyArrayObject *gyroscope_array;
+    PyArrayObject *accelerometer_array;
+    PyArrayObject *delta_time_array;
+    
+    const char *error = PARSE_TUPLE(args, "O!O!O!", 
+                                    &PyArray_Type, &gyroscope_array, 
+                                    &PyArray_Type, &accelerometer_array, 
+                                    &PyArray_Type, &delta_time_array);
+    if (error != NULL) {
+        PyErr_SetString(PyExc_TypeError, error);
+        return NULL;
+    }
+    if (PyArray_TYPE(gyroscope_array) != NPY_FLOAT) {
+        PyErr_SetString(PyExc_TypeError, "gyroscope array must be np.float32");
+        return NULL;
+    }
+    if (PyArray_TYPE(accelerometer_array) != NPY_FLOAT) {
+        PyErr_SetString(PyExc_TypeError, "accelerometer array must be np.float32");
+        return NULL;
+    }
+    if (PyArray_TYPE(delta_time_array) != NPY_FLOAT) {
+        PyErr_SetString(PyExc_TypeError, "delta_time array must be np.float32");
+        return NULL;
+    }
+    
+    npy_intp n = PyArray_SIZE(gyroscope_array) / 3;
+    if ((PyArray_SIZE(accelerometer_array) / 3) != n ||
+        (PyArray_SIZE(delta_time_array)) != n) {
+        PyErr_SetString(PyExc_ValueError, "All input arrays must have the same size.");
+        return NULL;
+    }
+    
+    npy_intp quaternion_dims[2] = { n, 4 };
+    npy_intp dims[2] = { n, 3 };
+    PyObject *quaternion_array = PyArray_SimpleNew(2, quaternion_dims, NPY_FLOAT);
+    if (!quaternion_array) {
+      PyErr_NoMemory();
+      return NULL;
+    }
+    float *quaternion_data = (float *) PyArray_DATA((PyArrayObject *)quaternion_array);
+    PyObject *euler_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!euler_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      return NULL;
+    }
+    float *euler_data = (float *) PyArray_DATA((PyArrayObject *)euler_array);
+    PyObject *earth_accel_array = PyArray_SimpleNew(2, dims, NPY_FLOAT);
+    if (!earth_accel_array) {
+      PyErr_NoMemory();
+      Py_DECREF(quaternion_array);
+      Py_DECREF(euler_array);
+      return NULL;
+    }
+    float *earth_accel_data = (float *) PyArray_DATA((PyArrayObject *)earth_accel_array);
+    
+    float *gyro_data = (float *) PyArray_DATA(gyroscope_array);
+    float *accel_data = (float *) PyArray_DATA(accelerometer_array);
+    float *dt_data = (float *) PyArray_DATA(delta_time_array);
+    
+    FusionVector gyro_vec, accel_vec, earth_accel;
+    FusionQuaternion quaternion;
+    FusionEuler euler;
+    
+    for (npy_intp i = 0; i < n; i++) {
+        for (int j = 0; j < 3; j++) {
+            gyro_vec.array[j] = gyro_data[i * 3 + j];
+            accel_vec.array[j] = accel_data[i * 3 + j];
+        }
+        
+        float dt = dt_data[i];
+        
+        FusionAhrsUpdateNoMagnetometer(&self->ahrs, gyro_vec, accel_vec, dt);
+        quaternion = FusionAhrsGetQuaternion(&self->ahrs);
+        euler = FusionQuaternionToEuler(quaternion);
+        earth_accel = FusionAhrsGetEarthAcceleration(&self->ahrs);
+
+        quaternion_data[i * 4 + 0] = quaternion.element.w;
+        quaternion_data[i * 4 + 1] = quaternion.element.x;
+        quaternion_data[i * 4 + 2] = quaternion.element.y;
+        quaternion_data[i * 4 + 3] = quaternion.element.z;
+
+        euler_data[i * 3 + 0] = euler.angle.roll;
+        euler_data[i * 3 + 1] = euler.angle.pitch;
+        euler_data[i * 3 + 2] = euler.angle.yaw;
+
+        earth_accel_data[i * 3 + 0] = earth_accel.axis.x;
+        earth_accel_data[i * 3 + 1] = earth_accel.axis.y;
+        earth_accel_data[i * 3 + 2] = earth_accel.axis.z;
+    }
+
+    PyObject *result = PyDict_New();
+    if (!result) {
+        PyErr_NoMemory();
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        return NULL;
+    }
+
+    if (PyDict_SetItemString(result, "quaternion", quaternion_array) < 0 ||
+        PyDict_SetItemString(result, "euler", euler_array) < 0 ||
+        PyDict_SetItemString(result, "earth_acceleration", earth_accel_array) < 0) {
+        Py_DECREF(quaternion_array);
+        Py_DECREF(euler_array);
+        Py_DECREF(earth_accel_array);
+        Py_DECREF(result);
+        return NULL;
+    }
+
+    Py_DECREF(quaternion_array);
+    Py_DECREF(euler_array);
+    Py_DECREF(earth_accel_array);
+
+    return result;
+}
+
 
 static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
     PyArrayObject *gyroscope_array;
@@ -224,10 +473,12 @@ static PyGetSetDef ahrs_get_set[] = {
 };
 
 static PyMethodDef ahrs_methods[] = {
-        {"reset",                   (PyCFunction) ahrs_reset,                   METH_NOARGS,  ""},
-        {"update",                  (PyCFunction) ahrs_update,                  METH_VARARGS, ""},
-        {"update_no_magnetometer",  (PyCFunction) ahrs_update_no_magnetometer,  METH_VARARGS, ""},
-        {"update_external_heading", (PyCFunction) ahrs_update_external_heading, METH_VARARGS, ""},
+        {"reset",                        (PyCFunction) ahrs_reset,                        METH_NOARGS,  ""},
+        {"update",                       (PyCFunction) ahrs_update,                       METH_VARARGS, ""},
+        {"update_no_magnetometer",       (PyCFunction) ahrs_update_no_magnetometer,       METH_VARARGS, ""},
+        {"update_external_heading",      (PyCFunction) ahrs_update_external_heading,      METH_VARARGS, ""},
+        {"update_batch",                 (PyCFunction) ahrs_update_batch,                 METH_VARARGS, ""},
+        {"update_no_magnetometer_batch", (PyCFunction) ahrs_update_no_magnetometer_batch, METH_VARARGS, ""},
         {NULL} /* sentinel */
 };
 
