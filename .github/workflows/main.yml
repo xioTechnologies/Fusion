@@ -8,6 +8,24 @@ on:
     branches: [ main ]
 
 jobs:
+  build_cmake:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:  [ macos-latest, ubuntu-latest, windows-latest ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build CMake targets
+        run: |
+          mkdir cmake-build-release
+          cd cmake-build-release
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build .
+
   build_wheels:
     runs-on: ${{ matrix.target[0] }}
 
@@ -25,13 +43,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Build CMake targets
-        run: |
-          mkdir cmake-build-release
-          cd cmake-build-release
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          cmake --build .
 
       - name: Install Python dependencies
         run: |
