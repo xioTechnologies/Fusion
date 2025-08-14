@@ -55,7 +55,7 @@ jobs:
           platforms: all
 
       - name: Build wheel
-        uses: pypa/cibuildwheel@v2.22.0
+        uses: pypa/cibuildwheel@v3.1.3
         env:
           CIBW_ARCHS: all
           CIBW_BUILD: ${{ matrix.python-version }}${{ matrix.target[1] }}
