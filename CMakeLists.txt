@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-project(Fusion)
+project(Fusion
+    VERSION 1.2.8
+    LANGUAGES C
+)
 
 add_subdirectory("Fusion")
 add_subdirectory("Examples/Advanced")
