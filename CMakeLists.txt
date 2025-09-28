@@ -4,9 +4,13 @@ project(Fusion
     LANGUAGES C
 )
 
+option(BUILD_EXAMPLES "Build examples" ON)
+
 add_subdirectory("Fusion")
-add_subdirectory("Examples/Advanced")
-add_subdirectory("Examples/Simple")
+if(BUILD_EXAMPLES)
+    add_subdirectory("Examples/Advanced")
+    add_subdirectory("Examples/Simple")
+endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory("Python/Python-C-API") # do not include when run by CI
 endif()
