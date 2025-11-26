@@ -111,7 +111,6 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
  * @param deltaTime Delta time in seconds.
  */
 void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer, const float deltaTime) {
-#define Q ahrs->quaternion.element
 
     // Store accelerometer
     ahrs->accelerometer = accelerometer;
@@ -213,7 +212,6 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
 
     // Normalise quaternion
     ahrs->quaternion = FusionQuaternionNormalise(ahrs->quaternion);
-#undef Q
 }
 
 /**
