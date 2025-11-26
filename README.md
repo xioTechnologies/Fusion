@@ -22,7 +22,7 @@ Initialisation occurs when the algorithm starts for the first time and during an
 
 ### Angular rate recovery
 
-Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery.  Angular rate recovery is activated when the angular rate exceeds the 98% of the gyroscope measurement range and equivalent to a reinitialisation of the algorithm. 
+Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery.  Angular rate recovery is activated when the angular rate exceeds the 98% of the gyroscope measurement range and will trigger reinitialisation of the algorithm. 
 
 ### Acceleration rejection
 
