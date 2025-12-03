@@ -8,7 +8,6 @@
 //------------------------------------------------------------------------------
 // Includes
 
-#include "FusionAxes.h"
 #include "FusionCompass.h"
 #include <math.h>
 
