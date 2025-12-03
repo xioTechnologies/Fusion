@@ -52,7 +52,6 @@ void FusionOffsetInitialise(FusionOffset *const offset, const unsigned int sampl
  * @return Corrected gyroscope measurement in degrees per second.
  */
 FusionVector FusionOffsetUpdate(FusionOffset *const offset, FusionVector gyroscope) {
-
     // Subtract offset from gyroscope measurement
     gyroscope = FusionVectorSubtract(gyroscope, offset->gyroscopeOffset);
 
