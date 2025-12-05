@@ -21,10 +21,8 @@ jobs:
 
       - name: Build CMake targets
         run: |
-          mkdir cmake-build-release
-          cd cmake-build-release
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          cmake --build .
+          cmake -B cmake-build-release -S . -DCMAKE_BUILD_TYPE=Release
+          cmake --build cmake-build-release
 
   build_wheels:
     runs-on: ${{ matrix.target[0] }}
