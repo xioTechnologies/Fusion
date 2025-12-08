@@ -433,18 +433,11 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
 #define A ahrs->accelerometer.axis
 
     // Calculate accelerometer measurement in the Earth coordinate frame
-    const float qwqw = Q.w * Q.w; // calculate common terms to avoid repeated operations
-    const float qwqx = Q.w * Q.x;
-    const float qwqy = Q.w * Q.y;
-    const float qwqz = Q.w * Q.z;
-    const float qxqy = Q.x * Q.y;
-    const float qxqz = Q.x * Q.z;
-    const float qyqz = Q.y * Q.z;
     FusionVector accelerometer = {
         .axis = {
-            .x = 2.0f * ((qwqw - 0.5f + Q.x * Q.x) * A.x + (qxqy - qwqz) * A.y + (qxqz + qwqy) * A.z),
-            .y = 2.0f * ((qxqy + qwqz) * A.x + (qwqw - 0.5f + Q.y * Q.y) * A.y + (qyqz - qwqx) * A.z),
-            .z = 2.0f * ((qxqz - qwqy) * A.x + (qyqz + qwqx) * A.y + (qwqw - 0.5f + Q.z * Q.z) * A.z),
+            .x = 2.0f * ((Q.w * Q.w - 0.5f + Q.x * Q.x) * A.x + (Q.x * Q.y - Q.w * Q.z) * A.y + (Q.x * Q.z + Q.w * Q.y) * A.z),
+            .y = 2.0f * ((Q.x * Q.y + Q.w * Q.z) * A.x + (Q.w * Q.w - 0.5f + Q.y * Q.y) * A.y + (Q.y * Q.z - Q.w * Q.x) * A.z),
+            .z = 2.0f * ((Q.x * Q.z - Q.w * Q.y) * A.x + (Q.y * Q.z + Q.w * Q.x) * A.y + (Q.w * Q.w - 0.5f + Q.z * Q.z) * A.z),
         }
     }; // rotation matrix multiplied with the accelerometer
 
