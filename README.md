@@ -36,7 +36,7 @@ The magnetic rejection feature reduces the errors that result from temporary mag
 
 ### Algorithm outputs
 
-The algorithm provides four outputs: quaternion, gravity, linear acceleration, and Earth acceleration.  The quaternion describes the orientation of the sensor relative to the Earth.  This can be converted to a rotation matrix using the `FusionQuaternionToMatrix` function or to Euler angles using the `FusionQuaternionToEuler` function.  Gravity is a direction of gravity in the sensor coordinate frame.  Linear acceleration is the accelerometer measurement with gravity removed.  Earth acceleration is the accelerometer measurement in the Earth coordinate frame with gravity removed.  The algorithm supports North-West-Up (NWU), East-North-Up (ENU), and North-East-Down (NED) axes conventions.
+The algorithm provides four outputs: quaternion, gravity, linear acceleration, and Earth acceleration.  The quaternion describes the orientation of the sensor relative to the Earth.  This can be converted to a rotation matrix using the `FusionMatrixFrom` function or to Euler angles using the `FusionEulerFrom` function.  Gravity is a direction of gravity in the sensor coordinate frame.  Linear acceleration is the accelerometer measurement with gravity removed.  Earth acceleration is the accelerometer measurement in the Earth coordinate frame with gravity removed.  The algorithm supports North-West-Up (NWU), East-North-Up (ENU), and North-East-Down (NED) axes conventions.
 
 ### Algorithm settings
 
