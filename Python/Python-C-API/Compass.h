@@ -33,11 +33,11 @@ static PyObject *compass_calculate_heading(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    return Py_BuildValue("f", FusionCompassCalculateHeading(convention, accelerometer_vector, magnetometer_vector));
+    return Py_BuildValue("f", FusionCompass(convention, accelerometer_vector, magnetometer_vector));
 }
 
 static PyMethodDef compass_methods[] = {
-        {"compass_calculate_heading", (PyCFunction) compass_calculate_heading, METH_VARARGS, ""},
+        {"compass", (PyCFunction) compass_calculate_heading, METH_VARARGS, ""},
         {NULL} /* sentinel */
 };
 

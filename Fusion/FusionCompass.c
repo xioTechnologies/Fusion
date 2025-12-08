@@ -20,7 +20,7 @@
  * @param magnetometer Magnetometer in any calibrated units.
  * @return Heading in degrees.
  */
-float FusionCompassCalculateHeading(const FusionConvention convention, const FusionVector accelerometer, const FusionVector magnetometer) {
+float FusionCompass(const FusionConvention convention, const FusionVector accelerometer, const FusionVector magnetometer) {
     switch (convention) {
         case FusionConventionNwu: {
             const FusionVector west = FusionVectorNormalise(FusionVectorCrossProduct(accelerometer, magnetometer));
