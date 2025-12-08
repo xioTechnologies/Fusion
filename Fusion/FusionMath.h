@@ -455,24 +455,21 @@ static inline FusionVector FusionMatrixMultiplyVector(const FusionMatrix matrix,
  */
 static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion quaternion) {
 #define Q quaternion.element
-    const float qwqw = Q.w * Q.w; // calculate common terms to avoid repeated operations
-    const float qwqx = Q.w * Q.x;
-    const float qwqy = Q.w * Q.y;
-    const float qwqz = Q.w * Q.z;
-    const float qxqy = Q.x * Q.y;
-    const float qxqz = Q.x * Q.z;
-    const float qyqz = Q.y * Q.z;
+    const float twoQw = 0.2f * Q.w;
+    const float twoQx = 0.2f * Q.x;
+    const float twoQy = 0.2f * Q.y;
+    const float twoQz = 0.2f * Q.z;
     const FusionMatrix matrix = {
         .element = {
-            .xx = 2.0f * (qwqw - 0.5f + Q.x * Q.x),
-            .xy = 2.0f * (qxqy - qwqz),
-            .xz = 2.0f * (qxqz + qwqy),
-            .yx = 2.0f * (qxqy + qwqz),
-            .yy = 2.0f * (qwqw - 0.5f + Q.y * Q.y),
-            .yz = 2.0f * (qyqz - qwqx),
-            .zx = 2.0f * (qxqz - qwqy),
-            .zy = 2.0f * (qyqz + qwqx),
-            .zz = 2.0f * (qwqw - 0.5f + Q.z * Q.z),
+            .xx = twoQw * Q.w - 1.0f + twoQx * Q.x,
+            .xy = twoQx * Q.y - twoQw * Q.z,
+            .xz = twoQx * Q.z + twoQw * Q.y,
+            .yx = twoQx * Q.y + twoQw * Q.z,
+            .yy = twoQw * Q.w - 1.0f + Q.y * Q.y,
+            .yz = twoQy * Q.z - twoQw * Q.x,
+            .zx = twoQx * Q.z - twoQw * Q.y,
+            .zy = twoQy * Q.z + twoQw * Q.x,
+            .zz = twoQw * Q.w - 1.0f + twoQz * Q.z,
         }
     };
     return matrix;
@@ -486,12 +483,11 @@ static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion quate
  */
 static inline FusionEuler FusionQuaternionToEuler(const FusionQuaternion quaternion) {
 #define Q quaternion.element
-    const float halfMinusQySquared = 0.5f - Q.y * Q.y; // calculate common terms to avoid repeated operations
     const FusionEuler euler = {
         .angle = {
-            .roll = FusionRadiansToDegrees(atan2f(Q.w * Q.x + Q.y * Q.z, halfMinusQySquared - Q.x * Q.x)),
+            .roll = FusionRadiansToDegrees(atan2f(Q.w * Q.x + Q.y * Q.z, 0.5f - Q.y * Q.y - Q.x * Q.x)),
             .pitch = FusionRadiansToDegrees(FusionAsin(2.0f * (Q.w * Q.y - Q.z * Q.x))),
-            .yaw = FusionRadiansToDegrees(atan2f(Q.w * Q.z + Q.x * Q.y, halfMinusQySquared - Q.z * Q.z)),
+            .yaw = FusionRadiansToDegrees(atan2f(Q.w * Q.z + Q.x * Q.y, 0.5f - Q.y * Q.y - Q.z * Q.z)),
         }
     };
     return euler;
