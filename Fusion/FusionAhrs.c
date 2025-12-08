@@ -241,8 +241,8 @@ static inline FusionVector HalfGravity(const FusionAhrs *const ahrs) {
             return halfGravity;
         }
     }
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
 #undef Q
+    return FUSION_VECTOR_ZERO; // avoid compiler warning
 }
 
 /**
@@ -284,8 +284,8 @@ static inline FusionVector HalfMagnetic(const FusionAhrs *const ahrs) {
             return halfMagnetic;
         }
     }
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
 #undef Q
+    return FUSION_VECTOR_ZERO; // avoid compiler warning
 }
 
 /**
@@ -346,10 +346,10 @@ void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector g
  * @param deltaTime Delta time in seconds.
  */
 void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading, const float deltaTime) {
-#define Q ahrs->quaternion.element
-
     // Calculate roll
+#define Q ahrs->quaternion.element
     const float roll = atan2f(Q.w * Q.x + Q.y * Q.z, 0.5f - Q.y * Q.y - Q.x * Q.x);
+#undef Q
 
     // Calculate magnetometer
     const float headingRadians = FusionDegreesToRadians(heading);
@@ -364,7 +364,6 @@ void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector 
 
     // Update AHRS algorithm
     FusionAhrsUpdate(ahrs, gyroscope, accelerometer, magnetometer, deltaTime);
-#undef Q
 }
 
 /**
@@ -399,8 +398,8 @@ FusionVector FusionAhrsGetGravity(const FusionAhrs *const ahrs) {
             .z = 2.0f * (Q.w * Q.w - 0.5f + Q.z * Q.z),
         }
     }; // third column of transposed rotation matrix
-    return gravity;
 #undef Q
+    return gravity;
 }
 
 /**
@@ -429,10 +428,9 @@ FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
  * @return Earth acceleration measurement in g.
  */
 FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
+    // Calculate accelerometer measurement in the Earth coordinate frame
 #define Q ahrs->quaternion.element
 #define A ahrs->accelerometer.axis
-
-    // Calculate accelerometer measurement in the Earth coordinate frame
     FusionVector accelerometer = {
         .axis = {
             .x = 2.0f * ((Q.w * Q.w - 0.5f + Q.x * Q.x) * A.x + (Q.x * Q.y - Q.w * Q.z) * A.y + (Q.x * Q.z + Q.w * Q.y) * A.z),
@@ -440,6 +438,8 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
             .z = 2.0f * ((Q.x * Q.z - Q.w * Q.y) * A.x + (Q.y * Q.z + Q.w * Q.x) * A.y + (Q.w * Q.w - 0.5f + Q.z * Q.z) * A.z),
         }
     }; // rotation matrix multiplied with the accelerometer
+#undef Q
+#undef A
 
     // Remove gravity from accelerometer measurement
     switch (ahrs->settings.convention) {
@@ -452,8 +452,6 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
             break;
     }
     return accelerometer;
-#undef Q
-#undef A
 }
 
 /**
@@ -498,6 +496,7 @@ FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
 void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
 #define Q ahrs->quaternion.element
     const float yaw = atan2f(Q.w * Q.z + Q.x * Q.y, 0.5f - Q.y * Q.y - Q.z * Q.z);
+#undef Q
     const float halfYawMinusHeading = 0.5f * (yaw - FusionDegreesToRadians(heading));
     const FusionQuaternion rotation = {
         .element = {
@@ -508,7 +507,6 @@ void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
         }
     };
     ahrs->quaternion = FusionQuaternionMultiply(rotation, ahrs->quaternion);
-#undef Q
 }
 
 //------------------------------------------------------------------------------

@@ -284,9 +284,9 @@ static inline FusionVector FusionVectorCrossProduct(const FusionVector vectorA, 
             .z = A.x * B.y - A.y * B.x,
         }
     };
-    return result;
 #undef A
 #undef B
+    return result;
 }
 
 /**
@@ -369,9 +369,9 @@ static inline FusionQuaternion FusionQuaternionMultiply(const FusionQuaternion q
             .z = A.w * B.z + A.x * B.y - A.y * B.x + A.z * B.w,
         }
     };
-    return result;
 #undef A
 #undef B
+    return result;
 }
 
 /**
@@ -394,9 +394,9 @@ static inline FusionQuaternion FusionQuaternionMultiplyVector(const FusionQuater
             .z = Q.w * V.z + Q.x * V.y - Q.y * V.x,
         }
     };
-    return result;
 #undef Q
 #undef V
+    return result;
 }
 
 /**
@@ -419,8 +419,8 @@ static inline FusionQuaternion FusionQuaternionNormalise(const FusionQuaternion 
             .z = Q.z * magnitudeReciprocal,
         }
     };
-    return result;
 #undef Q
+    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -441,8 +441,8 @@ static inline FusionVector FusionMatrixMultiplyVector(const FusionMatrix matrix,
             .z = R.zx * vector.axis.x + R.zy * vector.axis.y + R.zz * vector.axis.z,
         }
     };
-    return result;
 #undef R
+    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -472,8 +472,8 @@ static inline FusionMatrix FusionMatrixFrom(const FusionQuaternion quaternion) {
             .zz = twoQw * Q.w - 1.0f + twoQz * Q.z,
         }
     };
-    return matrix;
 #undef Q
+    return matrix;
 }
 
 /**
@@ -490,8 +490,8 @@ static inline FusionEuler FusionEulerFrom(const FusionQuaternion quaternion) {
             .yaw = FusionRadiansToDegrees(atan2f(Q.w * Q.z + Q.x * Q.y, 0.5f - Q.y * Q.y - Q.z * Q.z)),
         }
     };
-    return euler;
 #undef Q
+    return euler;
 }
 
 #endif
