@@ -6,37 +6,37 @@
 
 # Fusion
 
-Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems.  Fusion is a C library but is also available as the Python package, [imufusion](https://pypi.org/project/imufusion/).  Two example Python scripts, [simple_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/simple_example.py) and [advanced_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/advanced_example.py) are provided with example sensor data to demonstrate use of the package.
+Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems. Fusion is a C library but is also available as the Python package, [imufusion](https://pypi.org/project/imufusion/). Two example Python scripts, [simple_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/simple_example.py) and [advanced_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/advanced_example.py) are provided with example sensor data to demonstrate use of the package.
 
 ## AHRS algorithm
 
-The Attitude And Heading Reference System (AHRS) algorithm combines gyroscope, accelerometer, and magnetometer data into a single measurement of orientation relative to the Earth.  The algorithm also supports systems that use only a gyroscope and accelerometer, and systems that use a gyroscope and accelerometer combined with an external source of heading measurement such as GPS.
+The Attitude And Heading Reference System (AHRS) algorithm combines gyroscope, accelerometer, and magnetometer data into a single measurement of orientation relative to the Earth. The algorithm also supports systems that use only a gyroscope and accelerometer, and systems that use a gyroscope and accelerometer combined with an external source of heading measurement such as GPS.
 
-The algorithm is based on the revised AHRS algorithm presented in chapter 7 of [Madgwick's PhD thesis](https://x-io.co.uk/downloads/madgwick-phd-thesis.pdf).  This is a different algorithm to the better-known initial AHRS algorithm presented in chapter 3, commonly referred to as the *Madgwick algorithm*.
+The algorithm is based on the revised AHRS algorithm presented in chapter 7 of [Madgwick's PhD thesis](https://x-io.co.uk/downloads/madgwick-phd-thesis.pdf). This is a different algorithm to the better-known initial AHRS algorithm presented in chapter 3, commonly referred to as the *Madgwick algorithm*.
 
-The algorithm calculates the orientation as the integration of the gyroscope summed with a feedback term.  The feedback term is equal to the error in the current measurement of orientation as determined by the other sensors, multiplied by a gain.  The algorithm therefore functions as a complementary filter that combines high-pass filtered gyroscope measurements with low-pass filtered measurements from other sensors with a corner frequency determined by the gain.  A low gain will 'trust' the gyroscope more and so be more susceptible to drift.  A high gain will increase the influence of other sensors and the errors that result from accelerations and magnetic distortions.  A gain of zero will ignore the other sensors so that the measurement of orientation is determined by only the gyroscope.
+The algorithm calculates the orientation as the integration of the gyroscope summed with a feedback term. The feedback term is equal to the error in the current measurement of orientation as determined by the other sensors, multiplied by a gain. The algorithm therefore functions as a complementary filter that combines high-pass filtered gyroscope measurements with low-pass filtered measurements from other sensors with a corner frequency determined by the gain. A low gain will 'trust' the gyroscope more and so be more susceptible to drift. A high gain will increase the influence of other sensors and the errors that result from accelerations and magnetic distortions. A gain of zero will ignore the other sensors so that the measurement of orientation is determined by only the gyroscope.
 
 ### Initialisation
 
-Initialisation occurs when the algorithm starts for the first time and during angular rate recovery.  During initialisation, the acceleration and magnetic rejection features are disabled and the gain is ramped down from 10 to the final value over a 3 second period.  This allows the measurement of orientation to rapidly converge from an arbitrary initial value to the value indicated by the sensors.
+Initialisation occurs when the algorithm starts for the first time and during angular rate recovery. During initialisation, the acceleration and magnetic rejection features are disabled and the gain is ramped down from 10 to the final value over a 3 second period. This allows the measurement of orientation to rapidly converge from an arbitrary initial value to the value indicated by the sensors.
 
 ### Angular rate recovery
 
-Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery.  Angular rate recovery is activated when the angular rate exceeds the 98% of the gyroscope measurement range and will trigger reinitialisation of the algorithm. 
+Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery. Angular rate recovery is activated when the angular rate exceeds the 98% of the gyroscope measurement range and will trigger reinitialisation of the algorithm.
 
 ### Acceleration rejection
 
-The acceleration rejection feature reduces the errors that result from the accelerations of linear and rotational motion.  Acceleration rejection works by calculating an error as the angular difference between the instantaneous measurement of inclination indicated by the accelerometer, and the current measurement of inclination provided by the algorithm output.  If the error is greater than a threshold then the accelerometer will be ignored for that algorithm update.  This is equivalent to a dynamic gain that deceases as accelerations increase.
+The acceleration rejection feature reduces the errors that result from the accelerations of linear and rotational motion. Acceleration rejection works by calculating an error as the angular difference between the instantaneous measurement of inclination indicated by the accelerometer, and the current measurement of inclination provided by the algorithm output. If the error is greater than a threshold then the accelerometer will be ignored for that algorithm update. This is equivalent to a dynamic gain that deceases as accelerations increase.
 
-Prolonged accelerations risk an overdependency on the gyroscope and will trigger an acceleration recovery.  Acceleration recovery activates when the error exceeds the threshold for more than 90% of algorithm updates over a period of *t / (0.1p - 9)*, where *t* is the recovery trigger period and *p* is the percentage of algorithm updates where the error exceeds the threshold.  The recovery will remain active until the error exceeds the threshold for less than 90% of algorithm updates over the period *-t / (0.1p - 9)*.  The accelerometer will be used by every algorithm update during recovery.
+Prolonged accelerations risk an overdependency on the gyroscope and will trigger an acceleration recovery. Acceleration recovery activates when the error exceeds the threshold for more than 90% of algorithm updates over a period of *t / (0.1p - 9)*, where *t* is the recovery trigger period and *p* is the percentage of algorithm updates where the error exceeds the threshold. The recovery will remain active until the error exceeds the threshold for less than 90% of algorithm updates over the period *-t / (0.1p - 9)*. The accelerometer will be used by every algorithm update during recovery.
 
 ### Magnetic rejection
 
-The magnetic rejection feature reduces the errors that result from temporary magnetic distortions.  Magnetic rejection works using the same principle as acceleration rejection, operating on the magnetometer instead of the accelerometer and by comparing the measurements of heading instead of inclination.
+The magnetic rejection feature reduces the errors that result from temporary magnetic distortions. Magnetic rejection works using the same principle as acceleration rejection, operating on the magnetometer instead of the accelerometer and by comparing the measurements of heading instead of inclination.
 
 ### Algorithm outputs
 
-The algorithm provides four outputs: quaternion, gravity, linear acceleration, and Earth acceleration.  The quaternion describes the orientation of the sensor relative to the Earth.  This can be converted to a rotation matrix using the `FusionMatrixFrom` function or to Euler angles using the `FusionEulerFrom` function.  Gravity is a direction of gravity in the sensor coordinate frame.  Linear acceleration is the accelerometer measurement with gravity removed.  Earth acceleration is the accelerometer measurement in the Earth coordinate frame with gravity removed.  The algorithm supports North-West-Up (NWU), East-North-Up (ENU), and North-East-Down (NED) axes conventions.
+The algorithm provides four outputs: quaternion, gravity, linear acceleration, and Earth acceleration. The quaternion describes the orientation of the sensor relative to the Earth. This can be converted to a rotation matrix using the `FusionMatrixFrom` function or to Euler angles using the `FusionEulerFrom` function. Gravity is a direction of gravity in the sensor coordinate frame. Linear acceleration is the accelerometer measurement with gravity removed. Earth acceleration is the accelerometer measurement in the Earth coordinate frame with gravity removed. The algorithm supports North-West-Up (NWU), East-North-Up (ENU), and North-East-Down (NED) axes conventions.
 
 ### Algorithm settings
 
@@ -77,13 +77,13 @@ The AHRS algorithm flags are defined by the `FusionAhrsFlags` structure and obta
 
 ## Gyroscope offset correction algorithm
 
-The gyroscope offset correction algorithm provides run-time calibration of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place.  This algorithm should be used in conjunction with the AHRS algorithm to achieve best performance.
+The gyroscope offset correction algorithm provides run-time calibration of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place. This algorithm should be used in conjunction with the AHRS algorithm to achieve best performance.
 
-The algorithm calculates the gyroscope offset by detecting the stationary periods that occur naturally in most applications.  Gyroscope measurements are sampled during these periods and low-pass filtered to obtain the gyroscope offset.  The algorithm requires that gyroscope measurements do not exceed +/-3 degrees per second while stationary.  Basic gyroscope offset calibration may be necessary to ensure that the initial offset plus measurement noise is within these bounds.
+The algorithm calculates the gyroscope offset by detecting the stationary periods that occur naturally in most applications. Gyroscope measurements are sampled during these periods and low-pass filtered to obtain the gyroscope offset. The algorithm requires that gyroscope measurements do not exceed +/-3 degrees per second while stationary. Basic gyroscope offset calibration may be necessary to ensure that the initial offset plus measurement noise is within these bounds.
 
 ## Sensor calibration models
 
-Sensor calibration is essential for accurate measurements.  The library provides functions to apply gyroscope, accelerometer, and magnetometer calibration parameters, but it does not provide a solution for determining those parameters.
+Sensor calibration is essential for accurate measurements. The library provides functions to apply gyroscope, accelerometer, and magnetometer calibration parameters, but it does not provide a solution for determining those parameters.
 
 ### Inertial calibration
 
@@ -110,4 +110,4 @@ m<sub>c</sub> = S(m<sub>u</sub> - h)
 
 ## Fast inverse square root
 
-Fusion uses [Pizer's implementation](https://pizer.wordpress.com/2008/10/12/fast-inverse-square-root/) of the [fast inverse square root](https://en.wikipedia.org/wiki/Fast_inverse_square_root) algorithm for vector and quaternion normalisation.  Including the definition `FUSION_USE_NORMAL_SQRT` in [FusionMath.h](https://github.com/xioTechnologies/Fusion/blob/main/Fusion/FusionMath.h) or adding this as a preprocessor definition will use normal square root operations for all normalisation calculations.  This will slow down execution speed for a small increase in accuracy.  The increase in accuracy will typically be too small to observe on any practical system.
+Fusion uses [Pizer's implementation](https://pizer.wordpress.com/2008/10/12/fast-inverse-square-root/) of the [fast inverse square root](https://en.wikipedia.org/wiki/Fast_inverse_square_root) algorithm for vector and quaternion normalisation. Including the definition `FUSION_USE_NORMAL_SQRT` in [FusionMath.h](https://github.com/xioTechnologies/Fusion/blob/main/Fusion/FusionMath.h) or adding this as a preprocessor definition will use normal square root operations for all normalisation calculations. This will slow down execution speed for a small increase in accuracy. The increase in accuracy will typically be too small to observe on any practical system.
