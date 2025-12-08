@@ -1,8 +1,7 @@
 /**
  * @file FusionAhrs.c
  * @author Seb Madgwick
- * @brief AHRS algorithm to combine gyroscope, accelerometer, and magnetometer
- * measurements into a single measurement of orientation relative to the Earth.
+ * @brief Attitude and Heading Reference System (AHRS) algorithm.
  */
 
 //------------------------------------------------------------------------------
@@ -103,11 +102,11 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
 
 /**
  * @brief Updates the AHRS algorithm using the gyroscope, accelerometer, and
- * magnetometer measurements.
+ * magnetometer.
  * @param ahrs AHRS algorithm structure.
- * @param gyroscope Gyroscope measurement in degrees per second.
- * @param accelerometer Accelerometer measurement in g.
- * @param magnetometer Magnetometer measurement in arbitrary units.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @param accelerometer Accelerometer in g.
+ * @param magnetometer Magnetometer in any calibrated units.
  * @param deltaTime Delta time in seconds.
  */
 void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer, const float deltaTime) {
@@ -320,10 +319,10 @@ static inline int Clamp(const int value, const int min, const int max) {
 
 /**
  * @brief Updates the AHRS algorithm using the gyroscope and accelerometer
- * measurements only.
+ * only.
  * @param ahrs AHRS algorithm structure.
- * @param gyroscope Gyroscope measurement in degrees per second.
- * @param accelerometer Accelerometer measurement in g.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @param accelerometer Accelerometer in g.
  * @param deltaTime Delta time in seconds.
  */
 void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float deltaTime) {
@@ -337,12 +336,12 @@ void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector g
 }
 
 /**
- * @brief Updates the AHRS algorithm using the gyroscope, accelerometer, and
- * heading measurements.
+ * @brief Updates the AHRS algorithm using the gyroscope, accelerometer, and an
+ * external measurement of heading.
  * @param ahrs AHRS algorithm structure.
- * @param gyroscope Gyroscope measurement in degrees per second.
- * @param accelerometer Accelerometer measurement in g.
- * @param heading Heading measurement in degrees.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @param accelerometer Accelerometer in g.
+ * @param heading Heading in degrees.
  * @param deltaTime Delta time in seconds.
  */
 void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading, const float deltaTime) {
@@ -403,10 +402,10 @@ FusionVector FusionAhrsGetGravity(const FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Returns the linear acceleration measurement equal to the accelerometer
- * measurement with gravity removed.
+ * @brief Returns the linear acceleration equal to the accelerometer with
+ * gravity removed.
  * @param ahrs AHRS algorithm structure.
- * @return Linear acceleration measurement in g.
+ * @return Linear acceleration in g.
  */
 FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
     switch (ahrs->settings.convention) {
@@ -422,13 +421,13 @@ FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Returns the Earth acceleration measurement equal to accelerometer
- * measurement in the Earth coordinate frame with gravity removed.
+ * @brief Returns the Earth acceleration equal to accelerometer in the Earth
+ * coordinate frame with gravity removed.
  * @param ahrs AHRS algorithm structure.
- * @return Earth acceleration measurement in g.
+ * @return Earth acceleration in g.
  */
 FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
-    // Calculate accelerometer measurement in the Earth coordinate frame
+    // Calculate accelerometer in the Earth coordinate frame
 #define Q ahrs->quaternion.element
 #define A ahrs->accelerometer.axis
     FusionVector accelerometer = {
@@ -441,7 +440,7 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
 #undef Q
 #undef A
 
-    // Remove gravity from accelerometer measurement
+    // Remove gravity from accelerometer
     switch (ahrs->settings.convention) {
         case FusionConventionNwu:
         case FusionConventionEnu:
@@ -487,11 +486,11 @@ FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Sets the heading of the orientation measurement provided by the AHRS
- * algorithm. This function can be used to reset drift in heading when the AHRS
- * algorithm is being used without a magnetometer.
+ * @brief Sets the AHRS algorithm heading. This function can be used to reset
+ * drift in heading when the AHRS algorithm is being used without a
+ * magnetometer.
  * @param ahrs AHRS algorithm structure.
- * @param heading Heading angle in degrees.
+ * @param heading Heading in degrees.
  */
 void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
 #define Q ahrs->quaternion.element

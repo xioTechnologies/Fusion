@@ -1,8 +1,7 @@
 /**
  * @file FusionCompass.c
  * @author Seb Madgwick
- * @brief Tilt-compensated compass to calculate the magnetic heading using
- * accelerometer and magnetometer measurements.
+ * @brief Tilt-compensated compass to calculate magnetic heading.
  */
 
 //------------------------------------------------------------------------------
@@ -15,11 +14,11 @@
 // Functions
 
 /**
- * @brief Calculates the magnetic heading.
+ * @brief Calculates magnetic heading.
  * @param convention Earth axes convention.
- * @param accelerometer Accelerometer measurement in any calibrated units.
- * @param magnetometer Magnetometer measurement in any calibrated units.
- * @return Heading angle in degrees.
+ * @param accelerometer Accelerometer in any calibrated units.
+ * @param magnetometer Magnetometer in any calibrated units.
+ * @return Heading in degrees.
  */
 float FusionCompassCalculateHeading(const FusionConvention convention, const FusionVector accelerometer, const FusionVector magnetometer) {
     switch (convention) {
