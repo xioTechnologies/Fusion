@@ -46,13 +46,13 @@ void FusionOffsetInitialise(FusionOffset *const offset, const unsigned int sampl
 
 /**
  * @brief Updates the gyroscope offset algorithm and returns the corrected
- * gyroscope measurement.
+ * gyroscope.
  * @param offset Gyroscope offset algorithm structure.
- * @param gyroscope Gyroscope measurement in degrees per second.
- * @return Corrected gyroscope measurement in degrees per second.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @return Corrected gyroscope in degrees per second.
  */
 FusionVector FusionOffsetUpdate(FusionOffset *const offset, FusionVector gyroscope) {
-    // Subtract offset from gyroscope measurement
+    // Subtract offset from gyroscope
     gyroscope = FusionVectorSubtract(gyroscope, offset->gyroscopeOffset);
 
     // Reset timer if gyroscope not stationary

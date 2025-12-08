@@ -1,8 +1,7 @@
 /**
  * @file FusionCompass.h
  * @author Seb Madgwick
- * @brief Tilt-compensated compass to calculate the magnetic heading using
- * accelerometer and magnetometer measurements.
+ * @brief Tilt-compensated compass to calculate magnetic heading.
  */
 
 #ifndef FUSION_COMPASS_H
