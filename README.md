@@ -89,24 +89,53 @@ Sensor calibration is essential for accurate measurements. The library provides 
 
 The `FusionCalibrationInertial` function applies gyroscope or accelerometer calibration parameters using the model:
 
-i<sub>c</sub> = Ms(i<sub>u</sub> - b)
+$$
+\mathbf{i}_c = M_s (\mathbf{i}_u - \mathbf{b})
+$$
 
-- i<sub>c</sub> = Calibrated gyroscope or accelerometer (function `return` value)
-- i<sub>u</sub> = Uncalibrated gyroscope or accelerometer (`uncalibrated` parameter)
-- M = Misalignment matrix (`misalignment` parameter)
-- s = Sensitivity diagonal matrix (`sensitivity` parameter)
-- b = Offset vector (`offset` parameter)
+where:
+
+- $\mathbf{i}_c$ = Calibrated gyroscope or accelerometer (function return value)
+- $\mathbf{i}_u$ = Uncalibrated gyroscope or accelerometer (`uncalibrated` parameter)
+- $M_s$ = Misalignment matrix (`misalignment` parameter)
+- $s$ = Sensitivity diagonal matrix (`sensitivity` parameter)
+- $\mathbf{b}$ = Offset vector (`offset` parameter)
 
 ### Magnetic calibration
 
 The `FusionCalibrationMagnetic` function applies magnetometer calibration parameters using the model:
 
-m<sub>c</sub> = S(m<sub>u</sub> - h)
+$$
+\mathbf{m}_c = S (\mathbf{m}_u - \mathbf{h})
+$$
 
-- m<sub>c</sub> = Calibrated magnetometer (function `return` value)
-- m<sub>u</sub> = Uncalibrated magnetometer (`uncalibrated` parameter)
-- S = Soft-iron matrix (`softIron` parameter)
-- h = Hard-iron offset vector (`hardIron` parameter)
+where:
+
+- $\mathbf{m}_c$ = Calibrated magnetometer (function return value)
+- $\mathbf{m}_u$ = Uncalibrated magnetometer (`uncalibrated` parameter)
+- $S$ = Soft-iron matrix (`softIron` parameter)
+- $\mathbf{h}$ = Hard-iron offset vector (`hardIron` parameter)
+
+## Hard-iron calibration
+
+The hard-iron offset h = [h<sub>x</sub>, h<sub>y</sub>, h<sub>z</sub>] is estimated by assuming that calibrated magnetometer measurements lie on a sphere of radius r. Each magnetometer sample m = [m<sub>x</sub>, m<sub>y</sub>, m<sub>z</sub>] must therefore satisfy:
+
+(m<sub>x</sub> - h<sub>x</sub>)² + (m<sub>y</sub> - h<sub>y</sub>)² + (m<sub>z</sub> - h<sub>z</sub>)² = r²
+
+Expanding this expression allows it to be rewritten in linear form:
+
+y = Aθ
+
+- y = m<sub>x</sub>² + m<sub>y</sub>² + m<sub>z</sub>²
+- A = [ m<sub>x</sub>, m<sub>y</sub>, m<sub>z</sub>, 1 ]
+- θ = [ 2h<sub>x</sub>, 2h<sub>y</sub>, 2h<sub>z</sub>, d ]ᵀ
+- d = r² - (h<sub>x</sub>² + h<sub>y</sub>² + h<sub>z</sub>²)
+
+The parameter vector θ is obtained by stacking multiple magnetometer samples and solving the least-squares pseudo-inverse:
+
+θ = (AᵀA)⁻¹Aᵀ y
+
+The hard-iron offset is then extracted as the first three elements of θ scaled by 0.5. The `FusionHardIronSolve` function implements this solver to estimate the hard-iron offset from multiple magnetometer samples.
 
 ## Fast inverse square root
 
