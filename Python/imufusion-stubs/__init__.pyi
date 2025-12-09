@@ -31,6 +31,9 @@ CONVENTION_NED: int
 # compass_methods
 def compass(convention: int, accelerometer: np.ndarray, magnetometer: np.ndarray) -> float: ...
 
+# hard_iron_methods
+def hard_iron_solve(samples: np.ndarray) -> np.ndarray: ...
+
 # swap_methods
 def swap(sensor: np.ndarray, alignment: int) -> np.ndarray: ...
 

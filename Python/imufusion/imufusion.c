@@ -1,6 +1,7 @@
 #include "Ahrs.h"
 #include "Compass.h"
 #include "Flags.h"
+#include "HardIron.h"
 #include "InternalStates.h"
 #include <numpy/arrayobject.h>
 #include "Bias.h"
@@ -62,6 +63,7 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddIntConstant(module, "CONVENTION_ENU", FusionConventionEnu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
+        (PyModule_AddFunctions(module, hard_iron_methods) == 0) &&
         (PyModule_AddFunctions(module, swap_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&
         add_object(module, &bias_object, "Offset") &&

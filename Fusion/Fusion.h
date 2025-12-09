@@ -20,7 +20,9 @@ extern "C" {
 #include "FusionCalibration.h"
 #include "FusionCompass.h"
 #include "FusionConvention.h"
+#include "FusionHardIron.h"
 #include "FusionMath.h"
+#include "FusionResult.h"
 #include "FusionSwap.h"
 
 #ifdef __cplusplus

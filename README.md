@@ -130,6 +130,39 @@ where:
 - $S$ = Soft-iron matrix (`softIron` parameter)
 - $\mathbf{h}$ = Hard-iron offset vector (`hardIron` parameter)
 
+## Hard-iron calibration
+
+The hard-iron offset $\mathbf{h} = \begin{bmatrix} h_x & h_y & h_z \end{bmatrix}^T$ is estimated by assuming that calibrated magnetometer measurements lie on a sphere of radius $r$. Each magnetometer sample $\mathbf{m} = \begin{bmatrix} m_x & m_y & m_z \end{bmatrix}^T$ must therefore satisfy:
+
+$$
+(m_x - h_x)^2 + (m_y - h_y)^2 + (m_z - h_z)^2 = r^2
+$$
+
+Expanding this expression allows it to be rewritten in linear form:
+
+$$
+\mathbf{y} = \mathbf{A} \theta
+$$
+
+where:
+
+$$
+\begin{aligned}
+\mathbf{y} &= \begin{bmatrix} m_x^2 + m_y^2 + m_z^2 \end{bmatrix} \\
+\mathbf{A} &= \begin{bmatrix} m_x & m_y & m_z & 1 \end{bmatrix} \\
+\theta &= \begin{bmatrix} 2 h_x & 2 h_y & 2 h_z & d \end{bmatrix}^T \\
+d &= r^2 - (h_x^2 + h_y^2 + h_z^2)
+\end{aligned}
+$$
+
+The parameter vector $\theta$ is obtained by stacking multiple magnetometer samples and solving the least-squares pseudo-inverse:
+
+$$
+\theta = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \mathbf{y}
+$$
+
+The hard-iron offset is then extracted as the first three elements of $\theta$ scaled by 0.5. The `FusionHardIronSolve` function implements this solver to estimate the hard-iron offset from multiple magnetometer samples.
+
 ## Fast inverse square root
 
 Fusion uses [Pizer's implementation](https://pizer.wordpress.com/2008/10/12/fast-inverse-square-root/) of the [fast inverse square root](https://en.wikipedia.org/wiki/Fast_inverse_square_root) algorithm for vector and quaternion normalisation. Including the definition `FUSION_USE_NORMAL_SQRT` in [FusionMath.h](https://github.com/xioTechnologies/Fusion/blob/main/Fusion/FusionMath.h) or adding this as a preprocessor definition will use normal square root operations for all normalisation calculations. This will slow down execution speed for a small increase in accuracy. The increase in accuracy will typically be too small to observe on any practical system.
