@@ -94,8 +94,7 @@ static PyObject *ahrs_get_flags(Ahrs *self) {
 
 static PyObject *ahrs_reset(Ahrs *self, PyObject *args) {
     FusionAhrsReset(&self->ahrs);
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
@@ -133,8 +132,7 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
     }
 
     FusionAhrsUpdate(&self->ahrs, gyroscope_vector, accelerometer_vector, magnetometer_vector, delta_time);
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
@@ -164,8 +162,7 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
     }
 
     FusionAhrsUpdateNoMagnetometer(&self->ahrs, gyroscope_vector, accelerometer_vector, delta_time);
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
@@ -196,8 +193,7 @@ static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
     }
 
     FusionAhrsUpdateExternalHeading(&self->ahrs, gyroscope_vector, accelerometer_vector, heading, delta_time);
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static int ahrs_set_heading(Ahrs *self, PyObject *value, void *closure) {
