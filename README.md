@@ -6,7 +6,7 @@
 
 # Fusion
 
-Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems. Fusion is a C library but is also available as the Python package, [imufusion](https://pypi.org/project/imufusion/). Two example Python scripts, [simple_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/simple_example.py) and [advanced_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Python/advanced_example.py) are provided with example sensor data to demonstrate use of the package.
+Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems. Fusion is a C library but is also available as the Python package, [imufusion](https://pypi.org/project/imufusion/). Two example Python scripts, [simple_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Examples/Python/simple_example.py) and [advanced_example.py](https://github.com/xioTechnologies/Fusion/blob/main/Examples/Python/advanced_example.py) are provided with example sensor data to demonstrate use of the package.
 
 ## AHRS algorithm
 
