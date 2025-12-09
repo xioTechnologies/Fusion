@@ -7,7 +7,7 @@
 #include <Python.h>
 #include <stdlib.h>
 
-static PyObject *compass_calculate_heading(PyObject *self, PyObject *args) {
+static PyObject *compass(PyObject *self, PyObject *args) {
     FusionConvention convention;
     PyArrayObject *accelerometer_array;
     PyArrayObject *magnetometer_array;
@@ -37,7 +37,7 @@ static PyObject *compass_calculate_heading(PyObject *self, PyObject *args) {
 }
 
 static PyMethodDef compass_methods[] = {
-        {"compass", (PyCFunction) compass_calculate_heading, METH_VARARGS, ""},
+        {"compass", (PyCFunction) compass, METH_VARARGS, ""},
         {NULL} /* sentinel */
 };
 
