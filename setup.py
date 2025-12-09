@@ -2,7 +2,7 @@ import numpy
 import sys
 from setuptools import setup, Extension
 
-ext_modules = Extension("imufusion", ["Python/Python-C-API/imufusion.c",
+ext_modules = Extension("imufusion", ["Python/imufusion/imufusion.c",
                                       "Fusion/FusionAhrs.c",
                                       "Fusion/FusionCompass.c",
                                       "Fusion/FusionOffset.c"],
