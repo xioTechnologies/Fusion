@@ -59,7 +59,7 @@ int main() {
         FusionAhrsUpdate(&ahrs, gyroscope, accelerometer, magnetometer, deltaTime);
 
         // Print algorithm outputs
-        const FusionEuler euler = FusionEulerFrom(FusionAhrsGetQuaternion(&ahrs));
+        const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&ahrs));
         const FusionVector earth = FusionAhrsGetEarthAcceleration(&ahrs);
 
         printf("Roll %0.1f, Pitch %0.1f, Yaw %0.1f, X %0.1f, Y %0.1f, Z %0.1f\n",

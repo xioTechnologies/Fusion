@@ -67,7 +67,7 @@ static PyObject *quaternion_get_z(Quaternion *self) {
 
 static PyObject *quaternion_to_matrix(Quaternion *self, PyObject *args) {
     FusionMatrix *const matrix = malloc(sizeof(FusionMatrix));
-    *matrix = FusionMatrixFrom(self->quaternion);
+    *matrix = FusionQuaternionToMatrix(self->quaternion);
 
     const npy_intp dims[] = {3, 3};
     PyObject *array = PyArray_SimpleNewFromData(2, dims, NPY_FLOAT, matrix->array);
@@ -77,7 +77,7 @@ static PyObject *quaternion_to_matrix(Quaternion *self, PyObject *args) {
 
 static PyObject *quaternion_to_euler(Quaternion *self, PyObject *args) {
     FusionEuler *const euler = malloc(sizeof(FusionEuler));
-    *euler = FusionEulerFrom(self->quaternion);
+    *euler = FusionQuaternionToEuler(self->quaternion);
 
     const npy_intp dims[] = {3};
     PyObject *array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, euler->array);
