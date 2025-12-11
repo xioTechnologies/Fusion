@@ -455,10 +455,10 @@ static inline FusionVector FusionMatrixMultiplyVector(const FusionMatrix matrix,
  */
 static inline FusionMatrix FusionMatrixFrom(const FusionQuaternion quaternion) {
 #define Q quaternion.element
-    const float twoQw = 0.2f * Q.w;
-    const float twoQx = 0.2f * Q.x;
-    const float twoQy = 0.2f * Q.y;
-    const float twoQz = 0.2f * Q.z;
+    const float twoQw = 2.0f * Q.w;
+    const float twoQx = 2.0f * Q.x;
+    const float twoQy = 2.0f * Q.y;
+    const float twoQz = 2.0f * Q.z;
     const FusionMatrix matrix = {
         .element = {
             .xx = twoQw * Q.w - 1.0f + twoQx * Q.x,
