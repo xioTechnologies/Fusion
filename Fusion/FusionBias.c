@@ -1,14 +1,14 @@
 /**
- * @file FusionOffset.c
+ * @file FusionBias.c
  * @author Seb Madgwick
- * @brief Gyroscope offset correction algorithm for run-time calibration of the
+ * @brief Gyroscope bias correction algorithm for run-time calibration of the
  * gyroscope offset.
  */
 
 //------------------------------------------------------------------------------
 // Includes
 
-#include "FusionOffset.h"
+#include "FusionBias.h"
 #include <math.h>
 
 //------------------------------------------------------------------------------
@@ -33,42 +33,42 @@
 // Functions
 
 /**
- * @brief Initialises the gyroscope offset algorithm.
- * @param offset Gyroscope offset algorithm structure.
+ * @brief Initialises the gyroscope bias algorithm.
+ * @param bias Gyroscope bias algorithm structure.
  * @param sampleRate Sample rate in Hz.
  */
-void FusionOffsetInitialise(FusionOffset *const offset, const unsigned int sampleRate) {
-    offset->filterCoefficient = 2.0f * (float) M_PI * CUTOFF_FREQUENCY * (1.0f / (float) sampleRate);
-    offset->timeout = TIMEOUT * sampleRate;
-    offset->timer = 0;
-    offset->gyroscopeOffset = FUSION_VECTOR_ZERO;
+void FusionBiasInitialise(FusionBias *const bias, const unsigned int sampleRate) {
+    bias->filterCoefficient = 2.0f * (float) M_PI * CUTOFF_FREQUENCY * (1.0f / (float) sampleRate);
+    bias->timeout = TIMEOUT * sampleRate;
+    bias->timer = 0;
+    bias->gyroscopeOffset = FUSION_VECTOR_ZERO;
 }
 
 /**
- * @brief Updates the gyroscope offset algorithm and returns the corrected
+ * @brief Updates the gyroscope bias algorithm and returns the corrected
  * gyroscope.
- * @param offset Gyroscope offset algorithm structure.
+ * @param bias Gyroscope bias algorithm structure.
  * @param gyroscope Gyroscope in degrees per second.
  * @return Corrected gyroscope in degrees per second.
  */
-FusionVector FusionOffsetUpdate(FusionOffset *const offset, FusionVector gyroscope) {
+FusionVector FusionBiasUpdate(FusionBias *const bias, FusionVector gyroscope) {
     // Subtract offset from gyroscope
-    gyroscope = FusionVectorSubtract(gyroscope, offset->gyroscopeOffset);
+    gyroscope = FusionVectorSubtract(gyroscope, bias->gyroscopeOffset);
 
     // Reset timer if gyroscope not stationary
     if ((fabsf(gyroscope.axis.x) > THRESHOLD) || (fabsf(gyroscope.axis.y) > THRESHOLD) || (fabsf(gyroscope.axis.z) > THRESHOLD)) {
-        offset->timer = 0;
+        bias->timer = 0;
         return gyroscope;
     }
 
     // Increment timer while gyroscope stationary
-    if (offset->timer < offset->timeout) {
-        offset->timer++;
+    if (bias->timer < bias->timeout) {
+        bias->timer++;
         return gyroscope;
     }
 
     // Adjust offset if timer has elapsed
-    offset->gyroscopeOffset = FusionVectorAdd(offset->gyroscopeOffset, FusionVectorScale(gyroscope, offset->filterCoefficient));
+    bias->gyroscopeOffset = FusionVectorAdd(bias->gyroscopeOffset, FusionVectorScale(gyroscope, bias->filterCoefficient));
     return gyroscope;
 }
 

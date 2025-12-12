@@ -16,11 +16,11 @@ extern "C" {
 #endif
 
 #include "FusionAhrs.h"
+#include "FusionBias.h"
 #include "FusionCalibration.h"
 #include "FusionCompass.h"
 #include "FusionConvention.h"
 #include "FusionMath.h"
-#include "FusionOffset.h"
 #include "FusionSwap.h"
 
 #ifdef __cplusplus

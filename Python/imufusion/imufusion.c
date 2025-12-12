@@ -3,7 +3,7 @@
 #include "Flags.h"
 #include "InternalStates.h"
 #include <numpy/arrayobject.h>
-#include "Offset.h"
+#include "Bias.h"
 #include <Python.h>
 #include "Quaternion.h"
 #include "Settings.h"
@@ -64,9 +64,9 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
         (PyModule_AddFunctions(module, swap_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&
+        add_object(module, &bias_object, "Offset") &&
         add_object(module, &flags_object, "Flags") &&
         add_object(module, &internal_states_object, "InternalStates") &&
-        add_object(module, &offset_object, "Offset") &&
         add_object(module, &settings_object, "Settings") &&
         add_object(module, &quaternion_object, "Quaternion")) {
         return module;

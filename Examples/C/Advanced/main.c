@@ -18,10 +18,10 @@ int main() {
     const FusionVector hardIronOffset = {0.0f, 0.0f, 0.0f};
 
     // Initialise algorithms
-    FusionOffset offset;
+    FusionBias bias;
     FusionAhrs ahrs;
 
-    FusionOffsetInitialise(&offset, SAMPLE_RATE);
+    FusionBiasInitialise(&bias, SAMPLE_RATE);
     FusionAhrsInitialise(&ahrs);
 
     // Set AHRS algorithm settings
@@ -49,8 +49,8 @@ int main() {
         accelerometer = FusionCalibrationInertial(accelerometer, accelerometerMisalignment, accelerometerSensitivity, accelerometerOffset);
         magnetometer = FusionCalibrationMagnetic(magnetometer, softIronMatrix, hardIronOffset);
 
-        // Update gyroscope offset correction algorithm
-        gyroscope = FusionOffsetUpdate(&offset, gyroscope);
+        // Update gyroscope bias correction algorithm
+        gyroscope = FusionBiasUpdate(&bias, gyroscope);
 
         // Calculate delta time (in seconds) to account for gyroscope sample clock error
         static clock_t previousTimestamp;
