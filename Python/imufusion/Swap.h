@@ -1,5 +1,5 @@
-#ifndef AXES_H
-#define AXES_H
+#ifndef SWAP_H
+#define SWAP_H
 
 #include "../../Fusion/Fusion.h"
 #include "Helpers.h"
@@ -7,7 +7,7 @@
 #include <Python.h>
 #include <stdlib.h>
 
-static PyObject *axes_swap(PyObject *self, PyObject *args) {
+static PyObject *swap(PyObject *self, PyObject *args) {
     PyArrayObject *input_array;
     int alignment;
 
@@ -26,7 +26,7 @@ static PyObject *axes_swap(PyObject *self, PyObject *args) {
     }
 
     FusionVector *const output_vector = malloc(sizeof(FusionVector));
-    *output_vector = FusionAxesSwap(input_vector, (FusionAxesAlignment) alignment);
+    *output_vector = FusionSwap(input_vector, (FusionSwapAlignment) alignment);
 
     const npy_intp dims[] = {3};
     PyObject *output_array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, output_vector->array);
@@ -34,8 +34,8 @@ static PyObject *axes_swap(PyObject *self, PyObject *args) {
     return output_array;
 }
 
-static PyMethodDef axes_methods[] = {
-        {"axes_swap", (PyCFunction) axes_swap, METH_VARARGS, ""},
+static PyMethodDef swap_methods[] = {
+        {"swap", (PyCFunction) swap, METH_VARARGS, ""},
         {NULL} /* sentinel */
 };
 

@@ -28,11 +28,11 @@ CONVENTION_NWU: int
 CONVENTION_ENU: int
 CONVENTION_NED: int
 
-# axes_methods
-def axes_swap(sensor: np.ndarray, alignment: int) -> np.ndarray: ...
-
 # compass_methods
 def compass(convention: int, accelerometer: np.ndarray, magnetometer: np.ndarray) -> float: ...
+
+# swap_methods
+def swap(sensor: np.ndarray, alignment: int) -> np.ndarray: ...
 
 # ahrs_object
 class Ahrs:
