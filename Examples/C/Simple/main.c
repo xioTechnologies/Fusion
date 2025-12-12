@@ -1,21 +1,32 @@
 #include "Fusion.h"
-#include <stdbool.h>
 #include <stdio.h>
 
-#define SAMPLE_PERIOD (0.01f) // replace this with actual sample period
+#define SAMPLE_PERIOD (0.01f)
 
 int main() {
     FusionAhrs ahrs;
     FusionAhrsInitialise(&ahrs);
 
-    while (true) { // this loop should repeat each time new gyroscope data is available
-        const FusionVector gyroscope = {0.0f, 0.0f, 0.0f}; // replace this with actual gyroscope data in degrees/s
-        const FusionVector accelerometer = {0.0f, 0.0f, 1.0f}; // replace this with actual accelerometer data in g
+    float seconds;
+    FusionVector gyroscope;
+    FusionVector accelerometer;
+    float ignore;
 
+    FILE *file = fopen(SENSOR_DATA_CSV, "r");
+
+    char header[256];
+    fgets(header, sizeof(header), file); // skip CSV header
+
+    // Read and process each CSV line as if in real time
+    while (fscanf(file, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+                  &seconds,
+                  &gyroscope.axis.x, &gyroscope.axis.y, &gyroscope.axis.z, &accelerometer.axis.x,
+                  &accelerometer.axis.y, &accelerometer.axis.z,
+                  &ignore, &ignore, &ignore) == 10) {
         FusionAhrsUpdateNoMagnetometer(&ahrs, gyroscope, accelerometer, SAMPLE_PERIOD);
 
         const FusionEuler euler = FusionEulerFrom(FusionAhrsGetQuaternion(&ahrs));
 
-        printf("Roll %0.1f, Pitch %0.1f, Yaw %0.1f\n", euler.angle.roll, euler.angle.pitch, euler.angle.yaw);
+        printf("seconds=%0.3f, roll=%0.1f, pitch=%0.1f, yaw=%0.1f\n", seconds, euler.angle.roll, euler.angle.pitch, euler.angle.yaw);
     }
 }
