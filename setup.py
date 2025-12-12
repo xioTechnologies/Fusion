@@ -5,7 +5,12 @@ from setuptools import Extension, setup
 
 ext_modules = Extension(
     "imufusion",
-    ["Python/imufusion/imufusion.c", "Fusion/FusionAhrs.c", "Fusion/FusionCompass.c", "Fusion/FusionOffset.c"],
+    [
+        "Fusion/FusionAhrs.c",
+        "Fusion/FusionCompass.c",
+        "Fusion/FusionOffset.c",
+        "Python/imufusion/imufusion.c",
+    ],
     include_dirs=[numpy.get_include()],
     define_macros=[("FUSION_USE_NORMAL_SQRT", None)],
     libraries=(["m"] if "linux" in sys.platform else []),
