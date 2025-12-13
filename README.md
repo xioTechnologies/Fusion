@@ -81,6 +81,20 @@ The gyroscope bias algorithm provides run-time calibration of the gyroscope offs
 
 The algorithm calculates the gyroscope offset by detecting the stationary periods that occur naturally in most applications. Gyroscope measurements are sampled during these periods and low-pass filtered to obtain the gyroscope offset. The algorithm requires that gyroscope measurements do not exceed +/-3 degrees per second while stationary. Basic gyroscope offset calibration may be necessary to ensure that the initial offset plus measurement noise is within these bounds.
 
+### Settings
+
+The bias algorithm settings are defined by the `FusionBiasSettings` structure and are configured using the `FusionBiasGetSettings` and `FusionBiasSetSettings` functions.
+
+| Setting               | Description                                           |
+|-----------------------|-------------------------------------------------------|
+| `sampleRate`          | Sample rate in Hz.                                    |
+| `stationaryThreshold` | Stationary detection threshold in degrees per second. |
+| `stationaryPeriod`    | Stationary detection period in seconds.               |
+
+### Restoring from non-volatile memory
+
+`FusionBiasGetOffset` and `FusionBiasSetOffset`.
+
 ## Sensor calibration models
 
 Sensor calibration is essential for accurate measurements. The library provides functions to apply gyroscope, accelerometer, and magnetometer calibration parameters, but it does not provide a solution for determining those parameters.

@@ -1,8 +1,7 @@
 /**
  * @file FusionBias.h
  * @author Seb Madgwick
- * @brief Gyroscope bias correction algorithm for run-time calibration of the
- * gyroscope offset.
+ * @brief Run-time estimation and compensation of gyroscope offset.
  */
 
 #ifndef FUSION_BIAS_H
@@ -17,22 +16,39 @@
 // Definitions
 
 /**
- * @brief Gyroscope bias algorithm structure. Structure members are used
- * internally and must not be accessed by the application.
+ * @brief Settings.
  */
 typedef struct {
+    float sampleRate; // Hz
+    float stationaryThreshold; // degrees per second
+    float stationaryPeriod; // seconds
+} FusionBiasSettings;
+
+/**
+ * @brief Bias structure. All members are private.
+ */
+typedef struct {
+    FusionBiasSettings settings;
     float filterCoefficient;
     unsigned int timeout;
     unsigned int timer;
-    FusionVector gyroscopeOffset;
+    FusionVector offset;
 } FusionBias;
 
 //------------------------------------------------------------------------------
 // Function declarations
 
-void FusionBiasInitialise(FusionBias *const bias, const unsigned int sampleRate);
+void FusionBiasInitialise(FusionBias *const bias);
+
+const FusionBiasSettings *FusionBiasGetSettings(const FusionBias *const bias);
+
+void FusionBiasSetSettings(FusionBias *const bias, const FusionBiasSettings *const settings);
 
 FusionVector FusionBiasUpdate(FusionBias *const bias, FusionVector gyroscope);
+
+FusionVector FusionBiasGetOffset(const FusionBias *const bias);
+
+void FusionBiasSetOffset(FusionBias *const bias, const FusionVector offset);
 
 #endif
 

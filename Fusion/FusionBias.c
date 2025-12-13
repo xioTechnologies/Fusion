@@ -1,8 +1,7 @@
 /**
  * @file FusionBias.c
  * @author Seb Madgwick
- * @brief Gyroscope bias correction algorithm for run-time calibration of the
- * gyroscope offset.
+ * @brief Run-time estimation and compensation of gyroscope offset.
  */
 
 //------------------------------------------------------------------------------
@@ -15,48 +14,64 @@
 // Definitions
 
 /**
- * @brief Cutoff frequency in Hz.
+ * @brief High-pass filter cutoff frequency in Hz.
  */
 #define CUTOFF_FREQUENCY (0.02f)
-
-/**
- * @brief Timeout in seconds.
- */
-#define TIMEOUT (5)
-
-/**
- * @brief Threshold in degrees per second.
- */
-#define THRESHOLD (3.0f)
 
 //------------------------------------------------------------------------------
 // Functions
 
 /**
- * @brief Initialises the gyroscope bias algorithm.
- * @param bias Gyroscope bias algorithm structure.
- * @param sampleRate Sample rate in Hz.
+ * @brief Initialises the bias structure.
+ * @param Bias structure.
  */
-void FusionBiasInitialise(FusionBias *const bias, const unsigned int sampleRate) {
-    bias->filterCoefficient = 2.0f * (float) M_PI * CUTOFF_FREQUENCY * (1.0f / (float) sampleRate);
-    bias->timeout = TIMEOUT * sampleRate;
+void FusionBiasInitialise(FusionBias *const bias) {
+    const FusionBiasSettings settings = {
+        .sampleRate = 100.0f,
+        .stationaryThreshold = 3.0f,
+        .stationaryPeriod = 3.0f,
+    };
+    FusionBiasSetSettings(bias, &settings);
     bias->timer = 0;
-    bias->gyroscopeOffset = FUSION_VECTOR_ZERO;
+    bias->offset = FUSION_VECTOR_ZERO;
 }
 
 /**
- * @brief Updates the gyroscope bias algorithm and returns the corrected
- * gyroscope.
- * @param bias Gyroscope bias algorithm structure.
+ * @brief Returns the settings.
+ * @param Bias structure.
+ * @return Settings.
+ */
+const FusionBiasSettings *FusionBiasGetSettings(const FusionBias *const bias) {
+    return &bias->settings;
+}
+
+/**
+ * @brief Sets the settings.
+ * @param Bias structure.
+ * @param settings Settings.
+ */
+void FusionBiasSetSettings(FusionBias *const bias, const FusionBiasSettings *const settings) {
+    bias->settings = *settings;
+    bias->filterCoefficient = 2.0f * (float) M_PI * CUTOFF_FREQUENCY * (1.0f / bias->settings.sampleRate);
+    bias->timeout = (unsigned int) (bias->settings.stationaryPeriod * bias->settings.sampleRate);
+}
+
+/**
+ * @brief Updates the bias algorithm and returns the offset-corrected
+ * gyroscope. This function should be called once per gyroscope sample at the
+ * configured sample rate.
+ * @param Bias structure.
  * @param gyroscope Gyroscope in degrees per second.
- * @return Corrected gyroscope in degrees per second.
+ * @return Offset-corrected gyroscope in degrees per second.
  */
 FusionVector FusionBiasUpdate(FusionBias *const bias, FusionVector gyroscope) {
-    // Subtract offset from gyroscope
-    gyroscope = FusionVectorSubtract(gyroscope, bias->gyroscopeOffset);
+    // Apply gyroscope offset
+    gyroscope = FusionVectorSubtract(gyroscope, bias->offset);
 
     // Reset timer if gyroscope not stationary
-    if ((fabsf(gyroscope.axis.x) > THRESHOLD) || (fabsf(gyroscope.axis.y) > THRESHOLD) || (fabsf(gyroscope.axis.z) > THRESHOLD)) {
+    if ((fabsf(gyroscope.axis.x) > bias->settings.stationaryThreshold) ||
+        (fabsf(gyroscope.axis.y) > bias->settings.stationaryThreshold) ||
+        (fabsf(gyroscope.axis.z) > bias->settings.stationaryThreshold)) {
         bias->timer = 0;
         return gyroscope;
     }
@@ -67,9 +82,27 @@ FusionVector FusionBiasUpdate(FusionBias *const bias, FusionVector gyroscope) {
         return gyroscope;
     }
 
-    // Adjust offset if timer has elapsed
-    bias->gyroscopeOffset = FusionVectorAdd(bias->gyroscopeOffset, FusionVectorScale(gyroscope, bias->filterCoefficient));
+    // Update high-pass filter while timer has elapsed
+    bias->offset = FusionVectorAdd(bias->offset, FusionVectorScale(gyroscope, bias->filterCoefficient));
     return gyroscope;
+}
+
+/**
+ * @brief Returns the gyroscope offset.
+ * @param Bias structure.
+ * @return Gyroscope offset in degrees per second.
+ */
+FusionVector FusionBiasGetOffset(const FusionBias *const bias) {
+    return bias->offset;
+}
+
+/**
+ * @brief Sets the gyroscope offset.
+ * @param Bias structure.
+ * @param offset Gyroscope offset in degrees per second.
+ */
+void FusionBiasSetOffset(FusionBias *const bias, const FusionVector offset) {
+    bias->offset = offset;
 }
 
 //------------------------------------------------------------------------------
