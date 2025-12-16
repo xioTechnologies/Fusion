@@ -90,15 +90,15 @@ Sensor calibration is essential for accurate measurements. The library provides 
 The `FusionCalibrationInertial` function applies gyroscope or accelerometer calibration parameters using the model:
 
 $$
-\mathbf{i}_c = M_s (\mathbf{i}_u - \mathbf{b})
+\mathbf{i}_c = \mathbf{M} \mathbf{s} (\mathbf{i}_u - \mathbf{b})
 $$
 
 where:
 
 - $\mathbf{i}_c$ = Calibrated gyroscope or accelerometer (function return value)
 - $\mathbf{i}_u$ = Uncalibrated gyroscope or accelerometer (`uncalibrated` parameter)
-- $M_s$ = Misalignment matrix (`misalignment` parameter)
-- $s$ = Sensitivity diagonal matrix (`sensitivity` parameter)
+- $\mathbf{M}$ = Misalignment matrix (`misalignment` parameter)
+- $\mathbf{s}$ = Sensitivity diagonal matrix (`sensitivity` parameter)
 - $\mathbf{b}$ = Offset vector (`offset` parameter)
 
 ### Magnetic calibration
@@ -106,14 +106,14 @@ where:
 The `FusionCalibrationMagnetic` function applies magnetometer calibration parameters using the model:
 
 $$
-\mathbf{m}_c = S (\mathbf{m}_u - \mathbf{h})
+\mathbf{m}_c = \mathbf{S} (\mathbf{m}_u - \mathbf{h})
 $$
 
 where:
 
 - $\mathbf{m}_c$ = Calibrated magnetometer (function return value)
 - $\mathbf{m}_u$ = Uncalibrated magnetometer (`uncalibrated` parameter)
-- $S$ = Soft-iron matrix (`softIron` parameter)
+- $\mathbf{S}$ = Soft-iron matrix (`softIron` parameter)
 - $\mathbf{h}$ = Hard-iron offset vector (`hardIron` parameter)
 
 ## Fast inverse square root
