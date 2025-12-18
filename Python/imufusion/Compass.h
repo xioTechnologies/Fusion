@@ -12,16 +12,14 @@ static PyObject *compass(PyObject *self, PyObject *args) {
     PyArrayObject *accelerometer_array;
     PyArrayObject *magnetometer_array;
 
-    const char *error = PARSE_TUPLE(args, "iO!O!", &convention, &PyArray_Type, &accelerometer_array, &PyArray_Type, &magnetometer_array);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "iO!O!", &convention, &PyArray_Type, &accelerometer_array, &PyArray_Type, &magnetometer_array) == 0) {
         return NULL;
     }
 
     FusionVector accelerometer_vector;
     FusionVector magnetometer_vector;
 
-    error = parse_array(accelerometer_vector.array, accelerometer_array, 3);
+    const char *error = parse_array(accelerometer_vector.array, accelerometer_array, 3);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -33,7 +31,7 @@ static PyObject *compass(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    return Py_BuildValue("f", FusionCompass(convention, accelerometer_vector, magnetometer_vector));
+    return PyFloat_FromDouble((double) FusionCompass(convention, accelerometer_vector, magnetometer_vector));
 }
 
 static PyMethodDef compass_methods[] = {

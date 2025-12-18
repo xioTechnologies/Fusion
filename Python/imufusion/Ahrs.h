@@ -103,9 +103,7 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
     PyArrayObject *magnetometer_array;
     float delta_time;
 
-    const char *error = PARSE_TUPLE(args, "O!O!O!f", &PyArray_Type, &gyroscope_array, &PyArray_Type, &accelerometer_array, &PyArray_Type, &magnetometer_array, &delta_time);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "O!O!O!f", &PyArray_Type, &gyroscope_array, &PyArray_Type, &accelerometer_array, &PyArray_Type, &magnetometer_array, &delta_time) == 0) {
         return NULL;
     }
 
@@ -113,7 +111,7 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
     FusionVector accelerometer_vector;
     FusionVector magnetometer_vector;
 
-    error = parse_array(gyroscope_vector.array, gyroscope_array, 3);
+    const char *error = parse_array(gyroscope_vector.array, gyroscope_array, 3);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -140,16 +138,14 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
     PyArrayObject *accelerometer_array;
     float delta_time;
 
-    const char *error = PARSE_TUPLE(args, "O!O!f", &PyArray_Type, &gyroscope_array, &PyArray_Type, &accelerometer_array, &delta_time);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "O!O!f", &PyArray_Type, &gyroscope_array, &PyArray_Type, &accelerometer_array, &delta_time) == 0) {
         return NULL;
     }
 
     FusionVector gyroscope_vector;
     FusionVector accelerometer_vector;
 
-    error = parse_array(gyroscope_vector.array, gyroscope_array, 3);
+    const char *error = parse_array(gyroscope_vector.array, gyroscope_array, 3);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -171,16 +167,14 @@ static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
     float heading;
     float delta_time;
 
-    const char *error = PARSE_TUPLE(args, "O!O!ff", &PyArray_Type, &gyroscope_array, &PyArray_Type, &accelerometer_array, &heading, &delta_time);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "O!O!ff", &PyArray_Type, &gyroscope_array, &PyArray_Type, &accelerometer_array, &heading, &delta_time) == 0) {
         return NULL;
     }
 
     FusionVector gyroscope_vector;
     FusionVector accelerometer_vector;
 
-    error = parse_array(gyroscope_vector.array, gyroscope_array, 3);
+    const char *error = parse_array(gyroscope_vector.array, gyroscope_array, 3);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
