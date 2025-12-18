@@ -30,12 +30,11 @@ static void ahrs_free(Ahrs *self) {
 }
 
 static int ahrs_set_settings(Ahrs *self, PyObject *value, void *closure) {
-    if (PyObject_IsInstance(value, (PyObject *) &settings_object) == false) {
-        static char string[64];
-        snprintf(string, sizeof(string), "Value type is not %s", settings_object.tp_name);
-        PyErr_SetString(PyExc_TypeError, string);
+    if (!PyObject_TypeCheck(value, &settings_object)) {
+        PyErr_Format(PyExc_TypeError, "Expected %s", settings_object.tp_name);
         return -1;
     }
+
     FusionAhrsSetSettings(&self->ahrs, &((Settings *) value)->settings);
     return 0;
 }
@@ -77,11 +76,13 @@ static PyObject *ahrs_get_earth_acceleration(Ahrs *self) {
 
 static PyObject *ahrs_get_internal_states(Ahrs *self) {
     const FusionAhrsInternalStates internal_states = FusionAhrsGetInternalStates(&self->ahrs);
+
     return internal_states_from(&internal_states);
 }
 
 static PyObject *ahrs_get_flags(Ahrs *self) {
     const FusionAhrsFlags flags = FusionAhrsGetFlags(&self->ahrs);
+
     return flags_from(&flags);
 }
 
