@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:  [ macos-latest, ubuntu-latest, windows-latest ]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
           - [ ubuntu-latest, manylinux_x86_64 ]
           - [ windows-latest, win_amd64 ]
 
-        python-version: [ "cp38-", "cp39-", "cp310-", "cp311-", "cp312-", "cp313-", "cp314-" ]
+        python-version: [ "cp39-", "cp310-", "cp311-", "cp312-", "cp313-", "cp314-" ]
 
     steps:
       - uses: actions/checkout@v4

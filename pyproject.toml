@@ -8,8 +8,9 @@ version = "1.2.11"
 description = "Fusion Python package"
 readme = { text = "See [github](https://github.com/xioTechnologies/Fusion) for documentation and examples.", content-type = "text/markdown" }
 authors = [{ name = "x-io Technologies Limited", email = "info@x-io.co.uk" }]
-license = { file = "LICENSE.md" }
-classifiers = ["Programming Language :: Python :: 3.8",
+license = "MIT"
+license-files = ["LICENSE.md"]
+classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
