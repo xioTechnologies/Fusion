@@ -15,9 +15,7 @@ typedef struct {
 static PyObject *offset_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     unsigned int sample_rate;
 
-    const char *const error = PARSE_TUPLE(args, "I", &sample_rate);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "I", &sample_rate) == 0) {
         return NULL;
     }
 
@@ -33,15 +31,13 @@ static void offset_free(Offset *self) {
 static PyObject *offset_update(Offset *self, PyObject *args) {
     PyArrayObject *input_array;
 
-    const char *error = PARSE_TUPLE(args, "O!", &PyArray_Type, &input_array);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "O!", &PyArray_Type, &input_array) == 0) {
         return NULL;
     }
 
     FusionVector input_vector;
 
-    error = parse_array(input_vector.array, input_array, 3);
+    const char *error = parse_array(input_vector.array, input_array, 3);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;

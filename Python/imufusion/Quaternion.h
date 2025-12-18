@@ -15,15 +15,13 @@ typedef struct {
 static PyObject *quaternion_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     PyArrayObject *array;
 
-    const char *error = PARSE_TUPLE(args, "O!", &PyArray_Type, &array);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "O!", &PyArray_Type, &array) == 0) {
         return NULL;
     }
 
     FusionQuaternion quaternion;
 
-    error = parse_array(quaternion.array, array, 4);
+    const char *error = parse_array(quaternion.array, array, 4);
     if (error != NULL) {
         PyErr_SetString(PyExc_TypeError, error);
         return NULL;
@@ -47,19 +45,19 @@ static PyObject *quaternion_get_wxyz(Quaternion *self) {
 }
 
 static PyObject *quaternion_get_w(Quaternion *self) {
-    return Py_BuildValue("f", self->quaternion.element.w);
+    return PyFloat_FromDouble((double) self->quaternion.element.w);
 }
 
 static PyObject *quaternion_get_x(Quaternion *self) {
-    return Py_BuildValue("f", self->quaternion.element.x);
+    return PyFloat_FromDouble((double) self->quaternion.element.x);
 }
 
 static PyObject *quaternion_get_y(Quaternion *self) {
-    return Py_BuildValue("f", self->quaternion.element.y);
+    return PyFloat_FromDouble((double) self->quaternion.element.y);
 }
 
 static PyObject *quaternion_get_z(Quaternion *self) {
-    return Py_BuildValue("f", self->quaternion.element.z);
+    return PyFloat_FromDouble((double) self->quaternion.element.z);
 }
 
 static PyObject *quaternion_to_matrix(Quaternion *self, PyObject *args) {

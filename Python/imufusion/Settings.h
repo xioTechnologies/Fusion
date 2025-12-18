@@ -2,7 +2,6 @@
 #define SETTINGS_H
 
 #include "../../Fusion/Fusion.h"
-#include "Helpers.h"
 #include <Python.h>
 
 typedef struct {
@@ -13,9 +12,7 @@ typedef struct {
 static PyObject *settings_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     Settings *const self = (Settings *) subtype->tp_alloc(subtype, 0);
 
-    const char *const error = PARSE_TUPLE(args, "iffffI", &self->settings.convention, &self->settings.gain, &self->settings.gyroscopeRange, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.recoveryTriggerPeriod);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (PyArg_ParseTuple(args, "iffffI", &self->settings.convention, &self->settings.gain, &self->settings.gyroscopeRange, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.recoveryTriggerPeriod) == 0) {
         return NULL;
     }
     return (PyObject *) self;
@@ -26,11 +23,11 @@ static void settings_free(Settings *self) {
 }
 
 static PyObject *settings_get_convention(Settings *self) {
-    return Py_BuildValue("l", self->settings.convention);
+    return PyLong_FromLong(self->settings.convention);
 }
 
 static int settings_set_convention(Settings *self, PyObject *value, void *closure) {
-    const FusionConvention convention = (FusionConvention) PyFloat_AsDouble(value);
+    const FusionConvention convention = (FusionConvention) PyLong_AsUnsignedLong(value);
 
     if (PyErr_Occurred()) {
         return -1;
@@ -41,7 +38,7 @@ static int settings_set_convention(Settings *self, PyObject *value, void *closur
 }
 
 static PyObject *settings_get_gain(Settings *self) {
-    return Py_BuildValue("f", self->settings.gain);
+    return PyFloat_FromDouble((double) self->settings.gain);
 }
 
 static int settings_set_gain(Settings *self, PyObject *value, void *closure) {
@@ -56,7 +53,7 @@ static int settings_set_gain(Settings *self, PyObject *value, void *closure) {
 }
 
 static PyObject *settings_get_gyroscope_range(Settings *self) {
-    return Py_BuildValue("f", self->settings.gyroscopeRange);
+    return PyFloat_FromDouble((double) self->settings.gyroscopeRange);
 }
 
 static int settings_set_gyroscope_range(Settings *self, PyObject *value, void *closure) {
@@ -71,7 +68,7 @@ static int settings_set_gyroscope_range(Settings *self, PyObject *value, void *c
 }
 
 static PyObject *settings_get_acceleration_rejection(Settings *self) {
-    return Py_BuildValue("f", self->settings.accelerationRejection);
+    return PyFloat_FromDouble((double) self->settings.accelerationRejection);
 }
 
 static int settings_set_acceleration_rejection(Settings *self, PyObject *value, void *closure) {
@@ -86,7 +83,7 @@ static int settings_set_acceleration_rejection(Settings *self, PyObject *value, 
 }
 
 static PyObject *settings_get_magnetic_rejection(Settings *self) {
-    return Py_BuildValue("f", self->settings.magneticRejection);
+    return PyFloat_FromDouble((double) self->settings.magneticRejection);
 }
 
 static int settings_set_magnetic_rejection(Settings *self, PyObject *value, void *closure) {
@@ -101,11 +98,11 @@ static int settings_set_magnetic_rejection(Settings *self, PyObject *value, void
 }
 
 static PyObject *settings_get_recovery_trigger_period(Settings *self) {
-    return Py_BuildValue("I", self->settings.recoveryTriggerPeriod);
+    return PyLong_FromUnsignedLong((unsigned long) self->settings.recoveryTriggerPeriod);
 }
 
 static int settings_set_recovery_trigger_period(Settings *self, PyObject *value, void *closure) {
-    const unsigned int recovery_trigger_period = (unsigned int) PyFloat_AsDouble(value);
+    const unsigned int recovery_trigger_period = (unsigned int) PyLong_AsUnsignedLong(value);
 
     if (PyErr_Occurred()) {
         return -1;
