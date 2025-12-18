@@ -116,22 +116,22 @@ static int settings_set_recovery_trigger_period(Settings *self, PyObject *value,
 }
 
 static PyGetSetDef settings_get_set[] = {
-        {"convention",              (getter) settings_get_convention,              (setter) settings_set_convention,              "", NULL},
-        {"gain",                    (getter) settings_get_gain,                    (setter) settings_set_gain,                    "", NULL},
-        {"gyroscope_range",         (getter) settings_get_gyroscope_range,         (setter) settings_set_gyroscope_range,         "", NULL},
-        {"acceleration_rejection",  (getter) settings_get_acceleration_rejection,  (setter) settings_set_acceleration_rejection,  "", NULL},
-        {"magnetic_rejection",      (getter) settings_get_magnetic_rejection,      (setter) settings_set_magnetic_rejection,      "", NULL},
-        {"recovery_trigger_period", (getter) settings_get_recovery_trigger_period, (setter) settings_set_recovery_trigger_period, "", NULL},
-        {NULL}  /* sentinel */
+    {"convention", (getter) settings_get_convention, (setter) settings_set_convention, "", NULL},
+    {"gain", (getter) settings_get_gain, (setter) settings_set_gain, "", NULL},
+    {"gyroscope_range", (getter) settings_get_gyroscope_range, (setter) settings_set_gyroscope_range, "", NULL},
+    {"acceleration_rejection", (getter) settings_get_acceleration_rejection, (setter) settings_set_acceleration_rejection, "", NULL},
+    {"magnetic_rejection", (getter) settings_get_magnetic_rejection, (setter) settings_set_magnetic_rejection, "", NULL},
+    {"recovery_trigger_period", (getter) settings_get_recovery_trigger_period, (setter) settings_set_recovery_trigger_period, "", NULL},
+    {NULL} /* sentinel */
 };
 
 static PyTypeObject settings_object = {
-        PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "imufusion.Settings",
-        .tp_basicsize = sizeof(Settings),
-        .tp_dealloc = (destructor) settings_free,
-        .tp_new = settings_new,
-        .tp_getset = settings_get_set,
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "imufusion.Settings",
+    .tp_basicsize = sizeof(Settings),
+    .tp_dealloc = (destructor) settings_free,
+    .tp_new = settings_new,
+    .tp_getset = settings_get_set,
 };
 
 #endif

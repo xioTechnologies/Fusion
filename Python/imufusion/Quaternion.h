@@ -40,7 +40,7 @@ static void quaternion_free(Quaternion *self) {
 
 static PyObject *quaternion_get_wxyz(Quaternion *self) {
     const npy_intp dims[] = {4};
-    PyObject* array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->quaternion.array);
+    PyObject *array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->quaternion.array);
     Py_INCREF(self);
     PyArray_SetBaseObject((PyArrayObject *) array, (PyObject *) self);
     return array;
@@ -83,28 +83,28 @@ static PyObject *quaternion_to_euler(Quaternion *self, PyObject *args) {
 }
 
 static PyGetSetDef quaternion_get_set[] = {
-        {"wxyz", (getter) quaternion_get_wxyz, NULL, "", NULL},
-        {"w",    (getter) quaternion_get_w,    NULL, "", NULL},
-        {"x",    (getter) quaternion_get_x,    NULL, "", NULL},
-        {"y",    (getter) quaternion_get_y,    NULL, "", NULL},
-        {"z",    (getter) quaternion_get_z,    NULL, "", NULL},
-        {NULL}  /* sentinel */
+    {"wxyz", (getter) quaternion_get_wxyz, NULL, "", NULL},
+    {"w", (getter) quaternion_get_w, NULL, "", NULL},
+    {"x", (getter) quaternion_get_x, NULL, "", NULL},
+    {"y", (getter) quaternion_get_y, NULL, "", NULL},
+    {"z", (getter) quaternion_get_z, NULL, "", NULL},
+    {NULL} /* sentinel */
 };
 
 static PyMethodDef quaternion_methods[] = {
-        {"to_matrix", (PyCFunction) quaternion_to_matrix, METH_NOARGS, ""},
-        {"to_euler",  (PyCFunction) quaternion_to_euler,  METH_NOARGS, ""},
-        {NULL} /* sentinel */
+    {"to_matrix", (PyCFunction) quaternion_to_matrix, METH_NOARGS, ""},
+    {"to_euler", (PyCFunction) quaternion_to_euler, METH_NOARGS, ""},
+    {NULL} /* sentinel */
 };
 
 static PyTypeObject quaternion_object = {
-        PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "imufusion.Quaternion",
-        .tp_basicsize = sizeof(Quaternion),
-        .tp_dealloc = (destructor) quaternion_free,
-        .tp_new = quaternion_new,
-        .tp_getset = quaternion_get_set,
-        .tp_methods = quaternion_methods,
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "imufusion.Quaternion",
+    .tp_basicsize = sizeof(Quaternion),
+    .tp_dealloc = (destructor) quaternion_free,
+    .tp_new = quaternion_new,
+    .tp_getset = quaternion_get_set,
+    .tp_methods = quaternion_methods,
 };
 
 static PyObject *quaternion_from(const FusionQuaternion *const quaternion) {

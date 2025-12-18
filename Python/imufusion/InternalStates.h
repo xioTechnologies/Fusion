@@ -39,21 +39,21 @@ static PyObject *internal_states_get_magnetic_recovery_trigger(InternalStates *s
 }
 
 static PyGetSetDef internal_states_get_set[] = {
-        {"acceleration_error",            (getter) internal_states_get_acceleration_error,            NULL, "", NULL},
-        {"accelerometer_ignored",         (getter) internal_states_get_accelerometer_ignored,         NULL, "", NULL},
-        {"acceleration_recovery_trigger", (getter) internal_states_get_acceleration_recovery_trigger, NULL, "", NULL},
-        {"magnetic_error",                (getter) internal_states_get_magnetic_error,                NULL, "", NULL},
-        {"magnetometer_ignored",          (getter) internal_states_get_magnetometer_ignored,          NULL, "", NULL},
-        {"magnetic_recovery_trigger",     (getter) internal_states_get_magnetic_recovery_trigger,     NULL, "", NULL},
-        {NULL}  /* sentinel */
+    {"acceleration_error", (getter) internal_states_get_acceleration_error, NULL, "", NULL},
+    {"accelerometer_ignored", (getter) internal_states_get_accelerometer_ignored, NULL, "", NULL},
+    {"acceleration_recovery_trigger", (getter) internal_states_get_acceleration_recovery_trigger, NULL, "", NULL},
+    {"magnetic_error", (getter) internal_states_get_magnetic_error, NULL, "", NULL},
+    {"magnetometer_ignored", (getter) internal_states_get_magnetometer_ignored, NULL, "", NULL},
+    {"magnetic_recovery_trigger", (getter) internal_states_get_magnetic_recovery_trigger, NULL, "", NULL},
+    {NULL} /* sentinel */
 };
 
 static PyTypeObject internal_states_object = {
-        PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "imufusion.InternalStates",
-        .tp_basicsize = sizeof(InternalStates),
-        .tp_dealloc = (destructor) internal_states_free,
-        .tp_getset = internal_states_get_set,
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "imufusion.InternalStates",
+    .tp_basicsize = sizeof(InternalStates),
+    .tp_dealloc = (destructor) internal_states_free,
+    .tp_getset = internal_states_get_set,
 };
 
 static PyObject *internal_states_from(const FusionAhrsInternalStates *const internal_states) {

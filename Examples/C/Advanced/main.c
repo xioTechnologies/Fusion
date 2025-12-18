@@ -6,7 +6,6 @@
 #define SAMPLE_RATE (100) // replace this with actual sample rate
 
 int main() {
-
     // Define calibration (replace with actual calibration data if available)
     const FusionMatrix gyroscopeMisalignment = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     const FusionVector gyroscopeSensitivity = {1.0f, 1.0f, 1.0f};
@@ -26,18 +25,17 @@ int main() {
 
     // Set AHRS algorithm settings
     const FusionAhrsSettings settings = {
-            .convention = FusionConventionNwu,
-            .gain = 0.5f,
-            .gyroscopeRange = 2000.0f, /* replace this with actual gyroscope range in degrees/s */
-            .accelerationRejection = 10.0f,
-            .magneticRejection = 10.0f,
-            .recoveryTriggerPeriod = 5 * SAMPLE_RATE, /* 5 seconds */
+        .convention = FusionConventionNwu,
+        .gain = 0.5f,
+        .gyroscopeRange = 2000.0f, /* replace this with actual gyroscope range in degrees/s */
+        .accelerationRejection = 10.0f,
+        .magneticRejection = 10.0f,
+        .recoveryTriggerPeriod = 5 * SAMPLE_RATE, /* 5 seconds */
     };
     FusionAhrsSetSettings(&ahrs, &settings);
 
     // This loop should repeat each time new gyroscope data is available
     while (true) {
-
         // Acquire latest sensor data
         const clock_t timestamp = clock(); // replace this with actual gyroscope timestamp
         FusionVector gyroscope = {0.0f, 0.0f, 0.0f}; // replace this with actual gyroscope data in degrees/s

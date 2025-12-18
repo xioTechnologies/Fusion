@@ -35,8 +35,8 @@ static PyObject *axes_swap(PyObject *self, PyObject *args) {
 }
 
 static PyMethodDef axes_methods[] = {
-        {"axes_swap", (PyCFunction) axes_swap, METH_VARARGS, ""},
-        {NULL} /* sentinel */
+    {"axes_swap", (PyCFunction) axes_swap, METH_VARARGS, ""},
+    {NULL} /* sentinel */
 };
 
 #endif

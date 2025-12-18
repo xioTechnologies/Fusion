@@ -8,7 +8,8 @@ int main() {
     FusionAhrs ahrs;
     FusionAhrsInitialise(&ahrs);
 
-    while (true) { // this loop should repeat each time new gyroscope data is available
+    // this loop should repeat each time new gyroscope data is available
+    while (true) {
         const FusionVector gyroscope = {0.0f, 0.0f, 0.0f}; // replace this with actual gyroscope data in degrees/s
         const FusionVector accelerometer = {0.0f, 0.0f, 1.0f}; // replace this with actual accelerometer data in g
 
