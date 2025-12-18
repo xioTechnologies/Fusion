@@ -17,6 +17,11 @@ typedef struct {
 
 static PyObject *ahrs_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     Ahrs *const self = (Ahrs *) subtype->tp_alloc(subtype, 0);
+
+    if (self == NULL) {
+        return NULL;
+    }
+
     FusionAhrsInitialise(&self->ahrs);
     return (PyObject *) self;
 }

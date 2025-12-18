@@ -12,6 +12,10 @@ typedef struct {
 static PyObject *settings_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
     Settings *const self = (Settings *) subtype->tp_alloc(subtype, 0);
 
+    if (self == NULL) {
+        return NULL;
+    }
+
     if (PyArg_ParseTuple(args, "iffffI", &self->settings.convention, &self->settings.gain, &self->settings.gyroscopeRange, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.recoveryTriggerPeriod) == 0) {
         return NULL;
     }

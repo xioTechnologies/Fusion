@@ -20,6 +20,11 @@ static PyObject *offset_new(PyTypeObject *subtype, PyObject *args, PyObject *key
     }
 
     Offset *const self = (Offset *) subtype->tp_alloc(subtype, 0);
+
+    if (self == NULL) {
+        return NULL;
+    }
+
     FusionOffsetInitialise(&self->offset, sample_rate);
     return (PyObject *) self;
 }
