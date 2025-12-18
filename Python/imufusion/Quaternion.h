@@ -57,13 +57,13 @@ static PyObject *quaternion_get_z(Quaternion *self) {
     return PyFloat_FromDouble((double) self->quaternion.element.z);
 }
 
-static PyObject *quaternion_to_matrix(Quaternion *self, PyObject *args) {
+static PyObject *quaternion_to_matrix_(Quaternion *self, PyObject *args) {
     const FusionMatrix matrix = FusionQuaternionToMatrix(self->quaternion);
 
     return np_array_3x3_from(matrix.array);
 }
 
-static PyObject *quaternion_to_euler(Quaternion *self, PyObject *args) {
+static PyObject *quaternion_to_euler_(Quaternion *self, PyObject *args) {
     const FusionEuler euler = FusionQuaternionToEuler(self->quaternion);
 
     return np_array_1x3_from(euler.array);
@@ -79,8 +79,8 @@ static PyGetSetDef quaternion_get_set[] = {
 };
 
 static PyMethodDef quaternion_methods[] = {
-    {"to_matrix", (PyCFunction) quaternion_to_matrix, METH_NOARGS, ""},
-    {"to_euler", (PyCFunction) quaternion_to_euler, METH_NOARGS, ""},
+    {"to_matrix", (PyCFunction) quaternion_to_matrix_, METH_NOARGS, ""},
+    {"to_euler", (PyCFunction) quaternion_to_euler_, METH_NOARGS, ""},
     {NULL} /* sentinel */
 };
 

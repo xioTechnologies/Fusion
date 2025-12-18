@@ -64,12 +64,12 @@ jobs:
             cd {project}/Examples/Python &&
             python advanced_example.py dont_block &&
             python simple_example.py dont_block &&
-            python test_conversions.py
+            python test_convert.py
           CIBW_TEST_COMMAND_WINDOWS: >-
             cd /D {project}/Examples/Python &&
             python advanced_example.py dont_block &&
             python simple_example.py dont_block &&
-            python test_conversions.py
+            python test_convert.py
           CIBW_TEST_SKIP: "*-macosx_arm64" # fix CI warning
 
       - uses: actions/upload-artifact@v4

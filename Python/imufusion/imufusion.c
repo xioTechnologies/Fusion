@@ -1,6 +1,7 @@
 #include "Ahrs.h"
 #include "Axes.h"
 #include "Compass.h"
+#include "Convert.h"
 #include "Flags.h"
 #include "InternalStates.h"
 #include "Offset.h"
@@ -62,6 +63,7 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
         (PyModule_AddFunctions(module, axes_methods) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
+        (PyModule_AddFunctions(module, convert_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&
         add_object(module, &flags_object, "Flags") &&
         add_object(module, &internal_states_object, "InternalStates") &&
