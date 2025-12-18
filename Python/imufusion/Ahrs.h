@@ -208,33 +208,33 @@ static int ahrs_set_heading(Ahrs *self, PyObject *value, void *closure) {
 }
 
 static PyGetSetDef ahrs_get_set[] = {
-        {"settings", NULL,                                    (setter) ahrs_set_settings,   "", NULL},
-        {"quaternion",          (getter) ahrs_get_quaternion, (setter) ahrs_set_quaternion, "", NULL},
-        {"gravity",             (getter) ahrs_get_gravity,             NULL,                "", NULL},
-        {"linear_acceleration", (getter) ahrs_get_linear_acceleration, NULL,                "", NULL},
-        {"earth_acceleration",  (getter) ahrs_get_earth_acceleration,  NULL,                "", NULL},
-        {"internal_states",     (getter) ahrs_get_internal_states,     NULL,                "", NULL},
-        {"flags",               (getter) ahrs_get_flags,               NULL,                "", NULL},
-        {"heading",  NULL,                                    (setter) ahrs_set_heading,    "", NULL},
-        {NULL}  /* sentinel */
+    {"settings", NULL, (setter) ahrs_set_settings, "", NULL},
+    {"quaternion", (getter) ahrs_get_quaternion, (setter) ahrs_set_quaternion, "", NULL},
+    {"gravity", (getter) ahrs_get_gravity, NULL, "", NULL},
+    {"linear_acceleration", (getter) ahrs_get_linear_acceleration, NULL, "", NULL},
+    {"earth_acceleration", (getter) ahrs_get_earth_acceleration, NULL, "", NULL},
+    {"internal_states", (getter) ahrs_get_internal_states, NULL, "", NULL},
+    {"flags", (getter) ahrs_get_flags, NULL, "", NULL},
+    {"heading", NULL, (setter) ahrs_set_heading, "", NULL},
+    {NULL} /* sentinel */
 };
 
 static PyMethodDef ahrs_methods[] = {
-        {"reset",                   (PyCFunction) ahrs_reset,                   METH_NOARGS,  ""},
-        {"update",                  (PyCFunction) ahrs_update,                  METH_VARARGS, ""},
-        {"update_no_magnetometer",  (PyCFunction) ahrs_update_no_magnetometer,  METH_VARARGS, ""},
-        {"update_external_heading", (PyCFunction) ahrs_update_external_heading, METH_VARARGS, ""},
-        {NULL} /* sentinel */
+    {"reset", (PyCFunction) ahrs_reset, METH_NOARGS, ""},
+    {"update", (PyCFunction) ahrs_update, METH_VARARGS, ""},
+    {"update_no_magnetometer", (PyCFunction) ahrs_update_no_magnetometer, METH_VARARGS, ""},
+    {"update_external_heading", (PyCFunction) ahrs_update_external_heading, METH_VARARGS, ""},
+    {NULL} /* sentinel */
 };
 
 static PyTypeObject ahrs_object = {
-        PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "imufusion.Ahrs",
-        .tp_basicsize = sizeof(Ahrs),
-        .tp_dealloc = (destructor) ahrs_free,
-        .tp_new = ahrs_new,
-        .tp_getset = ahrs_get_set,
-        .tp_methods = ahrs_methods,
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "imufusion.Ahrs",
+    .tp_basicsize = sizeof(Ahrs),
+    .tp_dealloc = (destructor) ahrs_free,
+    .tp_new = ahrs_new,
+    .tp_getset = ahrs_get_set,
+    .tp_methods = ahrs_methods,
 };
 
 #endif

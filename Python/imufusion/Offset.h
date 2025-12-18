@@ -57,17 +57,17 @@ static PyObject *offset_update(Offset *self, PyObject *args) {
 }
 
 static PyMethodDef offset_methods[] = {
-        {"update", (PyCFunction) offset_update, METH_VARARGS, ""},
-        {NULL} /* sentinel */
+    {"update", (PyCFunction) offset_update, METH_VARARGS, ""},
+    {NULL} /* sentinel */
 };
 
 static PyTypeObject offset_object = {
-        PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "imufusion.Offset",
-        .tp_basicsize = sizeof(Offset),
-        .tp_dealloc = (destructor) offset_free,
-        .tp_new = offset_new,
-        .tp_methods = offset_methods,
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "imufusion.Offset",
+    .tp_basicsize = sizeof(Offset),
+    .tp_dealloc = (destructor) offset_free,
+    .tp_new = offset_new,
+    .tp_methods = offset_methods,
 };
 
 #endif

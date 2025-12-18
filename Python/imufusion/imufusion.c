@@ -10,10 +10,10 @@
 #include "Settings.h"
 
 static struct PyModuleDef config = {
-        PyModuleDef_HEAD_INIT,
-        "imufusion",
-        "",
-        -1,
+    PyModuleDef_HEAD_INIT,
+    "imufusion",
+    "",
+    -1,
 };
 
 bool add_object(PyObject *const module, PyTypeObject *const type_object, const char *const name) {

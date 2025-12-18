@@ -37,8 +37,8 @@ static PyObject *compass(PyObject *self, PyObject *args) {
 }
 
 static PyMethodDef compass_methods[] = {
-        {"compass", (PyCFunction) compass, METH_VARARGS, ""},
-        {NULL} /* sentinel */
+    {"compass", (PyCFunction) compass, METH_VARARGS, ""},
+    {NULL} /* sentinel */
 };
 
 #endif

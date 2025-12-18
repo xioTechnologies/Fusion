@@ -31,19 +31,19 @@ static PyObject *flags_get_magnetic_recovery(Flags *self) {
 }
 
 static PyGetSetDef flags_get_set[] = {
-        {"initialising",          (getter) flags_get_initialising,          NULL, "", NULL},
-        {"angular_rate_recovery", (getter) flags_get_angular_rate_recovery, NULL, "", NULL},
-        {"acceleration_recovery", (getter) flags_get_acceleration_recovery, NULL, "", NULL},
-        {"magnetic_recovery",     (getter) flags_get_magnetic_recovery,     NULL, "", NULL},
-        {NULL}  /* sentinel */
+    {"initialising", (getter) flags_get_initialising, NULL, "", NULL},
+    {"angular_rate_recovery", (getter) flags_get_angular_rate_recovery, NULL, "", NULL},
+    {"acceleration_recovery", (getter) flags_get_acceleration_recovery, NULL, "", NULL},
+    {"magnetic_recovery", (getter) flags_get_magnetic_recovery, NULL, "", NULL},
+    {NULL} /* sentinel */
 };
 
 static PyTypeObject flags_object = {
-        PyVarObject_HEAD_INIT(NULL, 0)
-        .tp_name = "imufusion.Flags",
-        .tp_basicsize = sizeof(Flags),
-        .tp_dealloc = (destructor) flags_free,
-        .tp_getset = flags_get_set,
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "imufusion.Flags",
+    .tp_basicsize = sizeof(Flags),
+    .tp_dealloc = (destructor) flags_free,
+    .tp_getset = flags_get_set,
 };
 
 static PyObject *flags_from(const FusionAhrsFlags *const flags) {
