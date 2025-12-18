@@ -106,8 +106,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install twine==6.0.1
-        # use twine v6.0.1 because bug in latest version (v6.1.0)    
+          python -m pip install twine
+          python -m pip install -U packaging
+        # https://github.com/pypa/twine/issues/1216#issuecomment-2606531615
 
       - name: Publish package
         env:
