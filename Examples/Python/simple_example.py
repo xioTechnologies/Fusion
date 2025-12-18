@@ -35,7 +35,7 @@ euler = np.empty((len(timestamp), 3))
 
 for index in range(len(timestamp)):
     ahrs.update_no_magnetometer(gyroscope[index], accelerometer[index], 1 / 100)  # 100 Hz sample rate
-    euler[index] = ahrs.quaternion.to_euler()
+    euler[index] = imufusion.quaternion_to_euler(ahrs.quaternion)
 
 # Plot Euler angles
 axes[2].plot(timestamp, euler[:, 0], "tab:red", label="Roll")

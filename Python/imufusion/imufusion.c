@@ -6,7 +6,6 @@
 #include "InternalStates.h"
 #include "Offset.h"
 #include <Python.h>
-#include "Quaternion.h"
 #include "Settings.h"
 
 static struct PyModuleDef config = {
@@ -68,8 +67,7 @@ PyMODINIT_FUNC PyInit_imufusion() {
         add_object(module, &flags_object, "Flags") &&
         add_object(module, &internal_states_object, "InternalStates") &&
         add_object(module, &offset_object, "Offset") &&
-        add_object(module, &settings_object, "Settings") &&
-        add_object(module, &quaternion_object, "Quaternion")) {
+        add_object(module, &settings_object, "Settings")) {
         return module;
     }
     Py_DECREF(module);
