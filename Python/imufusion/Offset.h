@@ -2,10 +2,8 @@
 #define OFFSET_H
 
 #include "../../Fusion/Fusion.h"
-#include "Helpers.h"
-#include <numpy/arrayobject.h>
+#include "NpArray.h"
 #include <Python.h>
-#include <stdlib.h>
 
 typedef struct {
     PyObject_HEAD
@@ -34,27 +32,21 @@ static void offset_free(Offset *self) {
 }
 
 static PyObject *offset_update(Offset *self, PyObject *args) {
-    PyArrayObject *input_array;
+    PyObject *gyroscope_object;
 
-    if (PyArg_ParseTuple(args, "O!", &PyArray_Type, &input_array) == 0) {
+    if (PyArg_ParseTuple(args, "O", &gyroscope_object) == 0) {
         return NULL;
     }
 
-    FusionVector input_vector;
+    FusionVector gyroscope;
 
-    const char *error = parse_array(input_vector.array, input_array, 3);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (np_array_1x3_to(gyroscope.array, gyroscope_object) != 0) {
         return NULL;
     }
 
-    FusionVector *const output_vector = malloc(sizeof(FusionVector));
-    *output_vector = FusionOffsetUpdate(&self->offset, input_vector);
+    const FusionVector compensated_gyroscope = FusionOffsetUpdate(&self->offset, gyroscope);
 
-    const npy_intp dims[] = {3};
-    PyObject *output_array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, output_vector->array);
-    PyArray_ENABLEFLAGS((PyArrayObject *) output_array, NPY_ARRAY_OWNDATA);
-    return output_array;
+    return np_array_1x3_from(compensated_gyroscope.array);
 }
 
 static PyMethodDef offset_methods[] = {
