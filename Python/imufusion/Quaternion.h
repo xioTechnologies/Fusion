@@ -2,10 +2,8 @@
 #define QUATERNION_H
 
 #include "../../Fusion/Fusion.h"
-#include "Helpers.h"
-#include <numpy/arrayobject.h>
+#include "NpArray.h"
 #include <Python.h>
-#include <stdlib.h>
 
 typedef struct {
     PyObject_HEAD
@@ -13,17 +11,15 @@ typedef struct {
 } Quaternion;
 
 static PyObject *quaternion_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
-    PyArrayObject *array;
+    PyObject *quaternion_object;
 
-    if (PyArg_ParseTuple(args, "O!", &PyArray_Type, &array) == 0) {
+    if (PyArg_ParseTuple(args, "O", &quaternion_object) == 0) {
         return NULL;
     }
 
     FusionQuaternion quaternion;
 
-    const char *error = parse_array(quaternion.array, array, 4);
-    if (error != NULL) {
-        PyErr_SetString(PyExc_TypeError, error);
+    if (np_array_1x4_to(quaternion.array, quaternion_object) != 0) {
         return NULL;
     }
 
@@ -42,11 +38,7 @@ static void quaternion_free(Quaternion *self) {
 }
 
 static PyObject *quaternion_get_wxyz(Quaternion *self) {
-    const npy_intp dims[] = {4};
-    PyObject *array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, self->quaternion.array);
-    Py_INCREF(self);
-    PyArray_SetBaseObject((PyArrayObject *) array, (PyObject *) self);
-    return array;
+    return np_array_1x4_from(self->quaternion.array);
 }
 
 static PyObject *quaternion_get_w(Quaternion *self) {
@@ -66,23 +58,15 @@ static PyObject *quaternion_get_z(Quaternion *self) {
 }
 
 static PyObject *quaternion_to_matrix(Quaternion *self, PyObject *args) {
-    FusionMatrix *const matrix = malloc(sizeof(FusionMatrix));
-    *matrix = FusionQuaternionToMatrix(self->quaternion);
+    const FusionMatrix matrix = FusionQuaternionToMatrix(self->quaternion);
 
-    const npy_intp dims[] = {3, 3};
-    PyObject *array = PyArray_SimpleNewFromData(2, dims, NPY_FLOAT, matrix->array);
-    PyArray_ENABLEFLAGS((PyArrayObject *) array, NPY_ARRAY_OWNDATA);
-    return array;
+    return np_array_3x3_from(matrix.array);
 }
 
 static PyObject *quaternion_to_euler(Quaternion *self, PyObject *args) {
-    FusionEuler *const euler = malloc(sizeof(FusionEuler));
-    *euler = FusionQuaternionToEuler(self->quaternion);
+    const FusionEuler euler = FusionQuaternionToEuler(self->quaternion);
 
-    const npy_intp dims[] = {3};
-    PyObject *array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, euler->array);
-    PyArray_ENABLEFLAGS((PyArrayObject *) array, NPY_ARRAY_OWNDATA);
-    return array;
+    return np_array_1x3_from(euler.array);
 }
 
 static PyGetSetDef quaternion_get_set[] = {
