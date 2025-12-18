@@ -8,13 +8,13 @@ static int np_array_1x3_to(float *const c_array, PyObject *object) {
     PyArrayObject *np_array = (PyArrayObject *) PyArray_FROM_OTF(object, NPY_FLOAT, NPY_ARRAY_IN_ARRAY | NPY_ARRAY_FORCECAST);
 
     if (np_array == NULL) {
-        return 1;
+        return -1;
     }
 
     if (PyArray_NDIM(np_array) != 1 || PyArray_DIM(np_array, 0) != 3) {
         PyErr_SetString(PyExc_TypeError, "Array must have shape (3,)");
         Py_DECREF(np_array);
-        return 1;
+        return -1;
     }
 
     memcpy(c_array, PyArray_DATA(np_array), sizeof(float) * 3);
@@ -26,13 +26,13 @@ static int np_array_1x4_to(float *const c_array, PyObject *object) {
     PyArrayObject *np_array = (PyArrayObject *) PyArray_FROM_OTF(object, NPY_FLOAT, NPY_ARRAY_IN_ARRAY | NPY_ARRAY_FORCECAST);
 
     if (np_array == NULL) {
-        return 1;
+        return -1;
     }
 
     if (PyArray_NDIM(np_array) != 1 || PyArray_DIM(np_array, 0) != 4) {
         PyErr_SetString(PyExc_TypeError, "Array must have shape (4,)");
         Py_DECREF(np_array);
-        return 1;
+        return -1;
     }
 
     memcpy(c_array, PyArray_DATA(np_array), sizeof(float) * 4);
