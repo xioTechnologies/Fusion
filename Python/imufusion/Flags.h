@@ -47,6 +47,11 @@ static PyTypeObject flags_object = {
 
 static PyObject *flags_from(const FusionAhrsFlags *const flags) {
     Flags *const self = (Flags *) flags_object.tp_alloc(&flags_object, 0);
+
+    if (self == NULL) {
+        return NULL;
+    }
+
     self->flags = *flags;
     return (PyObject *) self;
 }

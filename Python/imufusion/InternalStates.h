@@ -57,6 +57,11 @@ static PyTypeObject internal_states_object = {
 
 static PyObject *internal_states_from(const FusionAhrsInternalStates *const internal_states) {
     InternalStates *const self = (InternalStates *) internal_states_object.tp_alloc(&internal_states_object, 0);
+
+    if (self == NULL) {
+        return NULL;
+    }
+
     self->internal_states = *internal_states;
     return (PyObject *) self;
 }

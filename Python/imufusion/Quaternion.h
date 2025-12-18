@@ -28,6 +28,11 @@ static PyObject *quaternion_new(PyTypeObject *subtype, PyObject *args, PyObject 
     }
 
     Quaternion *const self = (Quaternion *) subtype->tp_alloc(subtype, 0);
+
+    if (self == NULL) {
+        return NULL;
+    }
+
     self->quaternion = quaternion;
     return (PyObject *) self;
 }
@@ -107,6 +112,11 @@ static PyTypeObject quaternion_object = {
 
 static PyObject *quaternion_from(const FusionQuaternion *const quaternion) {
     Quaternion *const self = (Quaternion *) quaternion_object.tp_alloc(&quaternion_object, 0);
+
+    if (self == NULL) {
+        return NULL;
+    }
+
     self->quaternion = *quaternion;
     return (PyObject *) self;
 }
