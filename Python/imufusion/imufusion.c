@@ -2,10 +2,10 @@
 #include "AhrsFlags.h"
 #include "AhrsInternalStates.h"
 #include "AhrsSettings.h"
+#include "Bias.h"
 #include "Compass.h"
 #include "Convert.h"
 #include "Model.h"
-#include "Offset.h"
 #include <Python.h>
 #include "Remap.h"
 
@@ -72,7 +72,7 @@ PyMODINIT_FUNC PyInit_imufusion() {
         add_object(module, &ahrs_flags_object, "AhrsFlags") &&
         add_object(module, &ahrs_internal_states_object, "AhrsInternalStates") &&
         add_object(module, &ahrs_settings_object, "AhrsSettings") &&
-        add_object(module, &offset_object, "Offset")) {
+        add_object(module, &bias_object, "Bias")) {
         return module;
     }
 

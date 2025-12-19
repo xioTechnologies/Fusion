@@ -1,5 +1,5 @@
 /**
- * @file FusionOffset.c
+ * @file FusionBias.c
  * @author Seb Madgwick
  * @brief Run-time estimation and compensation of gyroscope offset.
  */
@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------
 // Includes
 
-#include "FusionOffset.h"
+#include "FusionBias.h"
 #include <math.h>
 
 //------------------------------------------------------------------------------
@@ -32,42 +32,42 @@
 // Functions
 
 /**
- * @brief Initialises the offset structure.
- * @param offset Offset structure.
+ * @brief Initialises the bias structure.
+ * @param bias Bias structure.
  * @param sampleRate Sample rate in Hz.
  */
-void FusionOffsetInitialise(FusionOffset *const offset, const unsigned int sampleRate) {
-    offset->filterCoefficient = 2.0f * (float) M_PI * CUTOFF_FREQUENCY * (1.0f / (float) sampleRate);
-    offset->timeout = TIMEOUT * sampleRate;
-    offset->timer = 0;
-    offset->gyroscopeOffset = FUSION_VECTOR_ZERO;
+void FusionBiasInitialise(FusionBias *const bias, const unsigned int sampleRate) {
+    bias->filterCoefficient = 2.0f * (float) M_PI * CUTOFF_FREQUENCY * (1.0f / (float) sampleRate);
+    bias->timeout = TIMEOUT * sampleRate;
+    bias->timer = 0;
+    bias->gyroscopeOffset = FUSION_VECTOR_ZERO;
 }
 
 /**
- * @brief Updates the offset algorithm and returns the offset-corrected
+ * @brief Updates the bias algorithm and returns the offset-corrected
  * gyroscope.
- * @param offset Offset structure.
+ * @param bias Bias structure.
  * @param gyroscope Gyroscope in degrees per second.
  * @return Offset-corrected gyroscope in degrees per second.
  */
-FusionVector FusionOffsetUpdate(FusionOffset *const offset, FusionVector gyroscope) {
+FusionVector FusionBiasUpdate(FusionBias *const bias, FusionVector gyroscope) {
     // Apply gyroscope offset
-    gyroscope = FusionVectorSubtract(gyroscope, offset->gyroscopeOffset);
+    gyroscope = FusionVectorSubtract(gyroscope, bias->gyroscopeOffset);
 
     // Reset timer if gyroscope not stationary
     if ((fabsf(gyroscope.axis.x) > THRESHOLD) || (fabsf(gyroscope.axis.y) > THRESHOLD) || (fabsf(gyroscope.axis.z) > THRESHOLD)) {
-        offset->timer = 0;
+        bias->timer = 0;
         return gyroscope;
     }
 
     // Increment timer while gyroscope stationary
-    if (offset->timer < offset->timeout) {
-        offset->timer++;
+    if (bias->timer < bias->timeout) {
+        bias->timer++;
         return gyroscope;
     }
 
     // Update high-pass filter while timer has elapsed
-    offset->gyroscopeOffset = FusionVectorAdd(offset->gyroscopeOffset, FusionVectorScale(gyroscope, offset->filterCoefficient));
+    bias->gyroscopeOffset = FusionVectorAdd(bias->gyroscopeOffset, FusionVectorScale(gyroscope, bias->filterCoefficient));
     return gyroscope;
 }
 

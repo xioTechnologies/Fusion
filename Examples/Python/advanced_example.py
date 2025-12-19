@@ -15,7 +15,7 @@ accelerometer = data[:, 4:7]
 magnetometer = data[:, 7:10]
 
 # Instantiate algorithms
-offset = imufusion.Offset(sample_rate)
+bias = imufusion.Bias(sample_rate)
 ahrs = imufusion.Ahrs()
 
 ahrs.settings = imufusion.AhrsSettings(
@@ -35,7 +35,7 @@ internal_states = np.empty((len(timestamp), 6))
 flags = np.empty((len(timestamp), 4))
 
 for index in range(len(timestamp)):
-    gyroscope[index] = offset.update(gyroscope[index])
+    gyroscope[index] = bias.update(gyroscope[index])
 
     ahrs.update(gyroscope[index], accelerometer[index], magnetometer[index], delta_time[index])
 

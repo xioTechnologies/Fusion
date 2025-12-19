@@ -126,7 +126,7 @@ class AhrsSettings:
     @recovery_trigger_period.setter
     def recovery_trigger_period(self, recovery_trigger_period: int) -> None: ...
 
-# offset_object
-class Offset:
+# bias_object
+class Bias:
     def __init__(self, sample_rate: int) -> None: ...
     def update(self, gyroscope: np.ndarray) -> np.ndarray: ...
