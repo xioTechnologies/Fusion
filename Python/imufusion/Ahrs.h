@@ -2,12 +2,11 @@
 #define AHRS_H
 
 #include "../../Fusion/Fusion.h"
-#include "Flags.h"
-#include "InternalStates.h"
+#include "AhrsFlags.h"
+#include "AhrsInternalStates.h"
+#include "AhrsSettings.h"
 #include "NpArray.h"
 #include <Python.h>
-#include "Settings.h"
-#include <stdio.h>
 
 typedef struct {
     PyObject_HEAD
@@ -30,12 +29,12 @@ static void ahrs_free(Ahrs *self) {
 }
 
 static int ahrs_set_settings(Ahrs *self, PyObject *value, void *closure) {
-    if (!PyObject_TypeCheck(value, &settings_object)) {
-        PyErr_Format(PyExc_TypeError, "Expected %s", settings_object.tp_name);
+    if (!PyObject_TypeCheck(value, &ahrs_settings_object)) {
+        PyErr_Format(PyExc_TypeError, "Expected %s", ahrs_settings_object.tp_name);
         return -1;
     }
 
-    FusionAhrsSetSettings(&self->ahrs, &((Settings *) value)->settings);
+    FusionAhrsSetSettings(&self->ahrs, &((AhrsSettings *) value)->settings);
     return 0;
 }
 
@@ -83,7 +82,7 @@ static PyObject *ahrs_get_internal_states(Ahrs *self) {
 static PyObject *ahrs_get_flags(Ahrs *self) {
     const FusionAhrsFlags flags = FusionAhrsGetFlags(&self->ahrs);
 
-    return flags_from(&flags);
+    return ahrs_flags_from(&flags);
 }
 
 static PyObject *ahrs_reset(Ahrs *self, PyObject *args) {

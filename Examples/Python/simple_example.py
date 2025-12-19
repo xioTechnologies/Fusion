@@ -1,7 +1,8 @@
+import sys
+
 import imufusion
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 
 # Import sensor data
 data = np.genfromtxt("sensor_data.csv", delimiter=",", skip_header=1)
