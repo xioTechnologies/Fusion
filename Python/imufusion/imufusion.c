@@ -1,12 +1,12 @@
 #include "Ahrs.h"
+#include "AhrsFlags.h"
+#include "AhrsInternalStates.h"
+#include "AhrsSettings.h"
 #include "Axes.h"
 #include "Compass.h"
 #include "Convert.h"
-#include "Flags.h"
-#include "InternalStates.h"
 #include "Offset.h"
 #include <Python.h>
-#include "Settings.h"
 
 static struct PyModuleDef config = {
     PyModuleDef_HEAD_INIT,
@@ -16,14 +16,17 @@ static struct PyModuleDef config = {
 };
 
 bool add_object(PyObject *const module, PyTypeObject *const type_object, const char *const name) {
-    if (PyType_Ready(type_object) == 0) {
-        Py_INCREF(type_object);
-        if (PyModule_AddObject(module, name, (PyObject *) type_object) == 0) {
-            return true;
-        }
-        Py_DECREF(type_object);
+    if (PyType_Ready(type_object) != 0) {
         return false;
     }
+
+    Py_INCREF(type_object);
+
+    if (PyModule_AddObject(module, name, (PyObject *) type_object) == 0) {
+        return true;
+    }
+
+    Py_DECREF(type_object);
     return false;
 }
 
@@ -64,12 +67,13 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
         (PyModule_AddFunctions(module, convert_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&
-        add_object(module, &flags_object, "Flags") &&
-        add_object(module, &internal_states_object, "InternalStates") &&
-        add_object(module, &offset_object, "Offset") &&
-        add_object(module, &settings_object, "Settings")) {
+        add_object(module, &ahrs_flags_object, "AhrsFlags") &&
+        add_object(module, &ahrs_internal_states_object, "AhrsInternalStates") &&
+        add_object(module, &ahrs_settings_object, "AhrsSettings") &&
+        add_object(module, &offset_object, "Offset")) {
         return module;
     }
+
     Py_DECREF(module);
     return NULL;
 }
