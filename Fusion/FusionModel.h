@@ -1,11 +1,11 @@
 /**
- * @file FusionCalibration.h
+ * @file FusionModel.h
  * @author Seb Madgwick
- * @brief Sensor calibration models.
+ * @brief Sensor models for applying calibration parameters.
  */
 
-#ifndef FUSION_CALIBRATION_H
-#define FUSION_CALIBRATION_H
+#ifndef FUSION_MODEL_H
+#define FUSION_MODEL_H
 
 //------------------------------------------------------------------------------
 // Includes
@@ -16,26 +16,26 @@
 // Inline functions
 
 /**
- * @brief Gyroscope and accelerometer calibration model.
+ * @brief Gyroscope and accelerometer sensor model.
  * @param uncalibrated Uncalibrated gyroscope or accelerometer.
  * @param misalignment Misalignment matrix.
  * @param sensitivity Sensitivity.
  * @param offset Offset.
  * @return Calibrated gyroscope or accelerometer.
  */
-static inline FusionVector FusionCalibrationInertial(const FusionVector uncalibrated, const FusionMatrix misalignment, const FusionVector sensitivity, const FusionVector offset) {
+static inline FusionVector FusionModelInertial(const FusionVector uncalibrated, const FusionMatrix misalignment, const FusionVector sensitivity, const FusionVector offset) {
     return FusionMatrixMultiply(misalignment, FusionVectorHadamard(FusionVectorSubtract(uncalibrated, offset), sensitivity));
 }
 
 /**
- * @brief Magnetometer calibration model.
+ * @brief Magnetometer sensor model.
  * @param uncalibrated Uncalibrated magnetometer.
- * @param softIron Soft-iron matrix.
- * @param hardIron Hard-iron offset.
+ * @param softIronMatrix Soft-iron matrix.
+ * @param hardIronOffset Hard-iron offset.
  * @return Calibrated magnetometer.
  */
-static inline FusionVector FusionCalibrationMagnetic(const FusionVector uncalibrated, const FusionMatrix softIron, const FusionVector hardIron) {
-    return FusionMatrixMultiply(softIron, FusionVectorSubtract(uncalibrated, hardIron));
+static inline FusionVector FusionModelMagnetic(const FusionVector uncalibrated, const FusionMatrix softIronMatrix, const FusionVector hardIronOffset) {
+    return FusionMatrixMultiply(softIronMatrix, FusionVectorSubtract(uncalibrated, hardIronOffset));
 }
 
 #endif
