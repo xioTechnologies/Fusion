@@ -18,7 +18,7 @@
  * @param convention Earth axes convention.
  * @param accelerometer Accelerometer in any calibrated units.
  * @param magnetometer Magnetometer in any calibrated units.
- * @return Heading in degrees.
+ * @return Magnetic heading in degrees.
  */
 float FusionCompass(const FusionConvention convention, const FusionVector accelerometer, const FusionVector magnetometer) {
     switch (convention) {
