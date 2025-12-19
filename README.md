@@ -116,6 +116,10 @@ where:
 - $\mathbf{S}$ = Soft-iron matrix (`softIron` parameter)
 - $\mathbf{h}$ = Hard-iron offset vector (`hardIron` parameter)
 
+## Remap sensor axes
+
+Sensors are often mounted such that their axes are not aligned with the body axes. The library provides the `FusionRemap` function to remap sensor axes to the body frame using one of the 24 possible orthogonal axis permutations defined by `FusionRemapAlignment`.
+
 ## Fast inverse square root
 
 Fusion uses [Pizer's implementation](https://pizer.wordpress.com/2008/10/12/fast-inverse-square-root/) of the [fast inverse square root](https://en.wikipedia.org/wiki/Fast_inverse_square_root) algorithm for vector and quaternion normalisation. Including the definition `FUSION_USE_NORMAL_SQRT` in [FusionMath.h](https://github.com/xioTechnologies/Fusion/blob/main/Fusion/FusionMath.h) or adding this as a preprocessor definition will use normal square root operations for all normalisation calculations. This will slow down execution speed for a small increase in accuracy. The increase in accuracy will typically be too small to observe on any practical system.
