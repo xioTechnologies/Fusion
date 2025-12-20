@@ -7,8 +7,8 @@ ext_modules = Extension(
     "imufusion",
     [
         "Fusion/FusionAhrs.c",
-        "Fusion/FusionCompass.c",
         "Fusion/FusionBias.c",
+        "Fusion/FusionCompass.c",
         "Python/imufusion/imufusion.c",
     ],
     include_dirs=[numpy.get_include()],
