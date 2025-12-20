@@ -81,13 +81,13 @@ The gyroscope offset correction algorithm provides run-time calibration of the g
 
 The algorithm calculates the gyroscope offset by detecting the stationary periods that occur naturally in most applications. Gyroscope measurements are sampled during these periods and low-pass filtered to obtain the gyroscope offset. The algorithm requires that gyroscope measurements do not exceed +/-3 degrees per second while stationary. Basic gyroscope offset calibration may be necessary to ensure that the initial offset plus measurement noise is within these bounds.
 
-## Sensor calibration models
+## Sensor models
 
-Sensor calibration is essential for accurate measurements. The library provides functions to apply gyroscope, accelerometer, and magnetometer calibration parameters, but it does not provide a solution for determining those parameters.
+Accurate algorithm outputs require calibrated sensor measurements. The library provides sensor models for applying gyroscope, accelerometer, and magnetometer calibration parameters. The library does not provide a method to determine these parameters.
 
-### Inertial calibration
+### Inertial model
 
-The `FusionCalibrationInertial` function applies gyroscope or accelerometer calibration parameters using the model:
+The `FusionModelInertial` function applies gyroscope or accelerometer calibration parameters using the model:
 
 $$
 \mathbf{i}_c = \mathbf{M} \mathbf{s} (\mathbf{i}_u - \mathbf{b})
@@ -96,14 +96,14 @@ $$
 where:
 
 - $\mathbf{i}_c$ = Calibrated gyroscope or accelerometer (function return value)
-- $\mathbf{i}_u$ = Uncalibrated gyroscope or accelerometer (`uncalibrated` parameter)
-- $\mathbf{M}$ = Misalignment matrix (`misalignment` parameter)
-- $\mathbf{s}$ = Sensitivity diagonal matrix (`sensitivity` parameter)
-- $\mathbf{b}$ = Offset vector (`offset` parameter)
+- $\mathbf{i}_u$ = Uncalibrated gyroscope or accelerometer (`uncalibrated` function parameter)
+- $\mathbf{M}$ = Misalignment matrix (`misalignment` function parameter)
+- $\mathbf{s}$ = Sensitivity diagonal matrix (`sensitivity` function parameter)
+- $\mathbf{b}$ = Offset vector (`offset` function parameter)
 
-### Magnetic calibration
+### Magnetic model
 
-The `FusionCalibrationMagnetic` function applies magnetometer calibration parameters using the model:
+The `FusionModelMagnetic` function applies magnetometer calibration parameters using the model:
 
 $$
 \mathbf{m}_c = \mathbf{S} (\mathbf{m}_u - \mathbf{h})
@@ -112,9 +112,9 @@ $$
 where:
 
 - $\mathbf{m}_c$ = Calibrated magnetometer (function return value)
-- $\mathbf{m}_u$ = Uncalibrated magnetometer (`uncalibrated` parameter)
-- $\mathbf{S}$ = Soft-iron matrix (`softIron` parameter)
-- $\mathbf{h}$ = Hard-iron offset vector (`hardIron` parameter)
+- $\mathbf{m}_u$ = Uncalibrated magnetometer (`uncalibrated` function parameter)
+- $\mathbf{S}$ = Soft-iron matrix (`softIronMatrix` function parameter)
+- $\mathbf{h}$ = Hard-iron offset vector (`hardIronOffset` function parameter)
 
 ## Remap sensor axes
 

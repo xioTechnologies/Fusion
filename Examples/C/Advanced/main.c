@@ -46,11 +46,11 @@ int main() {
         FusionVector magnetometer = {1.0f, 0.0f, 0.0f};
 
         // Apply calibration
-        gyroscope = FusionCalibrationInertial(gyroscope, gyroscopeMisalignment, gyroscopeSensitivity, gyroscopeOffset);
+        gyroscope = FusionModelInertial(gyroscope, gyroscopeMisalignment, gyroscopeSensitivity, gyroscopeOffset);
 
-        accelerometer = FusionCalibrationInertial(accelerometer, accelerometerMisalignment, accelerometerSensitivity, accelerometerOffset);
+        accelerometer = FusionModelInertial(accelerometer, accelerometerMisalignment, accelerometerSensitivity, accelerometerOffset);
 
-        magnetometer = FusionCalibrationMagnetic(magnetometer, softIronMatrix, hardIronOffset);
+        magnetometer = FusionModelMagnetic(magnetometer, softIronMatrix, hardIronOffset);
 
         // Update gyroscope offset correction algorithm
         gyroscope = FusionOffsetUpdate(&offset, gyroscope);
