@@ -75,9 +75,9 @@ The AHRS algorithm flags are defined by the `FusionAhrsFlags` structure and obta
 | `accelerationRecovery` | `true` if acceleration recovery is active. |
 | `magneticRecovery`     | `true` if a magnetic recovery is active.   |
 
-## Gyroscope offset correction algorithm
+## Bias algorithm
 
-The gyroscope offset correction algorithm provides run-time calibration of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place. This algorithm should be used in conjunction with the AHRS algorithm to achieve best performance.
+The bias algorithm provides run-time estimation of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place. This algorithm should be used in conjunction with the AHRS algorithm to achieve best performance.
 
 The algorithm calculates the gyroscope offset by detecting the stationary periods that occur naturally in most applications. Gyroscope measurements are sampled during these periods and low-pass filtered to obtain the gyroscope offset. The algorithm requires that gyroscope measurements do not exceed +/-3 degrees per second while stationary. Basic gyroscope offset calibration may be necessary to ensure that the initial offset plus measurement noise is within these bounds.
 
