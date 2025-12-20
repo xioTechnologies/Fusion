@@ -15,7 +15,10 @@ accelerometer = data[:, 4:7]
 magnetometer = data[:, 7:10]
 
 # Instantiate algorithms
-bias = imufusion.Bias(sample_rate)
+bias = imufusion.Bias()
+
+bias.settings = imufusion.BiasSettings(sample_rate)
+
 ahrs = imufusion.Ahrs()
 
 ahrs.settings = imufusion.AhrsSettings(
