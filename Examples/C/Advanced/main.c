@@ -18,14 +18,10 @@ int main() {
     const FusionMatrix softIronMatrix = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     const FusionVector hardIronOffset = {0.0f, 0.0f, 0.0f};
 
-    // Initialise structures
-    FusionBias bias;
+    // Instantiate AHRS algorithm
     FusionAhrs ahrs;
-
-    FusionBiasInitialise(&bias, SAMPLE_RATE);
     FusionAhrsInitialise(&ahrs);
 
-    // Set AHRS settings
     const FusionAhrsSettings settings = {
         .convention = FusionConventionNwu,
         .gain = 0.5f,
@@ -36,6 +32,15 @@ int main() {
     };
 
     FusionAhrsSetSettings(&ahrs, &settings);
+
+    // Instantiate bias algorithm
+    FusionBias bias;
+    FusionBiasInitialise(&bias);
+
+    FusionBiasSettings biasSettings = fusionBiasDefaultSettings;
+    biasSettings.sampleRate = SAMPLE_RATE;
+
+    FusionBiasSetSettings(&bias, &biasSettings);
 
     // This loop should repeat for each new gyroscope measurement
     while (true) {
