@@ -96,7 +96,7 @@ typedef union {
 /**
  * @brief Identity matrix.
  */
-#define FUSION_MATRIX_IDENTITY ((FusionMatrix){ .array = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}} })
+#define FUSION_MATRIX_IDENTITY ((FusionMatrix){ .array = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f} })
 
 /**
  * @brief Euler angles of zero.
