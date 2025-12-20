@@ -4,6 +4,7 @@
 #include "AhrsSettings.h"
 #include "Compass.h"
 #include "Convert.h"
+#include "Model.h"
 #include "Offset.h"
 #include <Python.h>
 #include "Remap.h"
@@ -65,6 +66,7 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
         (PyModule_AddFunctions(module, convert_methods) == 0) &&
+        (PyModule_AddFunctions(module, model_methods) == 0) &&
         (PyModule_AddFunctions(module, remap_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&
         add_object(module, &ahrs_flags_object, "AhrsFlags") &&
