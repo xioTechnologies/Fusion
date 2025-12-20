@@ -2,6 +2,7 @@
 #define BIAS_H
 
 #include "../../Fusion/Fusion.h"
+#include "BiasSettings.h"
 #include "NpArray.h"
 #include <Python.h>
 
@@ -11,9 +12,7 @@ typedef struct {
 } Bias;
 
 static PyObject *bias_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
-    unsigned int sample_rate;
-
-    if (PyArg_ParseTuple(args, "I", &sample_rate) == 0) {
+    if (PyArg_ParseTuple(args, "") == 0) {
         return NULL;
     }
 
@@ -23,12 +22,22 @@ static PyObject *bias_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-    FusionBiasInitialise(&self->wrapped, sample_rate);
+    FusionBiasInitialise(&self->wrapped);
     return (PyObject *) self;
 }
 
 static void bias_free(Bias *self) {
     Py_TYPE(self)->tp_free(self);
+}
+
+static int bias_set_settings(Bias *self, PyObject *value, void *closure) {
+    if (PyObject_TypeCheck(value, &bias_settings_object) == 0) {
+        PyErr_Format(PyExc_TypeError, "'settings' must be %s", bias_settings_object.tp_name);
+        return -1;
+    }
+
+    FusionBiasSetSettings(&self->wrapped, &((BiasSettings *) value)->settings);
+    return 0;
 }
 
 static PyObject *bias_update(Bias *self, PyObject *arg) {
@@ -43,6 +52,11 @@ static PyObject *bias_update(Bias *self, PyObject *arg) {
     return np_array_1x3_from(compensated_gyroscope.array);
 }
 
+static PyGetSetDef bias_get_set[] = {
+    {"settings", NULL, (setter) bias_set_settings, "", NULL},
+    {NULL} /* sentinel */
+};
+
 static PyMethodDef bias_methods[] = {
     {"update", (PyCFunction) bias_update, METH_O, ""},
     {NULL} /* sentinel */
@@ -55,6 +69,7 @@ static PyTypeObject bias_object = {
     .tp_dealloc = (destructor) bias_free,
     .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_new = bias_new,
+    .tp_getset = bias_get_set,
     .tp_methods = bias_methods,
 };
 
