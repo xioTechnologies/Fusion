@@ -2,11 +2,11 @@
 #include "AhrsFlags.h"
 #include "AhrsInternalStates.h"
 #include "AhrsSettings.h"
-#include "Axes.h"
 #include "Compass.h"
 #include "Convert.h"
 #include "Offset.h"
 #include <Python.h>
+#include "Remap.h"
 
 static struct PyModuleDef config = {
     PyModuleDef_HEAD_INIT,
@@ -36,36 +36,36 @@ PyMODINIT_FUNC PyInit_imufusion() {
     PyObject *const module = PyModule_Create(&config);
 
     if (module != NULL &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PXPYPZ", FusionAxesAlignmentPXPYPZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PXNZPY", FusionAxesAlignmentPXNZPY) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PXNYNZ", FusionAxesAlignmentPXNYNZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PXPZNY", FusionAxesAlignmentPXPZNY) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NXPYNZ", FusionAxesAlignmentNXPYNZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NXPZPY", FusionAxesAlignmentNXPZPY) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NXNYPZ", FusionAxesAlignmentNXNYPZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NXNZNY", FusionAxesAlignmentNXNZNY) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PYNXPZ", FusionAxesAlignmentPYNXPZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PYNZNX", FusionAxesAlignmentPYNZNX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PYPXNZ", FusionAxesAlignmentPYPXNZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PYPZPX", FusionAxesAlignmentPYPZPX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NYPXPZ", FusionAxesAlignmentNYPXPZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NYNZPX", FusionAxesAlignmentNYNZPX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NYNXNZ", FusionAxesAlignmentNYNXNZ) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NYPZNX", FusionAxesAlignmentNYPZNX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PZPYNX", FusionAxesAlignmentPZPYNX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PZPXPY", FusionAxesAlignmentPZPXPY) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PZNYPX", FusionAxesAlignmentPZNYPX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_PZNXNY", FusionAxesAlignmentPZNXNY) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NZPYPX", FusionAxesAlignmentNZPYPX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NZNXPY", FusionAxesAlignmentNZNXPY) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NZNYNX", FusionAxesAlignmentNZNYNX) == 0) &&
-        (PyModule_AddIntConstant(module, "ALIGNMENT_NZPXNY", FusionAxesAlignmentNZPXNY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PXPYPZ", FusionRemapAlignmentPXPYPZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PXNZPY", FusionRemapAlignmentPXNZPY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PXNYNZ", FusionRemapAlignmentPXNYNZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PXPZNY", FusionRemapAlignmentPXPZNY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NXPYNZ", FusionRemapAlignmentNXPYNZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NXPZPY", FusionRemapAlignmentNXPZPY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NXNYPZ", FusionRemapAlignmentNXNYPZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NXNZNY", FusionRemapAlignmentNXNZNY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PYNXPZ", FusionRemapAlignmentPYNXPZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PYNZNX", FusionRemapAlignmentPYNZNX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PYPXNZ", FusionRemapAlignmentPYPXNZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PYPZPX", FusionRemapAlignmentPYPZPX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NYPXPZ", FusionRemapAlignmentNYPXPZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NYNZPX", FusionRemapAlignmentNYNZPX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NYNXNZ", FusionRemapAlignmentNYNXNZ) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NYPZNX", FusionRemapAlignmentNYPZNX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PZPYNX", FusionRemapAlignmentPZPYNX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PZPXPY", FusionRemapAlignmentPZPXPY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PZNYPX", FusionRemapAlignmentPZNYPX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_PZNXNY", FusionRemapAlignmentPZNXNY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NZPYPX", FusionRemapAlignmentNZPYPX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NZNXPY", FusionRemapAlignmentNZNXPY) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NZNYNX", FusionRemapAlignmentNZNYNX) == 0) &&
+        (PyModule_AddIntConstant(module, "ALIGNMENT_NZPXNY", FusionRemapAlignmentNZPXNY) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_NWU", FusionConventionNwu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_ENU", FusionConventionEnu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
-        (PyModule_AddFunctions(module, axes_methods) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
         (PyModule_AddFunctions(module, convert_methods) == 0) &&
+        (PyModule_AddFunctions(module, remap_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&
         add_object(module, &ahrs_flags_object, "AhrsFlags") &&
         add_object(module, &ahrs_internal_states_object, "AhrsInternalStates") &&

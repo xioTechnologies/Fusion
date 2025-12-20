@@ -1,11 +1,11 @@
-#ifndef AXES_H
-#define AXES_H
+#ifndef REMAP_H
+#define REMAP_H
 
 #include "../../Fusion/Fusion.h"
 #include "NpArray.h"
 #include <Python.h>
 
-static PyObject *axes_swap(PyObject *self, PyObject *args) {
+static PyObject *remap(PyObject *self, PyObject *args) {
     PyObject *sensor_object;
     int alignment;
 
@@ -19,13 +19,13 @@ static PyObject *axes_swap(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    const FusionVector aligned_sensor = FusionAxesSwap(sensor, (FusionAxesAlignment) alignment);
+    const FusionVector remapped_sensor = FusionRemap(sensor, (FusionRemapAlignment) alignment);
 
-    return np_array_1x3_from(aligned_sensor.array);
+    return np_array_1x3_from(remapped_sensor.array);
 }
 
-static PyMethodDef axes_methods[] = {
-    {"axes_swap", (PyCFunction) axes_swap, METH_VARARGS, ""},
+static PyMethodDef remap_methods[] = {
+    {"remap", (PyCFunction) remap, METH_VARARGS, ""},
     {NULL} /* sentinel */
 };
 
