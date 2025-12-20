@@ -1,8 +1,7 @@
 /**
  * @file FusionOffset.c
  * @author Seb Madgwick
- * @brief Gyroscope offset correction algorithm for run-time calibration of the
- * gyroscope offset.
+ * @brief Run-time estimation and compensation of gyroscope offset.
  */
 
 //------------------------------------------------------------------------------
@@ -15,7 +14,7 @@
 // Definitions
 
 /**
- * @brief Cutoff frequency in Hz.
+ * @brief High-pass filter cutoff frequency in Hz.
  */
 #define CUTOFF_FREQUENCY (0.02f)
 
@@ -33,8 +32,8 @@
 // Functions
 
 /**
- * @brief Initialises the gyroscope offset algorithm.
- * @param offset Gyroscope offset algorithm structure.
+ * @brief Initialises the offset structure.
+ * @param offset Offset structure.
  * @param sampleRate Sample rate in Hz.
  */
 void FusionOffsetInitialise(FusionOffset *const offset, const unsigned int sampleRate) {
@@ -45,14 +44,14 @@ void FusionOffsetInitialise(FusionOffset *const offset, const unsigned int sampl
 }
 
 /**
- * @brief Updates the gyroscope offset algorithm and returns the corrected
+ * @brief Updates the offset algorithm and returns the offset-corrected
  * gyroscope.
- * @param offset Gyroscope offset algorithm structure.
+ * @param offset Offset structure.
  * @param gyroscope Gyroscope in degrees per second.
- * @return Corrected gyroscope in degrees per second.
+ * @return Offset-corrected gyroscope in degrees per second.
  */
 FusionVector FusionOffsetUpdate(FusionOffset *const offset, FusionVector gyroscope) {
-    // Subtract offset from gyroscope
+    // Apply gyroscope offset
     gyroscope = FusionVectorSubtract(gyroscope, offset->gyroscopeOffset);
 
     // Reset timer if gyroscope not stationary
@@ -67,7 +66,7 @@ FusionVector FusionOffsetUpdate(FusionOffset *const offset, FusionVector gyrosco
         return gyroscope;
     }
 
-    // Adjust offset if timer has elapsed
+    // Update high-pass filter while timer has elapsed
     offset->gyroscopeOffset = FusionVectorAdd(offset->gyroscopeOffset, FusionVectorScale(gyroscope, offset->filterCoefficient));
     return gyroscope;
 }
