@@ -63,6 +63,7 @@ jobs:
           CIBW_TEST_COMMAND: >-
             cd {project}/Examples/Python &&
             python advanced_example.py dont_block &&
+            python compass_vs_ahrs.py dont_block &&
             python simple_example.py dont_block &&
             python test_convert.py
             python test_model.py
@@ -70,6 +71,7 @@ jobs:
           CIBW_TEST_COMMAND_WINDOWS: >-
             cd /D {project}/Examples/Python &&
             python advanced_example.py dont_block &&
+            python compass_vs_ahrs.py dont_block &&
             python simple_example.py dont_block &&
             python test_convert.py
             python test_model.py
