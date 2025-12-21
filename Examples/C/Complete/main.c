@@ -26,6 +26,15 @@ int main() {
 
     FusionBiasSetSettings(&bias, &biasSettings);
 
+    // Configure hard-iron algorithm
+    FusionHardIron hardIron;
+    FusionHardIronInitialise(&hardIron);
+
+    FusionHardIronSettings hardIronSettings = fusionHardIronDefaultSettings;
+    hardIronSettings.sampleRate = sampleRate;
+
+    FusionHardIronSetSettings(&hardIron, &hardIronSettings);
+
     // Open CSV file
     FILE *file = fopen(SENSOR_DATA_CSV, "r");
 
@@ -90,6 +99,18 @@ int main() {
 
         // Update bias algorithm
         gyroscope = FusionBiasUpdate(&bias, gyroscope);
+
+        // Update hard-iron algorithm
+        const FusionResult result = FusionHardIronUpdate(&hardIron, magnetometer); // call FusionHardIronStart(&hardIron) to start calibration
+
+        if (result != FusionResultOk) {
+            printf("Hard-iron update failed. %s.\n", FusionResultToString(result));
+        }
+
+        // Print hard-iron progress
+        const FusionProgress progress = FusionHardIronGetProgress(&hardIron);
+
+        printf("Hard-iron progress: %s (%d%%)\n", FusionProgressStatusToString(progress.status), progress.percentage);
 
         // Remap sensor axes
         const FusionRemapAlignment alignment = FusionRemapAlignmentPXPYPZ;
