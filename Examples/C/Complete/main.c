@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define HARD_IRON_TRIGGER() false
+
 int main() {
     const float sampleRate = 100.0f; // Hz
 
@@ -25,6 +27,15 @@ int main() {
     biasSettings.sampleRate = sampleRate;
 
     FusionBiasSetSettings(&bias, &biasSettings);
+
+    // Configure hard-iron algorithm
+    FusionHardIron hardIron;
+    FusionHardIronInitialise(&hardIron);
+
+    FusionHardIronSettings hardIronSettings = fusionHardIronDefaultSettings;
+    hardIronSettings.sampleRate = sampleRate;
+
+    FusionHardIronSetSettings(&hardIron, &hardIronSettings);
 
     // Open CSV file
     FILE *file = fopen(SENSOR_DATA_CSV, "r");
@@ -90,6 +101,15 @@ int main() {
 
         // Update bias algorithm
         gyroscope = FusionBiasUpdate(&bias, gyroscope);
+
+        // Update hard-iron algorithm
+        if (HARD_IRON_TRIGGER()) {
+            FusionHardIronInitialise(&hardIron);
+        }
+
+        magnetometer = FusionHardIronUpdate(&hardIron, gyroscope, magnetometer);
+
+        printf("Hard-iron algorithm status\n");
 
         // Remap sensor axes
         const FusionRemapAlignment alignment = FusionRemapAlignmentPXPYPZ;
