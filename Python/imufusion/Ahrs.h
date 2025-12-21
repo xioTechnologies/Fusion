@@ -29,7 +29,7 @@ static void ahrs_free(Ahrs *self) {
 }
 
 static int ahrs_set_settings(Ahrs *self, PyObject *value, void *closure) {
-    if (!PyObject_TypeCheck(value, &ahrs_settings_object)) {
+    if (PyObject_TypeCheck(value, &ahrs_settings_object) != 0) {
         PyErr_Format(PyExc_TypeError, "Expected %s", ahrs_settings_object.tp_name);
         return -1;
     }
