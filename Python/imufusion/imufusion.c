@@ -6,6 +6,8 @@
 #include "BiasSettings.h"
 #include "Compass.h"
 #include "Convert.h"
+#include "HardIron.h"
+#include "HardIronSettings.h"
 #include "Model.h"
 #include <Python.h>
 #include "Remap.h"
@@ -74,7 +76,9 @@ PyMODINIT_FUNC PyInit_imufusion() {
         add_object(module, &ahrs_internal_states_object, "AhrsInternalStates") &&
         add_object(module, &ahrs_settings_object, "AhrsSettings") &&
         add_object(module, &bias_object, "Bias") &&
-        add_object(module, &bias_settings_object, "BiasSettings")) {
+        add_object(module, &bias_settings_object, "BiasSettings") &&
+        add_object(module, &hard_iron_object, "HardIron") &&
+        add_object(module, &hard_iron_settings_object, "HardIronSettings")) {
         return module;
     }
 
