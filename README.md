@@ -88,7 +88,7 @@ The algorithm estimates the gyroscope offset by identifying the stationary perio
 
 ### Settings
 
-The bias algorithm settings are defined by the `FusionBiasSettings` structure and are configured using the `FusionBiasSetSettings` function.
+The bias algorithm settings are defined by the `FusionBiasSettings` structure and set using the `FusionBiasSetSettings` function.
 
 | Setting               | Description                                                                                      |
 |-----------------------|--------------------------------------------------------------------------------------------------|
@@ -98,7 +98,75 @@ The bias algorithm settings are defined by the `FusionBiasSettings` structure an
 
 ### Non-volatile memory
 
-The run-time estimate of the gyroscope offset may be saved to and restored from non-volatile memory to avoid re-estimation after each power cycle. This is supported by the `FusionBiasGetOffset` and `FusionBiasSetOffset` functions.
+The run-time estimate of the gyroscope offset may be saved to and restored from non-volatile memory to avoid recalibration after each power cycle. This is supported by the `FusionBiasGetOffset` and `FusionBiasSetOffset` functions.
+
+## Hard-iron algorithm
+
+TODO: Intro couple of sentences to hard-iron algorithm.  Assumes soft-iron calibration already in place. Just to trim.
+
+Calibration must be done with the IMU far from other objects.
+
+1. Start with the IMU held >1 meter away from the floor or any other object, then call `FusionHardIronStart`.
+2. Continuously rotate the IMU through different orientations in place until `FusionHardIronGetProgress` returns `FusionProgressStatusComplete`.
+
+Calibration will fail if sufficient coverage is not detected within the `timeout` setting. Calibration can be completed early by calling `FusionHardIronComplete` at any time. This should only be done if...
+
+### Coverage detection
+
+Calibration requires magnetometer samples that are well distributed across the surface of the sphere described in the [solver](#solver) section below. Coverage is measured as the minimum distance between any two collected samples, which increases as samples are gathered from a wider range of orientations. Calibration completes once this minimum distance exceeds a threshold, defined as 70% of the ideal spacing for samples distributed evenly across the surface of a sphere:
+
+$$
+d = 0.7 \, r \sqrt{\frac{4 \pi}{N}}
+$$
+
+where $d$ is the threshold distance, $r$ is the magnetic field intensity (`intensity` setting), and $N$ is the number of samples required (32). Calibration fails if this coverage is not achieved before the `timeout` setting is reached.
+
+### Solver
+
+The hard-iron offset $\mathbf{h} = \begin{bmatrix} h_x & h_y & h_z \end{bmatrix}^T$ is estimated by assuming that offset-corrected magnetometer measurements lie on a sphere of radius $r$, centred on the origin. Each magnetometer sample $\mathbf{m} = \begin{bmatrix} m_x & m_y & m_z \end{bmatrix}^T$ must therefore satisfy:
+
+$$
+(m_x - h_x)^2 + (m_y - h_y)^2 + (m_z - h_z)^2 = r^2
+$$
+
+Expanding this expression allows it to be rewritten in linear form:
+
+$$
+\mathbf{y} = \mathbf{A} \theta
+$$
+
+where:
+
+$$
+\begin{aligned}
+\mathbf{y} &= \begin{bmatrix} m_x^2 + m_y^2 + m_z^2 \end{bmatrix} \\
+\mathbf{A} &= \begin{bmatrix} m_x & m_y & m_z & 1 \end{bmatrix} \\
+\theta &= \begin{bmatrix} 2 h_x & 2 h_y & 2 h_z & d \end{bmatrix}^T \\
+d &= r^2 - (h_x^2 + h_y^2 + h_z^2)
+\end{aligned}
+$$
+
+The parameter vector $\theta$ is obtained by stacking multiple magnetometer samples and solving the least-squares pseudo-inverse:
+
+$$
+\theta = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \mathbf{y}
+$$
+
+The hard-iron offset is then extracted as the first three elements of $\theta$ scaled by 0.5. The `FusionHardIronSolve` function implements this solver to estimate the hard-iron offset from multiple magnetometer samples.
+
+### Settings
+
+The hard-iron algorithm settings are defined by the `FusionHardIronSettings` structure and set using the `FusionHardIronSetSettings` function.
+
+| Name         | Default  | Description                                                                           |
+|--------------|----------|---------------------------------------------------------------------------------------|
+| `sampleRate` | `100.0f` | Sample rate in Hz.                                                                    |
+| `timeout`    | `30.0f`  | Calibration timeout in seconds.                                                       |
+| `intensity`  | `1.0f`   | Magnetic field intensity in any calibrated units, used to detect sufficient coverage. |
+
+### Non-volatile memory
+
+The run-time estimate of the hard-iron offset may be saved to and restored from non-volatile memory to avoid recalibration after each power cycle. This is supported by the `FusionHardIronGetOffset` and `FusionHardIronSetOffset` functions.
 
 ## Sensor models
 
