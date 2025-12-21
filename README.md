@@ -99,6 +99,39 @@ The bias algorithm settings are defined by the `FusionBiasSettings` structure an
 
 `FusionBiasGetOffset` and `FusionBiasSetOffset`.
 
+## Hard-iron algorithm
+
+The hard-iron offset $\mathbf{h} = \begin{bmatrix} h_x & h_y & h_z \end{bmatrix}^T$ is estimated by assuming that offset-corrected magnetometer measurements lie on a sphere of radius $r$, centred on the origin. Each magnetometer sample $\mathbf{m} = \begin{bmatrix} m_x & m_y & m_z \end{bmatrix}^T$ must therefore satisfy:
+
+$$
+(m_x - h_x)^2 + (m_y - h_y)^2 + (m_z - h_z)^2 = r^2
+$$
+
+Expanding this expression allows it to be rewritten in linear form:
+
+$$
+\mathbf{y} = \mathbf{A} \theta
+$$
+
+where:
+
+$$
+\begin{aligned}
+\mathbf{y} &= \begin{bmatrix} m_x^2 + m_y^2 + m_z^2 \end{bmatrix} \\
+\mathbf{A} &= \begin{bmatrix} m_x & m_y & m_z & 1 \end{bmatrix} \\
+\theta &= \begin{bmatrix} 2 h_x & 2 h_y & 2 h_z & d \end{bmatrix}^T \\
+d &= r^2 - (h_x^2 + h_y^2 + h_z^2)
+\end{aligned}
+$$
+
+The parameter vector $\theta$ is obtained by stacking multiple magnetometer samples and solving the least-squares pseudo-inverse:
+
+$$
+\theta = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \mathbf{y}
+$$
+
+The hard-iron offset is then extracted as the first three elements of $\theta$ scaled by 0.5. The `FusionHardIronSolve` function implements this solver to estimate the hard-iron offset from multiple magnetometer samples.
+
 ## Sensor models
 
 Accurate algorithm outputs require calibrated sensor measurements. The library provides sensor models for applying gyroscope, accelerometer, and magnetometer calibration parameters. The library does not provide a method to determine these parameters.
