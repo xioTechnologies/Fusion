@@ -18,9 +18,12 @@ extern "C" {
 #include "FusionBias.h"
 #include "FusionCompass.h"
 #include "FusionConvention.h"
+#include "FusionHardIron.h"
 #include "FusionMath.h"
 #include "FusionModel.h"
+#include "FusionProgress.h"
 #include "FusionRemap.h"
+#include "FusionResult.h"
 
 #ifdef __cplusplus
 }

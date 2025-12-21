@@ -6,7 +6,10 @@
 #include "BiasSettings.h"
 #include "Compass.h"
 #include "Convert.h"
+#include "HardIron.h"
+#include "HardIronSettings.h"
 #include "Model.h"
+#include "Progress.h"
 #include <Python.h>
 #include "Remap.h"
 
@@ -65,16 +68,25 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddIntConstant(module, "CONVENTION_NWU", FusionConventionNwu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_ENU", FusionConventionEnu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
+        (PyModule_AddIntConstant(module, "PROGRESS_STATUS_NOT_STARTED", FusionProgressStatusNotStarted) == 0) &&
+        (PyModule_AddIntConstant(module, "PROGRESS_STATUS_IN_PROGRESS", FusionProgressStatusInProgress) == 0) &&
+        (PyModule_AddIntConstant(module, "PROGRESS_STATUS_COMPLETE", FusionProgressStatusComplete) == 0) &&
+        (PyModule_AddIntConstant(module, "PROGRESS_STATUS_FAILED", FusionProgressStatusFailed) == 0) &&
+        (PyModule_AddIntConstant(module, "PROGRESS_STATUS_ABORTED", FusionProgressStatusAborted) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
         (PyModule_AddFunctions(module, convert_methods) == 0) &&
         (PyModule_AddFunctions(module, model_methods) == 0) &&
+        (PyModule_AddFunctions(module, progress_methods) == 0) &&
         (PyModule_AddFunctions(module, remap_methods) == 0) &&
         add_object(module, &ahrs_object, "Ahrs") &&
         add_object(module, &ahrs_flags_object, "AhrsFlags") &&
         add_object(module, &ahrs_internal_states_object, "AhrsInternalStates") &&
         add_object(module, &ahrs_settings_object, "AhrsSettings") &&
         add_object(module, &bias_object, "Bias") &&
-        add_object(module, &bias_settings_object, "BiasSettings")) {
+        add_object(module, &bias_settings_object, "BiasSettings") &&
+        add_object(module, &hard_iron_object, "HardIron") &&
+        add_object(module, &hard_iron_settings_object, "HardIronSettings") &&
+        add_object(module, &progress_object, "Progress")) {
         return module;
     }
 
