@@ -16,11 +16,11 @@ for _ in range(100):
 
     # Magnetic sensor model
     uncalibrated = np.random.rand(3)
-    soft_iron = np.random.rand(3, 3)
-    hard_iron = np.random.rand(3)
+    soft_iron_matrix = np.random.rand(3, 3)
+    hard_iron_offset = np.random.rand(3)
 
-    numpy_magnetic = soft_iron @ (uncalibrated - hard_iron)
+    numpy_magnetic = soft_iron_matrix @ (uncalibrated - hard_iron_offset)
 
-    fusion_magnetic = imufusion.model_magnetic(uncalibrated, soft_iron, hard_iron)
+    fusion_magnetic = imufusion.model_magnetic(uncalibrated, soft_iron_matrix, hard_iron_offset)
 
     assert np.allclose(numpy_magnetic, fusion_magnetic, atol=1e-6), f"{numpy_magnetic} != {fusion_magnetic}"
