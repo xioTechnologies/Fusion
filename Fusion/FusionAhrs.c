@@ -36,6 +36,18 @@ static inline FusionVector Feedback(const FusionVector sensor, const FusionVecto
 static inline int Clamp(const int value, const int min, const int max);
 
 //------------------------------------------------------------------------------
+// Variables
+
+const FusionAhrsSettings fusionAhrsDefaultSettings = {
+    .convention = FusionConventionNwu,
+    .gain = 0.5f,
+    .gyroscopeRange = 0.0f,
+    .accelerationRejection = 90.0f,
+    .magneticRejection = 90.0f,
+    .recoveryTriggerPeriod = 0,
+};
+
+//------------------------------------------------------------------------------
 // Functions
 
 /**
@@ -43,15 +55,7 @@ static inline int Clamp(const int value, const int min, const int max);
  * @param ahrs AHRS structure.
  */
 void FusionAhrsInitialise(FusionAhrs *const ahrs) {
-    const FusionAhrsSettings settings = {
-        .convention = FusionConventionNwu,
-        .gain = 0.5f,
-        .gyroscopeRange = 0.0f,
-        .accelerationRejection = 90.0f,
-        .magneticRejection = 90.0f,
-        .recoveryTriggerPeriod = 0,
-    };
-    FusionAhrsSetSettings(ahrs, &settings);
+    FusionAhrsSetSettings(ahrs, &fusionAhrsDefaultSettings);
     FusionAhrsReset(ahrs);
 }
 

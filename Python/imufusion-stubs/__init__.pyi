@@ -29,15 +29,24 @@ CONVENTION_ENU: int
 CONVENTION_NED: int
 
 # compass_methods
-def compass(convention: int, accelerometer: np.ndarray, magnetometer: np.ndarray) -> float: ...
+def compass(accelerometer: np.ndarray, magnetometer: np.ndarray, convention: int = ...) -> float: ...
 
 # convert_methods
 def quaternion_to_matrix(quaternion: np.ndarray) -> np.ndarray: ...
 def quaternion_to_euler(quaternion: np.ndarray) -> np.ndarray: ...
 
 # model_methods
-def model_inertial(uncalibrated: np.ndarray, misalignment: np.ndarray, sensitivity: np.ndarray, offset: np.ndarray) -> np.ndarray: ...
-def model_magnetic(uncalibrated: np.ndarray, soft_iron_matrix: np.ndarray, hard_iron_offset: np.ndarray) -> np.ndarray: ...
+def model_inertial(
+    uncalibrated: np.ndarray,
+    misalignment: np.ndarray = ...,
+    sensitivity: np.ndarray = ...,
+    offset: np.ndarray = ...,
+) -> np.ndarray: ...
+def model_magnetic(
+    uncalibrated: np.ndarray,
+    soft_iron_matrix: np.ndarray = ...,
+    hard_iron_offset: np.ndarray = ...,
+) -> np.ndarray: ...
 
 # remap_methods
 def remap(sensor: np.ndarray, alignment: int) -> np.ndarray: ...
@@ -100,7 +109,15 @@ class AhrsInternalStates:
 
 # ahrs_settings_object
 class AhrsSettings:
-    def __init__(self, convention: int, gain: float, gyroscope_range: float, acceleration_rejection: float, magnetic_rejection: float, recovery_trigger_period: int) -> None: ...
+    def __init__(
+        self,
+        convention: int = ...,
+        gain: float = ...,
+        gyroscope_range: float = ...,
+        acceleration_rejection: float = ...,
+        magnetic_rejection: float = ...,
+        recovery_trigger_period: int = ...,
+    ) -> None: ...
     @property
     def convention(self) -> int: ...
     @convention.setter

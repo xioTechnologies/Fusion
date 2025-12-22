@@ -16,7 +16,7 @@
 //------------------------------------------------------------------------------
 // Function declarations
 
-float FusionCompass(const FusionConvention convention, const FusionVector accelerometer, const FusionVector magnetometer);
+float FusionCompass(const FusionVector accelerometer, const FusionVector magnetometer, const FusionConvention convention);
 
 #endif
 
