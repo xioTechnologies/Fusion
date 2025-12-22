@@ -138,6 +138,7 @@ static PyTypeObject ahrs_settings_object = {
     .tp_name = "imufusion.AhrsSettings",
     .tp_basicsize = sizeof(AhrsSettings),
     .tp_dealloc = (destructor) ahrs_settings_free,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_new = ahrs_settings_new,
     .tp_getset = ahrs_settings_get_set,
 };

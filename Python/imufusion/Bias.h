@@ -59,6 +59,7 @@ static PyTypeObject bias_object = {
     .tp_name = "imufusion.Bias",
     .tp_basicsize = sizeof(Bias),
     .tp_dealloc = (destructor) bias_free,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_new = bias_new,
     .tp_methods = bias_methods,
 };
