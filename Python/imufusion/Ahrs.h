@@ -42,6 +42,17 @@ static int ahrs_set_settings(Ahrs *self, PyObject *value, void *closure) {
     return 0;
 }
 
+static int ahrs_set_sample_period(Ahrs *self, PyObject *value, void *closure) {
+    const float sample_period = (float) PyFloat_AsDouble(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    FusionAhrsSetSamplePeriod(&self->ahrs, sample_period);
+    return 0;
+}
+
 static PyObject *ahrs_get_quaternion(Ahrs *self) {
     const FusionQuaternion quaternion = FusionAhrsGetQuaternion(&self->ahrs);
 
@@ -98,9 +109,8 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
     PyObject *gyroscope_object;
     PyObject *accelerometer_object;
     PyObject *magnetometer_object;
-    float delta_time;
 
-    if (PyArg_ParseTuple(args, "OOOf", &gyroscope_object, &accelerometer_object, &magnetometer_object, &delta_time) == 0) {
+    if (PyArg_ParseTuple(args, "OOO", &gyroscope_object, &accelerometer_object, &magnetometer_object) == 0) {
         return NULL;
     }
 
@@ -122,16 +132,15 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdate(&self->ahrs, gyroscope, accelerometer, magnetometer, delta_time);
+    FusionAhrsUpdate(&self->ahrs, gyroscope, accelerometer, magnetometer);
     Py_RETURN_NONE;
 }
 
 static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
     PyObject *gyroscope_object;
     PyObject *accelerometer_object;
-    float delta_time;
 
-    if (PyArg_ParseTuple(args, "OOf", &gyroscope_object, &accelerometer_object, &delta_time) == 0) {
+    if (PyArg_ParseTuple(args, "OO", &gyroscope_object, &accelerometer_object) == 0) {
         return NULL;
     }
 
@@ -147,7 +156,7 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdateNoMagnetometer(&self->ahrs, gyroscope, accelerometer, delta_time);
+    FusionAhrsUpdateNoMagnetometer(&self->ahrs, gyroscope, accelerometer);
     Py_RETURN_NONE;
 }
 
@@ -155,9 +164,8 @@ static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
     PyObject *gyroscope_object;
     PyObject *accelerometer_object;
     float heading;
-    float delta_time;
 
-    if (PyArg_ParseTuple(args, "OOff", &gyroscope_object, &accelerometer_object, &heading, &delta_time) == 0) {
+    if (PyArg_ParseTuple(args, "OOf", &gyroscope_object, &accelerometer_object, &heading) == 0) {
         return NULL;
     }
 
@@ -173,7 +181,7 @@ static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdateExternalHeading(&self->ahrs, gyroscope, accelerometer, heading, delta_time);
+    FusionAhrsUpdateExternalHeading(&self->ahrs, gyroscope, accelerometer, heading);
     Py_RETURN_NONE;
 }
 
@@ -190,6 +198,7 @@ static int ahrs_set_heading(Ahrs *self, PyObject *value, void *closure) {
 
 static PyGetSetDef ahrs_get_set[] = {
     {"settings", NULL, (setter) ahrs_set_settings, "", NULL},
+    {"sample_period", NULL, (setter) ahrs_set_sample_period, "", NULL},
     {"quaternion", (getter) ahrs_get_quaternion, (setter) ahrs_set_quaternion, "", NULL},
     {"gravity", (getter) ahrs_get_gravity, NULL, "", NULL},
     {"linear_acceleration", (getter) ahrs_get_linear_acceleration, NULL, "", NULL},

@@ -75,6 +75,10 @@ The AHRS algorithm flags are defined by the `FusionAhrsFlags` structure and obta
 | `accelerationRecovery` | `true` if acceleration recovery is active. |
 | `magneticRecovery`     | `true` if a magnetic recovery is active.   |
 
+### Sample clock errors
+
+Call `FusionAhrsSetSamplePeriod` before each algorithm update to compensate for gyroscope sample clock errors.
+
 ## Bias algorithm
 
 The bias algorithm provides run-time estimation of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place. This algorithm should be used in conjunction with the AHRS algorithm to achieve best performance.

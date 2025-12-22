@@ -21,6 +21,7 @@ compass_heading = [imufusion.compass(a, m) for a, m in zip(accelerometer, magnet
 ahrs = imufusion.Ahrs()
 
 ahrs.settings = imufusion.AhrsSettings(
+    sample_rate,
     magnetic_rejection=10,  # reject magnetic disturbances >10 degrees
     recovery_trigger_period=20 * sample_rate,  # reject magnetic disturbances for up to 20 seconds
 )
@@ -28,7 +29,7 @@ ahrs.settings = imufusion.AhrsSettings(
 ahrs_heading = np.empty_like(seconds)
 
 for index, _ in enumerate(seconds):
-    ahrs.update(gyroscope[index], accelerometer[index], magnetometer[index], 1 / sample_rate)
+    ahrs.update(gyroscope[index], accelerometer[index], magnetometer[index])
 
     ahrs_heading[index] = imufusion.quaternion_to_euler(ahrs.quaternion)[2]
 

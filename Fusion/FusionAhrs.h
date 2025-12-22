@@ -21,6 +21,7 @@
  * @brief Settings.
  */
 typedef struct {
+    float sampleRate;
     FusionConvention convention;
     float gain;
     float gyroscopeRange;
@@ -34,6 +35,7 @@ typedef struct {
  */
 typedef struct {
     FusionAhrsSettings settings;
+    float samplePeriod;
     FusionQuaternion quaternion;
     FusionVector accelerometer;
     FusionVector halfGravity;
@@ -87,11 +89,13 @@ void FusionAhrsReset(FusionAhrs *const ahrs);
 
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings);
 
-void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer, const float deltaTime);
+void FusionAhrsSetSamplePeriod(FusionAhrs *const ahrs, const float samplePeriod);
 
-void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float deltaTime);
+void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer);
 
-void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading, const float deltaTime);
+void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer);
+
+void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading);
 
 FusionQuaternion FusionAhrsGetQuaternion(const FusionAhrs *const ahrs);
 
