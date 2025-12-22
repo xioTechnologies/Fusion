@@ -213,6 +213,7 @@ static PyTypeObject ahrs_object = {
     .tp_name = "imufusion.Ahrs",
     .tp_basicsize = sizeof(Ahrs),
     .tp_dealloc = (destructor) ahrs_free,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_new = ahrs_new,
     .tp_getset = ahrs_get_set,
     .tp_methods = ahrs_methods,
