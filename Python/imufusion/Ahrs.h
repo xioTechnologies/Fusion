@@ -14,6 +14,10 @@ typedef struct {
 } Ahrs;
 
 static PyObject *ahrs_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
+    if (PyArg_ParseTuple(args, "") == 0) {
+        return NULL;
+    }
+
     Ahrs *const self = (Ahrs *) subtype->tp_alloc(subtype, 0);
 
     if (self == NULL) {
