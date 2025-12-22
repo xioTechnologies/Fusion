@@ -44,6 +44,7 @@ The AHRS algorithm settings are defined by the `FusionAhrsSettings` structure an
 
 | Setting                 | Description                                                                                                                                                                                                                                                |
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `sampleRate`            | Sample rate (in Hz).                                                                                                                                                                                                                                       |
 | `convention`            | Earth axes convention (NWU, ENU, or NED).                                                                                                                                                                                                                  |
 | `gain`                  | Determines the influence of the gyroscope relative to other sensors. A value of zero will disable startup and the acceleration and magnetic rejection features. A value of 0.5 is appropriate for most applications.                                       |
 | `gyroscopeRange`        | Gyroscope range (in degrees per second). Angular rate recovery will activate if the gyroscope measurement exceeds 98% of this value. A value of zero will disable this feature. The value should be set to the range specified in the gyroscope datasheet. |
@@ -74,6 +75,10 @@ The AHRS algorithm flags are defined by the `FusionAhrsFlags` structure and obta
 | `angularRateRecovery`  | `true` during angular rate recovery. |
 | `accelerationRecovery` | `true` during acceleration recovery. |
 | `magneticRecovery`     | `true` during magnetic recovery.     |
+
+### Sample clock errors
+
+The `FusionAhrsSetSamplePeriod` function may be called before each algorithm update with the measured sample period to compensate for gyroscope sample clock errors. The measured sample period must approximately match `sampleRate`.
 
 ## Bias algorithm
 

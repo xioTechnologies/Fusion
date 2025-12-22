@@ -15,6 +15,7 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
     FusionAhrsSettings settings = fusionAhrsDefaultSettings;
 
     static char *kwlist[] = {
+        "sample_rate",
         "convention",
         "gain",
         "gyroscope_range",
@@ -24,7 +25,8 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         NULL, /* sentinel */
     };
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|iffffI", kwlist,
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fiffffI", kwlist,
+                                    &settings.sampleRate,
                                     &convention_int,
                                     &settings.gain,
                                     &settings.gyroscopeRange,
@@ -52,6 +54,21 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
 
 static void ahrs_settings_free(AhrsSettings *self) {
     Py_TYPE(self)->tp_free(self);
+}
+
+static PyObject *ahrs_settings_get_sample_rate(AhrsSettings *self) {
+    return PyFloat_FromDouble((double) self->wrapped.sampleRate);
+}
+
+static int ahrs_settings_set_sample_rate(AhrsSettings *self, PyObject *value, void *closure) {
+    const float sample_rate = (float) PyFloat_AsDouble(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    self->wrapped.sampleRate = sample_rate;
+    return 0;
 }
 
 static PyObject *ahrs_settings_get_convention(AhrsSettings *self) {
@@ -151,6 +168,7 @@ static int ahrs_settings_set_recovery_trigger_period(AhrsSettings *self, PyObjec
 }
 
 static PyGetSetDef ahrs_settings_get_set[] = {
+    {"sample_rate", (getter) ahrs_settings_get_sample_rate, (setter) ahrs_settings_set_sample_rate, "", NULL},
     {"convention", (getter) ahrs_settings_get_convention, (setter) ahrs_settings_set_convention, "", NULL},
     {"gain", (getter) ahrs_settings_get_gain, (setter) ahrs_settings_set_gain, "", NULL},
     {"gyroscope_range", (getter) ahrs_settings_get_gyroscope_range, (setter) ahrs_settings_set_gyroscope_range, "", NULL},

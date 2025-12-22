@@ -17,11 +17,12 @@ magnetometer = data[:, 7:10]
 # Instantiate algorithms
 bias = imufusion.Bias()
 
-bias.settings = imufusion.BiasSettings(sample_rate)
+bias.settings = imufusion.BiasSettings(sample_rate=sample_rate)
 
 ahrs = imufusion.Ahrs()
 
 ahrs.settings = imufusion.AhrsSettings(
+    sample_rate=sample_rate,
     convention=imufusion.CONVENTION_NWU,
     gain=0.5,
     gyroscope_range=2000,
@@ -40,7 +41,9 @@ flags = np.empty((len(timestamp), 4))
 for index in range(len(timestamp)):
     gyroscope[index] = bias.update(gyroscope[index])
 
-    ahrs.update(gyroscope[index], accelerometer[index], magnetometer[index], delta_time[index])
+    ahrs.sample_period = delta_time[index]
+
+    ahrs.update(gyroscope[index], accelerometer[index], magnetometer[index])
 
     euler[index] = imufusion.quaternion_to_euler(ahrs.quaternion)
 
