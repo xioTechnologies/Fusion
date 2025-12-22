@@ -13,7 +13,7 @@ typedef struct {
     FusionAhrs ahrs;
 } Ahrs;
 
-static PyObject *ahrs_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
+static PyObject *ahrs_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
     if (PyArg_ParseTuple(args, "") == 0) {
         return NULL;
     }
