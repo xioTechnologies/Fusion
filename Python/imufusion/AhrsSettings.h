@@ -16,7 +16,14 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         return NULL;
     }
 
-    if (PyArg_ParseTuple(args, "iffffI", &self->settings.convention, &self->settings.gain, &self->settings.gyroscopeRange, &self->settings.accelerationRejection, &self->settings.magneticRejection, &self->settings.recoveryTriggerPeriod) == 0) {
+    if (PyArg_ParseTuple(args, "iffffI",
+                         &self->settings.convention,
+                         &self->settings.gain,
+                         &self->settings.gyroscopeRange,
+                         &self->settings.accelerationRejection,
+                         &self->settings.magneticRejection,
+                         &self->settings.recoveryTriggerPeriod) == 0) {
+        Py_DECREF(self);
         return NULL;
     }
     return (PyObject *) self;
