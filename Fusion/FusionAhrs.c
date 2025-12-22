@@ -39,6 +39,7 @@ static inline int Clamp(const int value, const int min, const int max);
 // Variables
 
 const FusionAhrsSettings fusionAhrsDefaultSettings = {
+    .sampleRate = 100.0f,
     .convention = FusionConventionNwu,
     .gain = 0.5f,
     .gyroscopeRange = 0.0f,
@@ -85,6 +86,7 @@ void FusionAhrsReset(FusionAhrs *const ahrs) {
  * @param settings Settings.
  */
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings) {
+    ahrs->samplePeriod = 1.0f / settings->sampleRate;
     ahrs->settings.convention = settings->convention;
     ahrs->settings.gain = settings->gain;
     ahrs->settings.gyroscopeRange = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
@@ -104,15 +106,24 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
 }
 
 /**
+ * @brief Sets the sample period. This function is intended to be called before
+ * each algorithm update to compensate for gyroscope sample clock errors.
+ * @param ahrs AHRS structure.
+ * @param samplePeriod Sample period in seconds.
+ */
+void FusionAhrsSetSamplePeriod(FusionAhrs *const ahrs, const float samplePeriod) {
+    ahrs->samplePeriod = samplePeriod;
+}
+
+/**
  * @brief Updates the AHRS algorithm using the gyroscope, accelerometer, and
  * magnetometer.
  * @param ahrs AHRS structure.
  * @param gyroscope Gyroscope in degrees per second.
  * @param accelerometer Accelerometer in g.
  * @param magnetometer Magnetometer in any calibrated units.
- * @param deltaTime Delta time in seconds.
  */
-void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer, const float deltaTime) {
+void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer) {
     ahrs->accelerometer = accelerometer;
 
     // Reinitialise if gyroscope range exceeded
@@ -125,7 +136,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
 
     // Ramp down gain during initialisation
     if (ahrs->initialising) {
-        ahrs->rampedGain -= ahrs->rampedGainStep * deltaTime;
+        ahrs->rampedGain -= ahrs->rampedGainStep * ahrs->samplePeriod;
         if ((ahrs->rampedGain < ahrs->settings.gain) || (ahrs->settings.gain == 0.0f)) {
             ahrs->rampedGain = ahrs->settings.gain;
             ahrs->initialising = false;
@@ -206,7 +217,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     const FusionVector adjustedHalfGyroscope = FusionVectorAdd(halfGyroscope, FusionVectorScale(FusionVectorAdd(halfAccelerometerFeedback, halfMagnetometerFeedback), ahrs->rampedGain));
 
     // Integrate rate of change of quaternion
-    ahrs->quaternion = FusionQuaternionAdd(ahrs->quaternion, FusionQuaternionVectorProduct(ahrs->quaternion, FusionVectorScale(adjustedHalfGyroscope, deltaTime)));
+    ahrs->quaternion = FusionQuaternionAdd(ahrs->quaternion, FusionQuaternionVectorProduct(ahrs->quaternion, FusionVectorScale(adjustedHalfGyroscope, ahrs->samplePeriod)));
 
     // Normalise quaternion
     ahrs->quaternion = FusionQuaternionNormalise(ahrs->quaternion);
@@ -324,10 +335,9 @@ static inline int Clamp(const int value, const int min, const int max) {
  * @param ahrs AHRS structure.
  * @param gyroscope Gyroscope in degrees per second.
  * @param accelerometer Accelerometer in g.
- * @param deltaTime Delta time in seconds.
  */
-void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float deltaTime) {
-    FusionAhrsUpdate(ahrs, gyroscope, accelerometer, FUSION_VECTOR_ZERO, deltaTime);
+void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer) {
+    FusionAhrsUpdate(ahrs, gyroscope, accelerometer, FUSION_VECTOR_ZERO);
 
     // Zero heading during initialisation
     if (ahrs->initialising) {
@@ -342,9 +352,8 @@ void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector g
  * @param gyroscope Gyroscope in degrees per second.
  * @param accelerometer Accelerometer in g.
  * @param heading Heading in degrees.
- * @param deltaTime Delta time in seconds.
  */
-void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading, const float deltaTime) {
+void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading) {
 #define Q ahrs->quaternion.element
     const float roll = atan2f(Q.w * Q.x + Q.y * Q.z, 0.5f - Q.y * Q.y - Q.x * Q.x);
 #undef Q
@@ -361,7 +370,7 @@ void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector 
     };
 
     // Update algorithm
-    FusionAhrsUpdate(ahrs, gyroscope, accelerometer, magnetometer, deltaTime);
+    FusionAhrsUpdate(ahrs, gyroscope, accelerometer, magnetometer);
 }
 
 /**

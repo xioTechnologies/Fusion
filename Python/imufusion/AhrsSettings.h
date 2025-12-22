@@ -19,6 +19,7 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
     self->settings = fusionAhrsDefaultSettings;
 
     static char *kwlist[] = {
+        "sample_rate",
         "convention",
         "gain",
         "gyroscope_range",
@@ -28,7 +29,8 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         NULL, /* sentinel */
     };
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|iffffI", kwlist,
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fiffffI", kwlist,
+                                    &self->settings.sampleRate,
                                     &self->settings.convention,
                                     &self->settings.gain,
                                     &self->settings.gyroscopeRange,
