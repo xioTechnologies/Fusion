@@ -19,12 +19,12 @@ bias = imufusion.Bias(sample_rate)
 ahrs = imufusion.Ahrs()
 
 ahrs.settings = imufusion.AhrsSettings(
-    imufusion.CONVENTION_NWU,  # convention
-    0.5,  # gain
-    2000,  # gyroscope range
-    10,  # acceleration rejection
-    10,  # magnetic rejection
-    5 * sample_rate,  # recovery trigger period = 5 seconds
+    convention=imufusion.CONVENTION_NWU,
+    gain=0.5,
+    gyroscope_range=2000,
+    acceleration_rejection=10,
+    magnetic_rejection=10,
+    recovery_trigger_period=5 * sample_rate,  # 5 seconds
 )
 
 # Process sensor data

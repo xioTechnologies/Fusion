@@ -6,11 +6,11 @@
 #include <Python.h>
 
 static PyObject *compass(PyObject *self, PyObject *args) {
-    FusionConvention convention;
+    FusionConvention convention = FusionConventionNwu;
     PyObject *accelerometer_object;
     PyObject *magnetometer_object;
 
-    if (PyArg_ParseTuple(args, "iOO", &convention, &accelerometer_object, &magnetometer_object) == 0) {
+    if (PyArg_ParseTuple(args, "OO|i", &accelerometer_object, &magnetometer_object, &convention) == 0) {
         return NULL;
     }
 
@@ -26,7 +26,7 @@ static PyObject *compass(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    const float heading = FusionCompass(convention, accelerometer, magnetometer);
+    const float heading = FusionCompass(accelerometer, magnetometer, convention);
 
     return PyFloat_FromDouble((double) heading);
 }
