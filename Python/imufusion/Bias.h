@@ -10,7 +10,7 @@ typedef struct {
     FusionBias bias;
 } Bias;
 
-static PyObject *bias_new(PyTypeObject *subtype, PyObject *args, PyObject *keywords) {
+static PyObject *bias_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
     unsigned int sample_rate;
 
     if (PyArg_ParseTuple(args, "I", &sample_rate) == 0) {
