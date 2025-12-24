@@ -13,6 +13,6 @@ for index, rotation in enumerate(rotations):
 
     scipy_sensor = rotation.as_matrix() @ sensor
 
-    fusion_sensor = imufusion.remap(sensor, index)
+    fusion_sensor = imufusion.remap(sensor, index)  # index value is ALIGNMENT_PXPYPZ to ALIGNMENT_NZPXNY
 
     assert np.allclose(scipy_sensor, fusion_sensor, atol=1e-6), f"{scipy_sensor} != {fusion_sensor}"
