@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 int main() {
-    // Initialise structure
+    // Configure AHRS algorithm
     FusionAhrs ahrs;
     FusionAhrsInitialise(&ahrs);
 
@@ -12,11 +12,25 @@ int main() {
 
     FusionAhrsSetSettings(&ahrs, &settings);
 
-    // This loop should repeat for each new gyroscope measurement
+    // Open CSV file
+    FILE *file = fopen(SENSOR_DATA_CSV, "r");
+
+    char header[256];
+    fgets(header, sizeof(header), file); // skip CSV header
+
     while (true) {
-        // Read sensors (replace with actual sensor data)
-        const FusionVector gyroscope = {0.0f, 0.0f, 0.0f};
-        const FusionVector accelerometer = {0.0f, 0.0f, 1.0f};
+        // Read each CSV line as if reading sensor data in real-time
+        float ignore;
+        FusionVector gyroscope;
+        FusionVector accelerometer;
+
+        if (fscanf(file, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+                   &ignore,
+                   &gyroscope.axis.x, &gyroscope.axis.y, &gyroscope.axis.z,
+                   &accelerometer.axis.x, &accelerometer.axis.y, &accelerometer.axis.z,
+                   &ignore, &ignore, &ignore) != 10) {
+            break;
+        }
 
         // Update AHRS algorithm
         FusionAhrsUpdateNoMagnetometer(&ahrs, gyroscope, accelerometer);
@@ -24,6 +38,10 @@ int main() {
         // Print Euler angles
         const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&ahrs));
 
-        printf("Roll %0.1f, Pitch %0.1f, Yaw %0.1f\n", euler.angle.roll, euler.angle.pitch, euler.angle.yaw);
+        printf("Euler angles (degrees) = %0.1f, %0.1f, %0.1f\n",
+               euler.angle.roll, euler.angle.pitch, euler.angle.yaw);
     }
+
+    fclose(file);
+    return 0;
 }
