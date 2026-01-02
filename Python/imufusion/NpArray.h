@@ -84,14 +84,14 @@ static PyObject *np_array_1x4_from(const float *const c_array) {
 
 static PyObject *np_array_3x3_from(const float *const c_array) {
     const npy_intp dimensions[] = {3, 3};
-    PyObject *array = PyArray_SimpleNew(2, dimensions, NPY_FLOAT);
+    PyObject *np_array = PyArray_SimpleNew(2, dimensions, NPY_FLOAT);
 
-    if (array == NULL) {
+    if (np_array == NULL) {
         return NULL;
     }
 
-    memcpy(PyArray_DATA((PyArrayObject *) array), c_array, 9 * sizeof(float));
-    return array;
+    memcpy(PyArray_DATA((PyArrayObject *) np_array), c_array, 9 * sizeof(float));
+    return np_array;
 }
 
 #endif
