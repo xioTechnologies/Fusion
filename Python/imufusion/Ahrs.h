@@ -184,7 +184,7 @@ static int ahrs_set_heading(Ahrs *self, PyObject *value, void *closure) {
         return -1;
     }
 
-    FusionAhrsSetHeading(&self->ahrs, heading);;
+    FusionAhrsSetHeading(&self->ahrs, heading);
     return 0;
 }
 
