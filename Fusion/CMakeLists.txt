@@ -8,6 +8,8 @@ target_include_directories(Fusion PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/include/>
 )
 
+set_property(TARGET Fusion PROPERTY CXX_STANDARD 20)
+
 if(UNIX AND NOT APPLE)
     target_link_libraries(Fusion m) # link math library for Linux
 endif()
