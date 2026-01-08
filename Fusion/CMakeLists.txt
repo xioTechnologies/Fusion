@@ -25,3 +25,8 @@ install(FILES
     ${header}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/include/
 )
+
+install(EXPORT FusionTargets
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION cmake/
+)
