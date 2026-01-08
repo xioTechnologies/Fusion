@@ -10,6 +10,9 @@ target_include_directories(Fusion PUBLIC
 
 set_property(TARGET Fusion PROPERTY CXX_STANDARD 20)
 
+set_property(TARGET Fusion PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
+
 if(UNIX AND NOT APPLE)
     target_link_libraries(Fusion m) # link math library for Linux
 endif()
