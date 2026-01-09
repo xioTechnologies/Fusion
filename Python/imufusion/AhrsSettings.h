@@ -2,6 +2,7 @@
 #define AHRS_SETTINGS_H
 
 #include "../../Fusion/Fusion.h"
+#include "Convention.h"
 #include <Python.h>
 
 typedef struct {
@@ -10,6 +11,7 @@ typedef struct {
 } AhrsSettings;
 
 static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
+    int convention_int = fusionAhrsDefaultSettings.convention;
     FusionAhrsSettings settings = fusionAhrsDefaultSettings;
 
     static char *kwlist[] = {
@@ -23,12 +25,18 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
     };
 
     if (PyArg_ParseTupleAndKeywords(args, kwds, "|iffffI", kwlist,
-                                    &settings.convention,
+                                    &convention_int,
                                     &settings.gain,
                                     &settings.gyroscopeRange,
                                     &settings.accelerationRejection,
                                     &settings.magneticRejection,
                                     &settings.recoveryTriggerPeriod) == 0) {
+        return NULL;
+    }
+
+    FusionConvention convention;
+
+    if (convention_from(&convention, convention_int) != 0) {
         return NULL;
     }
 
@@ -51,9 +59,15 @@ static PyObject *ahrs_settings_get_convention(AhrsSettings *self) {
 }
 
 static int ahrs_settings_set_convention(AhrsSettings *self, PyObject *value, void *closure) {
-    const FusionConvention convention = (FusionConvention) PyLong_AsUnsignedLong(value);
+    const int convention_int = (int) PyLong_AsUnsignedLong(value);
 
     if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    FusionConvention convention;
+
+    if (convention_from(&convention, convention_int) != 0) {
         return -1;
     }
 
