@@ -10,13 +10,7 @@ typedef struct {
 } AhrsSettings;
 
 static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
-    AhrsSettings *const self = (AhrsSettings *) subtype->tp_alloc(subtype, 0);
-
-    if (self == NULL) {
-        return NULL;
-    }
-
-    self->settings = fusionAhrsDefaultSettings;
+    FusionAhrsSettings settings = fusionAhrsDefaultSettings;
 
     static char *kwlist[] = {
         "convention",
@@ -29,15 +23,22 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
     };
 
     if (PyArg_ParseTupleAndKeywords(args, kwds, "|iffffI", kwlist,
-                                    &self->settings.convention,
-                                    &self->settings.gain,
-                                    &self->settings.gyroscopeRange,
-                                    &self->settings.accelerationRejection,
-                                    &self->settings.magneticRejection,
-                                    &self->settings.recoveryTriggerPeriod) == 0) {
-        Py_DECREF(self);
+                                    &settings.convention,
+                                    &settings.gain,
+                                    &settings.gyroscopeRange,
+                                    &settings.accelerationRejection,
+                                    &settings.magneticRejection,
+                                    &settings.recoveryTriggerPeriod) == 0) {
         return NULL;
     }
+
+    AhrsSettings *const self = (AhrsSettings *) subtype->tp_alloc(subtype, 0);
+
+    if (self == NULL) {
+        return NULL;
+    }
+
+    self->settings = settings;
     return (PyObject *) self;
 }
 
