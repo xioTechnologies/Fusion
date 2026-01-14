@@ -2,15 +2,16 @@
 #define COMPASS_H
 
 #include "../../Fusion/Fusion.h"
+#include "Convention.h"
 #include "NpArray.h"
 #include <Python.h>
 
 static PyObject *compass(PyObject *self, PyObject *args) {
-    FusionConvention convention = FusionConventionNwu;
     PyObject *accelerometer_object;
     PyObject *magnetometer_object;
+    int convention_int = fusionAhrsDefaultSettings.convention;
 
-    if (PyArg_ParseTuple(args, "OO|i", &accelerometer_object, &magnetometer_object, &convention) == 0) {
+    if (PyArg_ParseTuple(args, "OO|i", &accelerometer_object, &magnetometer_object, &convention_int) == 0) {
         return NULL;
     }
 
@@ -23,6 +24,12 @@ static PyObject *compass(PyObject *self, PyObject *args) {
     FusionVector magnetometer;
 
     if (np_array_1x3_to(magnetometer.array, magnetometer_object) != 0) {
+        return NULL;
+    }
+
+    FusionConvention convention;
+
+    if (convention_from(&convention, convention_int) != 0) {
         return NULL;
     }
 
