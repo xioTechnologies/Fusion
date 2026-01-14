@@ -36,6 +36,7 @@ typedef struct {
     FusionAhrsSettings settings;
     FusionQuaternion quaternion;
     FusionVector accelerometer;
+    FusionVector halfGravity;
     bool initialising;
     float rampedGain;
     float rampedGainStep;

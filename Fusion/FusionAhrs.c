@@ -134,14 +134,14 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     }
 
     // Calculate direction of gravity indicated by algorithm
-    const FusionVector halfGravity = HalfGravity(ahrs);
+    ahrs->halfGravity = HalfGravity(ahrs);
 
     // Calculate accelerometer feedback
     FusionVector halfAccelerometerFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = true;
     if (FusionVectorIsZero(accelerometer) == false) {
         // Calculate accelerometer feedback scaled by 0.5
-        ahrs->halfAccelerometerFeedback = Feedback(FusionVectorNormalise(accelerometer), halfGravity);
+        ahrs->halfAccelerometerFeedback = Feedback(FusionVectorNormalise(accelerometer), ahrs->halfGravity);
 
         // Don't ignore accelerometer if acceleration error below threshold
         if (ahrs->initialising || (FusionVectorNormSquared(ahrs->halfAccelerometerFeedback) <= ahrs->settings.accelerationRejection)) {
@@ -174,7 +174,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         const FusionVector halfMagnetic = HalfMagnetic(ahrs);
 
         // Calculate magnetometer feedback scaled by 0.5
-        ahrs->halfMagnetometerFeedback = Feedback(FusionVectorNormalise(FusionVectorCross(halfGravity, magnetometer)), halfMagnetic);
+        ahrs->halfMagnetometerFeedback = Feedback(FusionVectorNormalise(FusionVectorCross(ahrs->halfGravity, magnetometer)), halfMagnetic);
 
         // Don't ignore magnetometer if magnetic error below threshold
         if (ahrs->initialising || (FusionVectorNormSquared(ahrs->halfMagnetometerFeedback) <= ahrs->settings.magneticRejection)) {
@@ -388,16 +388,7 @@ void FusionAhrsSetQuaternion(FusionAhrs *const ahrs, const FusionQuaternion quat
  * @return Direction of gravity as a unit vector.
  */
 FusionVector FusionAhrsGetGravity(const FusionAhrs *const ahrs) {
-#define Q ahrs->quaternion.element
-    const FusionVector gravity = {
-        .axis = {
-            .x = 2.0f * (Q.x * Q.z - Q.w * Q.y),
-            .y = 2.0f * (Q.y * Q.z + Q.w * Q.x),
-            .z = 2.0f * (Q.w * Q.w - 0.5f + Q.z * Q.z),
-        }
-    }; // third column of transposed rotation matrix
-#undef Q
-    return gravity;
+    return FusionVectorScale(ahrs->halfGravity, 2.0f);
 }
 
 /**
