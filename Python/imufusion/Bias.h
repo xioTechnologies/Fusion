@@ -31,16 +31,10 @@ static void bias_free(Bias *self) {
     Py_TYPE(self)->tp_free(self);
 }
 
-static PyObject *bias_update(Bias *self, PyObject *args) {
-    PyObject *gyroscope_object;
-
-    if (PyArg_ParseTuple(args, "O", &gyroscope_object) == 0) {
-        return NULL;
-    }
-
+static PyObject *bias_update(Bias *self, PyObject *arg) {
     FusionVector gyroscope;
 
-    if (np_array_1x3_to(gyroscope.array, gyroscope_object) != 0) {
+    if (np_array_1x3_to(gyroscope.array, arg) != 0) {
         return NULL;
     }
 
@@ -50,7 +44,7 @@ static PyObject *bias_update(Bias *self, PyObject *args) {
 }
 
 static PyMethodDef bias_methods[] = {
-    {"update", (PyCFunction) bias_update, METH_VARARGS, ""},
+    {"update", (PyCFunction) bias_update, METH_O, ""},
     {NULL} /* sentinel */
 };
 
