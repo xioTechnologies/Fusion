@@ -33,12 +33,13 @@ static void ahrs_free(Ahrs *self) {
 }
 
 static int ahrs_set_settings(Ahrs *self, PyObject *value, void *closure) {
-    if (PyObject_TypeCheck(value, &ahrs_settings_object) == 0) {
-        PyErr_Format(PyExc_TypeError, "'settings' must be %s", ahrs_settings_object.tp_name);
+    AhrsSettings* settings;
+
+    if (PyArg_Parse(value, "O!", &ahrs_settings_object, &settings) == 0) {
         return -1;
     }
 
-    FusionAhrsSetSettings(&self->wrapped, &((AhrsSettings *) value)->wrapped);
+    FusionAhrsSetSettings(&self->wrapped, &settings->wrapped);
     return 0;
 }
 
