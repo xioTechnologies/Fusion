@@ -6,7 +6,7 @@
 
 typedef struct {
     PyObject_HEAD
-    FusionAhrsInternalStates internal_states;
+    FusionAhrsInternalStates wrapped;
 } AhrsInternalStates;
 
 static void ahrs_internal_states_free(AhrsInternalStates *self) {
@@ -14,27 +14,27 @@ static void ahrs_internal_states_free(AhrsInternalStates *self) {
 }
 
 static PyObject *ahrs_internal_states_get_acceleration_error(AhrsInternalStates *self) {
-    return PyFloat_FromDouble((double) self->internal_states.accelerationError);
+    return PyFloat_FromDouble((double) self->wrapped.accelerationError);
 }
 
 static PyObject *ahrs_internal_states_get_accelerometer_ignored(AhrsInternalStates *self) {
-    return PyBool_FromLong((long) self->internal_states.accelerometerIgnored);
+    return PyBool_FromLong((long) self->wrapped.accelerometerIgnored);
 }
 
 static PyObject *ahrs_internal_states_get_acceleration_recovery_trigger(AhrsInternalStates *self) {
-    return PyFloat_FromDouble((double) self->internal_states.accelerationRecoveryTrigger);
+    return PyFloat_FromDouble((double) self->wrapped.accelerationRecoveryTrigger);
 }
 
 static PyObject *ahrs_internal_states_get_magnetic_error(AhrsInternalStates *self) {
-    return PyFloat_FromDouble((double) self->internal_states.magneticError);
+    return PyFloat_FromDouble((double) self->wrapped.magneticError);
 }
 
 static PyObject *ahrs_internal_states_get_magnetometer_ignored(AhrsInternalStates *self) {
-    return PyBool_FromLong((long) self->internal_states.magnetometerIgnored);
+    return PyBool_FromLong((long) self->wrapped.magnetometerIgnored);
 }
 
 static PyObject *ahrs_internal_states_get_magnetic_recovery_trigger(AhrsInternalStates *self) {
-    return PyFloat_FromDouble((double) self->internal_states.magneticRecoveryTrigger);
+    return PyFloat_FromDouble((double) self->wrapped.magneticRecoveryTrigger);
 }
 
 static PyGetSetDef ahrs_internal_states_get_set[] = {
@@ -63,7 +63,7 @@ static PyObject *internal_states_from(const FusionAhrsInternalStates *const inte
         return NULL;
     }
 
-    self->internal_states = *internal_states;
+    self->wrapped = *internal_states;
     return (PyObject *) self;
 }
 

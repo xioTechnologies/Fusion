@@ -10,7 +10,7 @@
 
 typedef struct {
     PyObject_HEAD
-    FusionAhrs ahrs;
+    FusionAhrs wrapped;
 } Ahrs;
 
 static PyObject *ahrs_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
@@ -24,7 +24,7 @@ static PyObject *ahrs_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-    FusionAhrsInitialise(&self->ahrs);
+    FusionAhrsInitialise(&self->wrapped);
     return (PyObject *) self;
 }
 
@@ -38,12 +38,12 @@ static int ahrs_set_settings(Ahrs *self, PyObject *value, void *closure) {
         return -1;
     }
 
-    FusionAhrsSetSettings(&self->ahrs, &((AhrsSettings *) value)->settings);
+    FusionAhrsSetSettings(&self->wrapped, &((AhrsSettings *) value)->wrapped);
     return 0;
 }
 
 static PyObject *ahrs_get_quaternion(Ahrs *self) {
-    const FusionQuaternion quaternion = FusionAhrsGetQuaternion(&self->ahrs);
+    const FusionQuaternion quaternion = FusionAhrsGetQuaternion(&self->wrapped);
 
     return np_array_1x4_from(quaternion.array);
 }
@@ -55,42 +55,42 @@ static int ahrs_set_quaternion(Ahrs *self, PyObject *value, void *closure) {
         return -1;
     }
 
-    FusionAhrsSetQuaternion(&self->ahrs, quaternion);
+    FusionAhrsSetQuaternion(&self->wrapped, quaternion);
     return 0;
 }
 
 static PyObject *ahrs_get_gravity(Ahrs *self) {
-    const FusionVector gravity = FusionAhrsGetGravity(&self->ahrs);
+    const FusionVector gravity = FusionAhrsGetGravity(&self->wrapped);
 
     return np_array_1x3_from(gravity.array);
 }
 
 static PyObject *ahrs_get_linear_acceleration(Ahrs *self) {
-    const FusionVector linear_acceleration = FusionAhrsGetLinearAcceleration(&self->ahrs);
+    const FusionVector linear_acceleration = FusionAhrsGetLinearAcceleration(&self->wrapped);
 
     return np_array_1x3_from(linear_acceleration.array);
 }
 
 static PyObject *ahrs_get_earth_acceleration(Ahrs *self) {
-    const FusionVector earth_acceleration = FusionAhrsGetEarthAcceleration(&self->ahrs);
+    const FusionVector earth_acceleration = FusionAhrsGetEarthAcceleration(&self->wrapped);
 
     return np_array_1x3_from(earth_acceleration.array);
 }
 
 static PyObject *ahrs_get_internal_states(Ahrs *self) {
-    const FusionAhrsInternalStates internal_states = FusionAhrsGetInternalStates(&self->ahrs);
+    const FusionAhrsInternalStates internal_states = FusionAhrsGetInternalStates(&self->wrapped);
 
     return internal_states_from(&internal_states);
 }
 
 static PyObject *ahrs_get_flags(Ahrs *self) {
-    const FusionAhrsFlags flags = FusionAhrsGetFlags(&self->ahrs);
+    const FusionAhrsFlags flags = FusionAhrsGetFlags(&self->wrapped);
 
     return ahrs_flags_from(&flags);
 }
 
 static PyObject *ahrs_reset(Ahrs *self, PyObject *args) {
-    FusionAhrsReset(&self->ahrs);
+    FusionAhrsReset(&self->wrapped);
     Py_RETURN_NONE;
 }
 
@@ -122,7 +122,7 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdate(&self->ahrs, gyroscope, accelerometer, magnetometer, delta_time);
+    FusionAhrsUpdate(&self->wrapped, gyroscope, accelerometer, magnetometer, delta_time);
     Py_RETURN_NONE;
 }
 
@@ -147,7 +147,7 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdateNoMagnetometer(&self->ahrs, gyroscope, accelerometer, delta_time);
+    FusionAhrsUpdateNoMagnetometer(&self->wrapped, gyroscope, accelerometer, delta_time);
     Py_RETURN_NONE;
 }
 
@@ -173,7 +173,7 @@ static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdateExternalHeading(&self->ahrs, gyroscope, accelerometer, heading, delta_time);
+    FusionAhrsUpdateExternalHeading(&self->wrapped, gyroscope, accelerometer, heading, delta_time);
     Py_RETURN_NONE;
 }
 
@@ -184,7 +184,7 @@ static int ahrs_set_heading(Ahrs *self, PyObject *value, void *closure) {
         return -1;
     }
 
-    FusionAhrsSetHeading(&self->ahrs, heading);
+    FusionAhrsSetHeading(&self->wrapped, heading);
     return 0;
 }
 

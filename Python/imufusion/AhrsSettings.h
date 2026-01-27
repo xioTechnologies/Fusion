@@ -7,7 +7,7 @@
 
 typedef struct {
     PyObject_HEAD
-    FusionAhrsSettings settings;
+    FusionAhrsSettings wrapped;
 } AhrsSettings;
 
 static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
@@ -46,7 +46,7 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         return NULL;
     }
 
-    self->settings = settings;
+    self->wrapped = settings;
     return (PyObject *) self;
 }
 
@@ -55,7 +55,7 @@ static void ahrs_settings_free(AhrsSettings *self) {
 }
 
 static PyObject *ahrs_settings_get_convention(AhrsSettings *self) {
-    return PyLong_FromLong(self->settings.convention);
+    return PyLong_FromLong(self->wrapped.convention);
 }
 
 static int ahrs_settings_set_convention(AhrsSettings *self, PyObject *value, void *closure) {
@@ -71,12 +71,12 @@ static int ahrs_settings_set_convention(AhrsSettings *self, PyObject *value, voi
         return -1;
     }
 
-    self->settings.convention = convention;
+    self->wrapped.convention = convention;
     return 0;
 }
 
 static PyObject *ahrs_settings_get_gain(AhrsSettings *self) {
-    return PyFloat_FromDouble((double) self->settings.gain);
+    return PyFloat_FromDouble((double) self->wrapped.gain);
 }
 
 static int ahrs_settings_set_gain(AhrsSettings *self, PyObject *value, void *closure) {
@@ -86,12 +86,12 @@ static int ahrs_settings_set_gain(AhrsSettings *self, PyObject *value, void *clo
         return -1;
     }
 
-    self->settings.gain = gain;
+    self->wrapped.gain = gain;
     return 0;
 }
 
 static PyObject *ahrs_settings_get_gyroscope_range(AhrsSettings *self) {
-    return PyFloat_FromDouble((double) self->settings.gyroscopeRange);
+    return PyFloat_FromDouble((double) self->wrapped.gyroscopeRange);
 }
 
 static int ahrs_settings_set_gyroscope_range(AhrsSettings *self, PyObject *value, void *closure) {
@@ -101,12 +101,12 @@ static int ahrs_settings_set_gyroscope_range(AhrsSettings *self, PyObject *value
         return -1;
     }
 
-    self->settings.gyroscopeRange = gyroscope_range;
+    self->wrapped.gyroscopeRange = gyroscope_range;
     return 0;
 }
 
 static PyObject *ahrs_settings_get_acceleration_rejection(AhrsSettings *self) {
-    return PyFloat_FromDouble((double) self->settings.accelerationRejection);
+    return PyFloat_FromDouble((double) self->wrapped.accelerationRejection);
 }
 
 static int ahrs_settings_set_acceleration_rejection(AhrsSettings *self, PyObject *value, void *closure) {
@@ -116,12 +116,12 @@ static int ahrs_settings_set_acceleration_rejection(AhrsSettings *self, PyObject
         return -1;
     }
 
-    self->settings.accelerationRejection = acceleration_rejection;
+    self->wrapped.accelerationRejection = acceleration_rejection;
     return 0;
 }
 
 static PyObject *ahrs_settings_get_magnetic_rejection(AhrsSettings *self) {
-    return PyFloat_FromDouble((double) self->settings.magneticRejection);
+    return PyFloat_FromDouble((double) self->wrapped.magneticRejection);
 }
 
 static int ahrs_settings_set_magnetic_rejection(AhrsSettings *self, PyObject *value, void *closure) {
@@ -131,12 +131,12 @@ static int ahrs_settings_set_magnetic_rejection(AhrsSettings *self, PyObject *va
         return -1;
     }
 
-    self->settings.magneticRejection = magnetic_rejection;
+    self->wrapped.magneticRejection = magnetic_rejection;
     return 0;
 }
 
 static PyObject *ahrs_settings_get_recovery_trigger_period(AhrsSettings *self) {
-    return PyLong_FromUnsignedLong((unsigned long) self->settings.recoveryTriggerPeriod);
+    return PyLong_FromUnsignedLong((unsigned long) self->wrapped.recoveryTriggerPeriod);
 }
 
 static int ahrs_settings_set_recovery_trigger_period(AhrsSettings *self, PyObject *value, void *closure) {
@@ -146,7 +146,7 @@ static int ahrs_settings_set_recovery_trigger_period(AhrsSettings *self, PyObjec
         return -1;
     }
 
-    self->settings.recoveryTriggerPeriod = recovery_trigger_period;
+    self->wrapped.recoveryTriggerPeriod = recovery_trigger_period;
     return 0;
 }
 
