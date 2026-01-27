@@ -7,7 +7,7 @@
 
 typedef struct {
     PyObject_HEAD
-    FusionBias bias;
+    FusionBias wrapped;
 } Bias;
 
 static PyObject *bias_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
@@ -23,7 +23,7 @@ static PyObject *bias_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-    FusionBiasInitialise(&self->bias, sample_rate);
+    FusionBiasInitialise(&self->wrapped, sample_rate);
     return (PyObject *) self;
 }
 
@@ -38,7 +38,7 @@ static PyObject *bias_update(Bias *self, PyObject *arg) {
         return NULL;
     }
 
-    const FusionVector compensated_gyroscope = FusionBiasUpdate(&self->bias, gyroscope);
+    const FusionVector compensated_gyroscope = FusionBiasUpdate(&self->wrapped, gyroscope);
 
     return np_array_1x3_from(compensated_gyroscope.array);
 }

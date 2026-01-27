@@ -6,7 +6,7 @@
 
 typedef struct {
     PyObject_HEAD
-    FusionAhrsFlags flags;
+    FusionAhrsFlags wrapped;
 } AhrsFlags;
 
 static void ahrs_flags_free(AhrsFlags *self) {
@@ -14,19 +14,19 @@ static void ahrs_flags_free(AhrsFlags *self) {
 }
 
 static PyObject *ahrs_flags_get_initialising(AhrsFlags *self) {
-    return PyBool_FromLong((long) self->flags.initialising);
+    return PyBool_FromLong((long) self->wrapped.initialising);
 }
 
 static PyObject *ahrs_flags_get_angular_rate_recovery(AhrsFlags *self) {
-    return PyBool_FromLong((long) self->flags.angularRateRecovery);
+    return PyBool_FromLong((long) self->wrapped.angularRateRecovery);
 }
 
 static PyObject *ahrs_flags_get_acceleration_recovery(AhrsFlags *self) {
-    return PyBool_FromLong((long) self->flags.accelerationRecovery);
+    return PyBool_FromLong((long) self->wrapped.accelerationRecovery);
 }
 
 static PyObject *ahrs_flags_get_magnetic_recovery(AhrsFlags *self) {
-    return PyBool_FromLong((long) self->flags.magneticRecovery);
+    return PyBool_FromLong((long) self->wrapped.magneticRecovery);
 }
 
 static PyGetSetDef ahrs_flags_get_set[] = {
@@ -53,7 +53,7 @@ static PyObject *ahrs_flags_from(const FusionAhrsFlags *const flags) {
         return NULL;
     }
 
-    self->flags = *flags;
+    self->wrapped = *flags;
     return (PyObject *) self;
 }
 
