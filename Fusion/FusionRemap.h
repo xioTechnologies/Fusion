@@ -22,7 +22,7 @@
  * alignment is +Y-X+Z.
  */
 typedef enum {
-    FusionRemapAlignmentPXPYPZ, /* +X+Y+Z */
+    FusionRemapAlignmentPXPYPZ, /* +X+Y+Z (no remap) */
     FusionRemapAlignmentPXPZNY, /* +X+Z-Y */
     FusionRemapAlignmentPXNZPY, /* +X-Z+Y */
     FusionRemapAlignmentPXNYNZ, /* +X-Y-Z */
