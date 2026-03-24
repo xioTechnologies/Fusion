@@ -90,8 +90,8 @@ static PyObject *ahrs_get_flags(Ahrs *self) {
     return ahrs_flags_from(&flags);
 }
 
-static PyObject *ahrs_reset(Ahrs *self, PyObject *args) {
-    FusionAhrsReset(&self->wrapped);
+static PyObject *ahrs_restart(Ahrs *self, PyObject *args) {
+    FusionAhrsRestart(&self->wrapped);
     Py_RETURN_NONE;
 }
 
@@ -202,7 +202,7 @@ static PyGetSetDef ahrs_get_set[] = {
 };
 
 static PyMethodDef ahrs_methods[] = {
-    {"reset", (PyCFunction) ahrs_reset, METH_NOARGS, ""},
+    {"restart", (PyCFunction) ahrs_restart, METH_NOARGS, ""},
     {"update", (PyCFunction) ahrs_update, METH_VARARGS, ""},
     {"update_no_magnetometer", (PyCFunction) ahrs_update_no_magnetometer, METH_VARARGS, ""},
     {"update_external_heading", (PyCFunction) ahrs_update_external_heading, METH_VARARGS, ""},
