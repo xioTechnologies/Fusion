@@ -66,6 +66,7 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
 void FusionAhrsReset(FusionAhrs *const ahrs) {
     ahrs->quaternion = FUSION_QUATERNION_IDENTITY;
     ahrs->accelerometer = FUSION_VECTOR_ZERO;
+    ahrs->halfGravity = FUSION_VECTOR_ZERO;
     ahrs->initialising = true;
     ahrs->rampedGain = INITIAL_GAIN;
     ahrs->angularRateRecovery = false;
