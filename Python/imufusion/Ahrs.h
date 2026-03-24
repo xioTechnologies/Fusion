@@ -157,7 +157,7 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdateNoMagnetometer(&self->wrapped, gyroscope, accelerometer);
+    FusionAhrsUpdateGyroscopeHeading(&self->wrapped, gyroscope, accelerometer);
     Py_RETURN_NONE;
 }
 

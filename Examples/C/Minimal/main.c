@@ -33,7 +33,7 @@ int main() {
         }
 
         // Update AHRS algorithm
-        FusionAhrsUpdateNoMagnetometer(&ahrs, gyroscope, accelerometer);
+        FusionAhrsUpdateGyroscopeHeading(&ahrs, gyroscope, accelerometer);
 
         // Print Euler angles
         const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&ahrs));

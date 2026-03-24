@@ -21,6 +21,8 @@ const char *FusionResultToString(const FusionResult result) {
     switch (result) {
         case FusionResultOk:
             return "Ok";
+        case FusionResultInvalidMode:
+            return "Invalid mode";
         case FusionResultTooFewSamples:
             return "Too few samples";
         case FusionResultMallocFailed:
