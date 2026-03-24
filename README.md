@@ -22,11 +22,11 @@ Initialisation occurs when the algorithm starts for the first time and during an
 
 ### Angular rate recovery
 
-Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery. Angular rate recovery is activated when the angular rate exceeds the 98% of the gyroscope measurement range and will trigger reinitialisation of the algorithm.
+Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery. Angular rate recovery is activated when the angular rate exceeds 98% of the gyroscope measurement range and will trigger reinitialisation of the algorithm.
 
 ### Acceleration rejection
 
-The acceleration rejection feature reduces the errors that result from the accelerations of linear and rotational motion. Acceleration rejection works by calculating an error as the angular difference between the instantaneous measurement of inclination indicated by the accelerometer, and the current measurement of inclination provided by the algorithm output. If the error is greater than a threshold then the accelerometer will be ignored for that algorithm update. This is equivalent to a dynamic gain that deceases as accelerations increase.
+The acceleration rejection feature reduces the errors that result from the accelerations of linear and rotational motion. Acceleration rejection works by calculating an error as the angular difference between the instantaneous measurement of inclination indicated by the accelerometer, and the current measurement of inclination provided by the algorithm output. If the error is greater than a threshold then the accelerometer will be ignored for that algorithm update. This is equivalent to a dynamic gain that decreases as accelerations increase.
 
 Prolonged accelerations risk an overdependency on the gyroscope and will trigger an acceleration recovery. Acceleration recovery activates when the error exceeds the threshold for more than 90% of algorithm updates over a period of *t / (0.1p - 9)*, where *t* is the recovery trigger period and *p* is the percentage of algorithm updates where the error exceeds the threshold. The recovery will remain active until the error exceeds the threshold for less than 90% of algorithm updates over the period *-t / (0.1p - 9)*. The accelerometer will be used by every algorithm update during recovery.
 
@@ -77,9 +77,23 @@ The AHRS algorithm flags are defined by the `FusionAhrsFlags` structure and obta
 
 ## Bias algorithm
 
-The bias algorithm provides run-time estimation of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place. This algorithm should be used in conjunction with the AHRS algorithm to achieve best performance.
+The bias algorithm provides run-time estimation of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place. This algorithm may be used to improve gyroscope measurements before providing them to the AHRS algorithm.
 
-The algorithm calculates the gyroscope offset by detecting the stationary periods that occur naturally in most applications. Gyroscope measurements are sampled during these periods and low-pass filtered to obtain the gyroscope offset. The algorithm requires that gyroscope measurements do not exceed +/-3 degrees per second while stationary. Basic gyroscope offset calibration may be necessary to ensure that the initial offset plus measurement noise is within these bounds.
+The algorithm estimates the gyroscope offset by identifying the stationary periods that occur naturally in many applications. Stationary periods are detected as the gyroscope measurement remaining below a threshold for a period of time. The gyroscope offset is then updated using a high-pass filter with a very low cutoff frequency.
+
+### Settings
+
+The bias algorithm settings are defined by the `FusionBiasSettings` structure and are configured using the `FusionBiasSetSettings` function.
+
+| Setting               | Description                                                                                      |
+|-----------------------|--------------------------------------------------------------------------------------------------|
+| `sampleRate`          | Sample rate in Hz. The default value is 100 Hz.                                                  |
+| `stationaryThreshold` | Stationary detection threshold in degrees per second. The default value is 3 degrees per second. |
+| `stationaryPeriod`    | Stationary detection period in seconds. The default value is 3 seconds.                          |
+
+### Non-volatile memory
+
+The run-time estimate of the gyroscope offset may be saved to and restored from non-volatile memory to avoid re-estimation after each power cycle. This is supported by the `FusionBiasGetOffset` and `FusionBiasSetOffset` functions.
 
 ## Sensor models
 
