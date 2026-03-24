@@ -13,8 +13,8 @@ static void ahrs_flags_free(AhrsFlags *self) {
     Py_TYPE(self)->tp_free(self);
 }
 
-static PyObject *ahrs_flags_get_initialising(AhrsFlags *self) {
-    return PyBool_FromLong((long) self->wrapped.initialising);
+static PyObject *ahrs_flags_get_startup(AhrsFlags *self) {
+    return PyBool_FromLong((long) self->wrapped.startup);
 }
 
 static PyObject *ahrs_flags_get_angular_rate_recovery(AhrsFlags *self) {
@@ -30,7 +30,7 @@ static PyObject *ahrs_flags_get_magnetic_recovery(AhrsFlags *self) {
 }
 
 static PyGetSetDef ahrs_flags_get_set[] = {
-    {"initialising", (getter) ahrs_flags_get_initialising, NULL, "", NULL},
+    {"startup", (getter) ahrs_flags_get_startup, NULL, "", NULL},
     {"angular_rate_recovery", (getter) ahrs_flags_get_angular_rate_recovery, NULL, "", NULL},
     {"acceleration_recovery", (getter) ahrs_flags_get_acceleration_recovery, NULL, "", NULL},
     {"magnetic_recovery", (getter) ahrs_flags_get_magnetic_recovery, NULL, "", NULL},
