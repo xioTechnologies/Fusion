@@ -40,6 +40,23 @@ static int bias_set_settings(Bias *self, PyObject *value, void *closure) {
     return 0;
 }
 
+static PyObject *bias_get_offset(Bias *self) {
+    const FusionVector offset = FusionBiasGetOffset(&self->wrapped);
+
+    return np_array_1x3_from(offset.array);
+}
+
+static int bias_set_offset(Bias *self, PyObject *value, void *closure) {
+    FusionVector offset;
+
+    if (np_array_1x3_to(offset.array, value) != 0) {
+        return -1;
+    }
+
+    FusionBiasSetOffset(&self->wrapped, offset);
+    return 0;
+}
+
 static PyObject *bias_update(Bias *self, PyObject *arg) {
     FusionVector gyroscope;
 
@@ -54,6 +71,7 @@ static PyObject *bias_update(Bias *self, PyObject *arg) {
 
 static PyGetSetDef bias_get_set[] = {
     {"settings", NULL, (setter) bias_set_settings, "", NULL},
+    {"offset", (getter) bias_get_offset, (setter) bias_set_offset, "", NULL},
     {NULL} /* sentinel */
 };
 
