@@ -45,7 +45,7 @@ static PyObject *bias_settings_get_sample_rate(BiasSettings *self) {
 }
 
 static int bias_settings_set_sample_rate(BiasSettings *self, PyObject *value, void *closure) {
-    const float sample_rate = (float) PyLong_AsUnsignedLong(value);
+    const float sample_rate = (float) PyFloat_AsDouble(value);
 
     if (PyErr_Occurred()) {
         return -1;
