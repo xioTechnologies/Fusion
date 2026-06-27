@@ -398,16 +398,7 @@ FusionVector FusionAhrsGetGravity(const FusionAhrs *const ahrs) {
  * @return Linear acceleration in g.
  */
 FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
-    switch (ahrs->settings.convention) {
-        case FusionConventionNwu:
-        case FusionConventionEnu: {
-            return FusionVectorSubtract(ahrs->accelerometer, FusionAhrsGetGravity(ahrs));
-        }
-        case FusionConventionNed: {
-            return FusionVectorAdd(ahrs->accelerometer, FusionAhrsGetGravity(ahrs));
-        }
-    }
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
+    return FusionVectorSubtract(ahrs->accelerometer, FusionAhrsGetGravity(ahrs));
 }
 
 /**
