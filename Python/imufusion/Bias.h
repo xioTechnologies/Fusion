@@ -64,9 +64,9 @@ static PyObject *bias_update(Bias *self, PyObject *arg) {
         return NULL;
     }
 
-    const FusionVector compensated_gyroscope = FusionBiasUpdate(&self->wrapped, gyroscope);
+    const FusionVector corrected_gyroscope = FusionBiasUpdate(&self->wrapped, gyroscope);
 
-    return np_array_1x3_from(compensated_gyroscope.array);
+    return np_array_1x3_from(corrected_gyroscope.array);
 }
 
 static PyGetSetDef bias_get_set[] = {
