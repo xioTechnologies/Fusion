@@ -3,6 +3,7 @@
 
 #include <numpy/arrayobject.h>
 #include <Python.h>
+#include <string.h>
 
 static int np_array_1x3_to(float *const c_array, PyObject *object) {
     PyArrayObject *np_array = (PyArrayObject *) PyArray_FROM_OTF(object, NPY_FLOAT, NPY_ARRAY_IN_ARRAY | NPY_ARRAY_FORCECAST);
