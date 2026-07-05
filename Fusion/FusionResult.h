@@ -15,6 +15,7 @@
  */
 typedef enum {
     FusionResultOk,
+    FusionResultInvalidMode,
     FusionResultTimeout,
     FusionResultNotInProgress,
     FusionResultTooFewSamples,
