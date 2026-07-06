@@ -6,7 +6,7 @@
 
 typedef struct {
     PyObject_HEAD
-    FusionBiasSettings settings;
+    FusionBiasSettings wrapped;
 } BiasSettings;
 
 static PyObject *bias_settings_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
@@ -14,15 +14,15 @@ static PyObject *bias_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
 
     static char *kwlist[] = {
         "sample_rate",
-        "stationary_period",
         "stationary_threshold",
+        "stationary_period",
         NULL, /* sentinel */
     };
 
     if (PyArg_ParseTupleAndKeywords(args, kwds, "|fff", kwlist,
                                     &settings.sampleRate,
-                                    &settings.stationaryPeriod,
-                                    &settings.stationaryThreshold) == 0) {
+                                    &settings.stationaryThreshold,
+                                    &settings.stationaryPeriod) == 0) {
         return NULL;
     }
 
@@ -32,7 +32,7 @@ static PyObject *bias_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         return NULL;
     }
 
-    self->settings = settings;
+    self->wrapped = settings;
     return (PyObject *) self;
 }
 
@@ -41,7 +41,7 @@ static void bias_settings_free(BiasSettings *self) {
 }
 
 static PyObject *bias_settings_get_sample_rate(BiasSettings *self) {
-    return PyFloat_FromDouble(self->settings.sampleRate);
+    return PyFloat_FromDouble(self->wrapped.sampleRate);
 }
 
 static int bias_settings_set_sample_rate(BiasSettings *self, PyObject *value, void *closure) {
@@ -51,12 +51,12 @@ static int bias_settings_set_sample_rate(BiasSettings *self, PyObject *value, vo
         return -1;
     }
 
-    self->settings.sampleRate = sample_rate;
+    self->wrapped.sampleRate = sample_rate;
     return 0;
 }
 
 static PyObject *bias_settings_get_stationary_period(BiasSettings *self) {
-    return PyFloat_FromDouble((double) self->settings.stationaryPeriod);
+    return PyFloat_FromDouble((double) self->wrapped.stationaryPeriod);
 }
 
 static int bias_settings_set_stationary_period(BiasSettings *self, PyObject *value, void *closure) {
@@ -66,12 +66,12 @@ static int bias_settings_set_stationary_period(BiasSettings *self, PyObject *val
         return -1;
     }
 
-    self->settings.stationaryPeriod = stationary_period;
+    self->wrapped.stationaryPeriod = stationary_period;
     return 0;
 }
 
 static PyObject *bias_settings_get_stationary_threshold(BiasSettings *self) {
-    return PyFloat_FromDouble((double) self->settings.stationaryThreshold);
+    return PyFloat_FromDouble((double) self->wrapped.stationaryThreshold);
 }
 
 static int bias_settings_set_stationary_threshold(BiasSettings *self, PyObject *value, void *closure) {
@@ -81,14 +81,14 @@ static int bias_settings_set_stationary_threshold(BiasSettings *self, PyObject *
         return -1;
     }
 
-    self->settings.stationaryThreshold = stationary_threshold;
+    self->wrapped.stationaryThreshold = stationary_threshold;
     return 0;
 }
 
 static PyGetSetDef bias_settings_get_set[] = {
     {"sample_rate", (getter) bias_settings_get_sample_rate, (setter) bias_settings_set_sample_rate, "", NULL},
-    {"stationary_period", (getter) bias_settings_get_stationary_period, (setter) bias_settings_set_stationary_period, "", NULL},
     {"stationary_threshold", (getter) bias_settings_get_stationary_threshold, (setter) bias_settings_set_stationary_threshold, "", NULL},
+    {"stationary_period", (getter) bias_settings_get_stationary_period, (setter) bias_settings_set_stationary_period, "", NULL},
     {NULL} /* sentinel */
 };
 
@@ -109,7 +109,7 @@ static PyObject *bias_settings_from(const FusionBiasSettings *const settings) {
         return NULL;
     }
 
-    self->settings = *settings;
+    self->wrapped = *settings;
     return (PyObject *) self;
 }
 
