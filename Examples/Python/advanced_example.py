@@ -17,18 +17,20 @@ magnetometer = data[:, 7:10]
 # Instantiate algorithms
 bias = imufusion.Bias()
 
-bias.settings = imufusion.BiasSettings(sample_rate=sample_rate)
+bias.set_settings(imufusion.BiasSettings(sample_rate=sample_rate))
 
 ahrs = imufusion.Ahrs()
 
-ahrs.settings = imufusion.AhrsSettings(
-    sample_rate=sample_rate,
-    convention=imufusion.CONVENTION_NWU,
-    gain=0.5,
-    gyroscope_range=2000,
-    acceleration_rejection=10,
-    magnetic_rejection=10,
-    recovery_trigger_period=5 * sample_rate,  # 5 seconds
+ahrs.set_settings(
+    imufusion.AhrsSettings(
+        sample_rate=sample_rate,
+        convention=imufusion.CONVENTION_NWU,
+        gain=0.5,
+        gyroscope_range=2000,
+        acceleration_rejection=10,
+        magnetic_rejection=10,
+        recovery_trigger_period=5 * sample_rate,  # 5 seconds
+    )
 )
 
 # Process sensor data
@@ -41,13 +43,13 @@ flags = np.empty((len(timestamp), 4))
 for index in range(len(timestamp)):
     gyroscope[index] = bias.update(gyroscope[index])
 
-    ahrs.sample_period = delta_time[index]
+    ahrs.set_sample_period(delta_time[index])
 
     ahrs.update(gyroscope[index], accelerometer[index], magnetometer[index])
 
-    euler[index] = imufusion.quaternion_to_euler(ahrs.quaternion)
+    euler[index] = imufusion.quaternion_to_euler(ahrs.get_quaternion())
 
-    ahrs_internal_states = ahrs.internal_states
+    ahrs_internal_states = ahrs.get_internal_states()
     internal_states[index] = np.array(
         [
             ahrs_internal_states.acceleration_error,
@@ -59,7 +61,7 @@ for index in range(len(timestamp)):
         ]
     )
 
-    ahrs_flags = ahrs.flags
+    ahrs_flags = ahrs.get_flags()
     flags[index] = np.array(
         [
             ahrs_flags.startup,
