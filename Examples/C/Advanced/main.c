@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <time.h>
 
-#define SAMPLE_RATE (100) // replace with actual sample rate
-
 int main() {
+    const float sampleRate = 100.0f; // Hz
+
     // Calibration parameters (replace with actual calibration data)
     const FusionMatrix gyroscopeMisalignment = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     const FusionVector gyroscopeSensitivity = {1.0f, 1.0f, 1.0f};
@@ -23,12 +23,13 @@ int main() {
     FusionAhrsInitialise(&ahrs);
 
     const FusionAhrsSettings settings = {
+        .sampleRate = sampleRate,
         .convention = FusionConventionNwu,
         .gain = 0.5f,
         .gyroscopeRange = 2000.0f, /* replace with actual gyroscope range */
         .accelerationRejection = 10.0f,
         .magneticRejection = 10.0f,
-        .recoveryTriggerPeriod = 5 * SAMPLE_RATE, /* 5 seconds */
+        .recoveryTriggerPeriod = (unsigned int) (5.0f * sampleRate), /* 5 seconds */
     };
 
     FusionAhrsSetSettings(&ahrs, &settings);
@@ -38,7 +39,7 @@ int main() {
     FusionBiasInitialise(&bias);
 
     FusionBiasSettings biasSettings = fusionBiasDefaultSettings;
-    biasSettings.sampleRate = SAMPLE_RATE;
+    biasSettings.sampleRate = sampleRate;
 
     FusionBiasSetSettings(&bias, &biasSettings);
 
@@ -65,8 +66,10 @@ int main() {
         const float deltaTime = (float) (timestamp - previousTimestamp) / (float) CLOCKS_PER_SEC;
         previousTimestamp = timestamp;
 
+        FusionAhrsSetSamplePeriod(&ahrs, deltaTime);
+
         // Update AHRS algorithm
-        FusionAhrsUpdate(&ahrs, gyroscope, accelerometer, magnetometer, deltaTime);
+        FusionAhrsUpdate(&ahrs, gyroscope, accelerometer, magnetometer);
 
         // Print AHRS outputs
         const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&ahrs));
