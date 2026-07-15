@@ -22,13 +22,13 @@
  * @brief Settings.
  */
 typedef struct {
-    float sampleRate;
+    float sampleRate; // Hz
     FusionConvention convention;
     float gain;
-    float gyroscopeRange;
-    float accelerationRejection;
-    float magneticRejection;
-    uint32_t recoveryTriggerPeriod;
+    float gyroscopeRange; // degrees per second
+    float accelerationRejection; // degrees
+    float magneticRejection; // degrees
+    float recoveryTriggerPeriod; // seconds
 } FusionAhrsSettings;
 
 /**
@@ -37,6 +37,7 @@ typedef struct {
 typedef struct {
     FusionAhrsSettings settings;
     float samplePeriod;
+    int32_t recoveryTriggerPeriod;
     FusionQuaternion quaternion;
     FusionVector accelerometer;
     FusionVector halfGravity;

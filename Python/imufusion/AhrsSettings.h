@@ -25,7 +25,7 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         NULL, /* sentinel */
     };
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fiffffI", kwlist,
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fifffff", kwlist,
                                     &settings.sampleRate,
                                     &convention_int,
                                     &settings.gain,
@@ -153,11 +153,11 @@ static int ahrs_settings_set_magnetic_rejection(AhrsSettings *self, PyObject *va
 }
 
 static PyObject *ahrs_settings_get_recovery_trigger_period(AhrsSettings *self) {
-    return PyLong_FromUnsignedLong((unsigned long) self->wrapped.recoveryTriggerPeriod);
+    return PyFloat_FromDouble((double) self->wrapped.recoveryTriggerPeriod);
 }
 
 static int ahrs_settings_set_recovery_trigger_period(AhrsSettings *self, PyObject *value, void *closure) {
-    const uint32_t recovery_trigger_period = (uint32_t) PyLong_AsUnsignedLong(value);
+    const float recovery_trigger_period = (float) PyFloat_AsDouble(value);
 
     if (PyErr_Occurred()) {
         return -1;
