@@ -24,7 +24,7 @@ ahrs.set_settings(
     imufusion.AhrsSettings(
         sample_rate=sample_rate,
         magnetic_rejection=10,  # reject magnetic disturbances >10 degrees
-        recovery_trigger_period=20 * sample_rate,  # reject magnetic disturbances for up to 20 seconds
+        recovery_trigger_period=20,  # reject magnetic disturbances for up to 20 seconds
     )
 )
 

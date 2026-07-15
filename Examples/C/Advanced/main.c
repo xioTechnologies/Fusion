@@ -29,7 +29,7 @@ int main() {
         .gyroscopeRange = 2000.0f, /* replace with actual gyroscope range */
         .accelerationRejection = 10.0f,
         .magneticRejection = 10.0f,
-        .recoveryTriggerPeriod = (unsigned int) (5.0f * sampleRate), /* 5 seconds */
+        .recoveryTriggerPeriod = 5.0f,
     };
 
     FusionAhrsSetSettings(&ahrs, &settings);

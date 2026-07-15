@@ -29,7 +29,7 @@ ahrs.set_settings(
         gyroscope_range=2000,
         acceleration_rejection=10,
         magnetic_rejection=10,
-        recovery_trigger_period=5 * sample_rate,  # 5 seconds
+        recovery_trigger_period=5,
     )
 )
 
