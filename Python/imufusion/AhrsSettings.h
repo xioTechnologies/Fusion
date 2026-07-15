@@ -157,7 +157,7 @@ static PyObject *ahrs_settings_get_recovery_trigger_period(AhrsSettings *self) {
 }
 
 static int ahrs_settings_set_recovery_trigger_period(AhrsSettings *self, PyObject *value, void *closure) {
-    const unsigned int recovery_trigger_period = (unsigned int) PyLong_AsUnsignedLong(value);
+    const uint32_t recovery_trigger_period = (uint32_t) PyLong_AsUnsignedLong(value);
 
     if (PyErr_Occurred()) {
         return -1;
