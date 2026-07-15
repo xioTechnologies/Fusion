@@ -59,7 +59,9 @@ int main() {
         magnetometer = FusionModelMagnetic(magnetometer, softIronMatrix, hardIronOffset);
 
         // Update bias algorithm
-        gyroscope = FusionBiasUpdate(&bias, gyroscope);
+        FusionBiasUpdate(&bias, gyroscope);
+
+        gyroscope = FusionBiasGetCorrectedGyroscope(&bias);
 
         // Calculate delta time to compensate for gyroscope sample clock errors
         static clock_t previousTimestamp;
