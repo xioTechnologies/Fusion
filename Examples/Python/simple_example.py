@@ -33,7 +33,11 @@ axes[1].legend()
 # Process sensor data
 ahrs = imufusion.Ahrs()
 
-ahrs.set_settings(imufusion.AhrsSettings(sample_rate=100))  # Hz
+ahrs.set_settings(
+    imufusion.AhrsSettings(
+        sample_rate=100,  # Hz
+    )
+)
 
 euler = np.empty((len(timestamp), 3))
 
