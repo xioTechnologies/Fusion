@@ -48,7 +48,7 @@ void FusionBiasInitialise(FusionBias *const bias) {
 void FusionBiasSetSettings(FusionBias *const bias, const FusionBiasSettings *const settings) {
     bias->settings = *settings;
     bias->filterCoefficient = 2.0f * (float) M_PI * CUTOFF_FREQUENCY * (1.0f / bias->settings.sampleRate);
-    bias->timeout = (unsigned int) (bias->settings.stationaryPeriod * bias->settings.sampleRate);
+    bias->timeout = (uint32_t) (bias->settings.stationaryPeriod * bias->settings.sampleRate);
 }
 
 /**

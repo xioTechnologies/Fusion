@@ -11,6 +11,7 @@
 // Includes
 
 #include "FusionMath.h"
+#include <stdint.h>
 
 //------------------------------------------------------------------------------
 // Definitions
@@ -30,8 +31,8 @@ typedef struct {
 typedef struct {
     FusionBiasSettings settings;
     float filterCoefficient;
-    unsigned int timeout;
-    unsigned int timer;
+    uint32_t timeout;
+    uint32_t timer;
     FusionVector offset;
 } FusionBias;
 

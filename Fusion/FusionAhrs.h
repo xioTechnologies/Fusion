@@ -13,6 +13,7 @@
 #include "FusionConvention.h"
 #include "FusionMath.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 //------------------------------------------------------------------------------
 // Definitions
@@ -27,7 +28,7 @@ typedef struct {
     float gyroscopeRange;
     float accelerationRejection;
     float magneticRejection;
-    unsigned int recoveryTriggerPeriod;
+    uint32_t recoveryTriggerPeriod;
 } FusionAhrsSettings;
 
 /**
@@ -46,11 +47,11 @@ typedef struct {
     FusionVector halfAccelerometerFeedback;
     FusionVector halfMagnetometerFeedback;
     bool accelerometerIgnored;
-    int accelerationRecoveryTrigger;
-    int accelerationRecoveryTimeout;
+    int32_t accelerationRecoveryTrigger;
+    int32_t accelerationRecoveryTimeout;
     bool magnetometerIgnored;
-    int magneticRecoveryTrigger;
-    int magneticRecoveryTimeout;
+    int32_t magneticRecoveryTrigger;
+    int32_t magneticRecoveryTimeout;
 } FusionAhrs;
 
 /**
