@@ -82,19 +82,29 @@ The `FusionAhrsSetSamplePeriod` function may be called before each algorithm upd
 
 ## Bias algorithm
 
-The bias algorithm provides run-time estimation of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place. This algorithm may be used to improve gyroscope measurements before providing them to the AHRS algorithm.
+The bias algorithm provides run-time estimation of the gyroscope offset to compensate for variations in temperature and fine-tune existing offset calibration that may already be in place.
 
-The algorithm estimates the gyroscope offset by identifying the stationary periods that occur naturally in many applications. Stationary periods are detected as the gyroscope measurement remaining below a threshold for a period of time. The gyroscope offset is then updated using a high-pass filter with a very low cutoff frequency.
+TODO: Supports controlled calirbationa nd continious. Controlled procedure:
+
+1. Start with the IMU stationary on a hard surface
+2. Call `FusionBiasStart` to start calibration.
+3. Call `FusionBiasGetProgress`
+
+### Continuous calibration
+
+The algorithm estimates the gyroscope offset by identifying the stationary periods that occur naturally in many applications. Stationary periods are detected as the gyroscope measurement remaining below a threshold for a period of time.
 
 ### Settings
 
 The bias algorithm settings are defined by the `FusionBiasSettings` structure and set using the `FusionBiasSetSettings` function.
 
-| Setting               | Description                                                                                      |
-|-----------------------|--------------------------------------------------------------------------------------------------|
-| `sampleRate`          | Sample rate in Hz. The default value is 100 Hz.                                                  |
-| `stationaryThreshold` | Stationary detection threshold in degrees per second. The default value is 3 degrees per second. |
-| `stationaryPeriod`    | Stationary detection period in seconds. The default value is 3 seconds.                          |
+| Name         | Default  | Description                                                                 |
+|--------------|----------|-----------------------------------------------------------------------------|
+| `sampleRate` | `100.0f` | Sample rate in Hz.                                                          |
+| `duration`   | `15.0f`  | Calibration duration in seconds.                                            |
+| `threshold`  | `3.0f`   | Stationary detection threshold in degrees per second.                       |
+| `continuous` | `true`   | Enables continuous background correction while the gyroscope is stationary. |
+| `holdoff`    | `3.0f`   | Continuous correction holdoff period in seconds.                            |
 
 ### Non-volatile memory
 

@@ -25,6 +25,8 @@ const char *FusionResultToString(const FusionResult result) {
             return "Timeout";
         case FusionResultNotInProgress:
             return "Not in progress";
+        case FusionResultNotStationary:
+            return "Not stationary";
         case FusionResultTooFewSamples:
             return "Too few samples";
         case FusionResultMallocFailed:

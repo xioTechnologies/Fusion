@@ -17,7 +17,11 @@ magnetometer = data[:, 7:10]
 # Instantiate algorithms
 bias = imufusion.Bias()
 
-bias.set_settings(imufusion.BiasSettings(sample_rate=sample_rate))
+bias.set_settings(
+    imufusion.BiasSettings(
+        sample_rate=sample_rate,
+    )
+)
 
 ahrs = imufusion.Ahrs()
 
@@ -41,7 +45,8 @@ internal_states = np.empty((len(timestamp), 6))
 flags = np.empty((len(timestamp), 4))
 
 for index in range(len(timestamp)):
-    gyroscope[index] = bias.update(gyroscope[index])
+    bias.update(gyroscope[index])
+    gyroscope[index] = bias.get_corrected_gyroscope()
 
     ahrs.set_sample_period(delta_time[index])
 

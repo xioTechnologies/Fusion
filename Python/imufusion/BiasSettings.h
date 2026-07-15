@@ -11,20 +11,27 @@ typedef struct {
 
 static PyObject *bias_settings_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
     FusionBiasSettings settings = fusionBiasDefaultSettings;
+    int continuous = settings.continuous;
 
     static char *kwlist[] = {
         "sample_rate",
-        "stationary_threshold",
-        "stationary_period",
+        "duration",
+        "threshold",
+        "continuous",
+        "holdoff",
         NULL, /* sentinel */
     };
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fff", kwlist,
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fffpf", kwlist,
                                     &settings.sampleRate,
-                                    &settings.stationaryThreshold,
-                                    &settings.stationaryPeriod) == 0) {
+                                    &settings.duration,
+                                    &settings.threshold,
+                                    &continuous,
+                                    &settings.holdoff) == 0) {
         return NULL;
     }
+
+    settings.continuous = continuous != 0;
 
     BiasSettings *const self = (BiasSettings *) subtype->tp_alloc(subtype, 0);
 
@@ -41,7 +48,7 @@ static void bias_settings_free(BiasSettings *self) {
 }
 
 static PyObject *bias_settings_get_sample_rate(BiasSettings *self) {
-    return PyFloat_FromDouble(self->wrapped.sampleRate);
+    return PyFloat_FromDouble((double) self->wrapped.sampleRate);
 }
 
 static int bias_settings_set_sample_rate(BiasSettings *self, PyObject *value, void *closure) {
@@ -55,40 +62,75 @@ static int bias_settings_set_sample_rate(BiasSettings *self, PyObject *value, vo
     return 0;
 }
 
-static PyObject *bias_settings_get_stationary_period(BiasSettings *self) {
-    return PyFloat_FromDouble((double) self->wrapped.stationaryPeriod);
+static PyObject *bias_settings_get_duration(BiasSettings *self) {
+    return PyFloat_FromDouble((double) self->wrapped.duration);
 }
 
-static int bias_settings_set_stationary_period(BiasSettings *self, PyObject *value, void *closure) {
-    const float stationary_period = (float) PyFloat_AsDouble(value);
+static int bias_settings_set_duration(BiasSettings *self, PyObject *value, void *closure) {
+    const float duration = (float) PyFloat_AsDouble(value);
 
     if (PyErr_Occurred()) {
         return -1;
     }
 
-    self->wrapped.stationaryPeriod = stationary_period;
+    self->wrapped.duration = duration;
     return 0;
 }
 
-static PyObject *bias_settings_get_stationary_threshold(BiasSettings *self) {
-    return PyFloat_FromDouble((double) self->wrapped.stationaryThreshold);
+static PyObject *bias_settings_get_threshold(BiasSettings *self) {
+    return PyFloat_FromDouble((double) self->wrapped.threshold);
 }
 
-static int bias_settings_set_stationary_threshold(BiasSettings *self, PyObject *value, void *closure) {
-    const float stationary_threshold = (float) PyFloat_AsDouble(value);
+static int bias_settings_set_threshold(BiasSettings *self, PyObject *value, void *closure) {
+    const float threshold = (float) PyFloat_AsDouble(value);
 
     if (PyErr_Occurred()) {
         return -1;
     }
 
-    self->wrapped.stationaryThreshold = stationary_threshold;
+    self->wrapped.threshold = threshold;
+    return 0;
+}
+
+static PyObject *bias_settings_get_continuous(BiasSettings *self) {
+    if (self->wrapped.continuous) {
+        Py_RETURN_TRUE;
+    }
+    Py_RETURN_FALSE;
+}
+
+static int bias_settings_set_continuous(BiasSettings *self, PyObject *value, void *closure) {
+    const int continuous = PyObject_IsTrue(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    self->wrapped.continuous = continuous != 0;
+    return 0;
+}
+
+static PyObject *bias_settings_get_holdoff(BiasSettings *self) {
+    return PyFloat_FromDouble((double) self->wrapped.holdoff);
+}
+
+static int bias_settings_set_holdoff(BiasSettings *self, PyObject *value, void *closure) {
+    const float holdoff = (float) PyFloat_AsDouble(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    self->wrapped.holdoff = holdoff;
     return 0;
 }
 
 static PyGetSetDef bias_settings_get_set[] = {
     {"sample_rate", (getter) bias_settings_get_sample_rate, (setter) bias_settings_set_sample_rate, "", NULL},
-    {"stationary_threshold", (getter) bias_settings_get_stationary_threshold, (setter) bias_settings_set_stationary_threshold, "", NULL},
-    {"stationary_period", (getter) bias_settings_get_stationary_period, (setter) bias_settings_set_stationary_period, "", NULL},
+    {"duration", (getter) bias_settings_get_duration, (setter) bias_settings_set_duration, "", NULL},
+    {"threshold", (getter) bias_settings_get_threshold, (setter) bias_settings_set_threshold, "", NULL},
+    {"continuous", (getter) bias_settings_get_continuous, (setter) bias_settings_set_continuous, "", NULL},
+    {"holdoff", (getter) bias_settings_get_holdoff, (setter) bias_settings_set_holdoff, "", NULL},
     {NULL} /* sentinel */
 };
 
