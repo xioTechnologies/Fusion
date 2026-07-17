@@ -28,7 +28,7 @@ typedef struct {
     float gyroscopeRange; // degrees per second
     float accelerationRejection; // degrees
     float magneticRejection; // degrees
-    float recoveryTriggerPeriod; // seconds
+    float rejectionTimeout; // seconds
 } FusionAhrsSettings;
 
 /**
@@ -42,7 +42,7 @@ typedef struct {
     float gyroscopeRange;
     float accelerationRejection;
     float magneticRejection;
-    int32_t recoveryTriggerPeriod;
+    int32_t rejectionTimeout;
 
     // Outputs
     FusionQuaternion quaternion;
@@ -62,10 +62,10 @@ typedef struct {
     FusionVector halfMagnetometerFeedback;
     bool accelerometerIgnored;
     int32_t accelerationRecoveryTrigger;
-    int32_t accelerationRecoveryTimeout;
+    int32_t accelerationRecoveryThreshold;
     bool magnetometerIgnored;
     int32_t magneticRecoveryTrigger;
-    int32_t magneticRecoveryTimeout;
+    int32_t magneticRecoveryThreshold;
 } FusionAhrs;
 
 /**
