@@ -65,12 +65,19 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
  * @param ahrs AHRS structure.
  */
 void FusionAhrsRestart(FusionAhrs *const ahrs) {
+    // Outputs
     ahrs->quaternion = FUSION_QUATERNION_IDENTITY;
     ahrs->accelerometer = FUSION_VECTOR_ZERO;
     ahrs->halfGravity = FUSION_VECTOR_ZERO;
+
+    // Startup
     ahrs->startup = true;
     ahrs->rampedGain = STARTUP_GAIN;
+
+    // Gyroscope overrange
     ahrs->angularRateRecovery = false;
+
+    // Acceleration and magnetic rejection
     ahrs->halfAccelerometerFeedback = FUSION_VECTOR_ZERO;
     ahrs->halfMagnetometerFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = false;
@@ -88,22 +95,22 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
  */
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings) {
     ahrs->samplePeriod = 1.0f / settings->sampleRate;
-    ahrs->settings.convention = settings->convention;
-    ahrs->settings.gain = settings->gain;
-    ahrs->settings.gyroscopeRange = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
-    ahrs->settings.accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
-    ahrs->settings.magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
+    ahrs->convention = settings->convention;
+    ahrs->gain = settings->gain;
+    ahrs->gyroscopeRange = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
+    ahrs->accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
+    ahrs->magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
     ahrs->recoveryTriggerPeriod = (int32_t) (settings->sampleRate * settings->recoveryTriggerPeriod);
     ahrs->accelerationRecoveryTimeout = ahrs->recoveryTriggerPeriod;
     ahrs->magneticRecoveryTimeout = ahrs->recoveryTriggerPeriod;
     if ((settings->gain == 0.0f) || (settings->recoveryTriggerPeriod == 0)) {
-        ahrs->settings.accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
-        ahrs->settings.magneticRejection = FLT_MAX;
+        ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
+        ahrs->magneticRejection = FLT_MAX;
     }
     if (ahrs->startup == false) {
-        ahrs->rampedGain = ahrs->settings.gain;
+        ahrs->rampedGain = ahrs->gain;
     }
-    ahrs->rampedGainStep = (STARTUP_GAIN - ahrs->settings.gain) / STARTUP_PERIOD;
+    ahrs->rampedGainStep = (STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD;
 }
 
 /**
@@ -128,7 +135,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     ahrs->accelerometer = accelerometer;
 
     // Restart if gyroscope range exceeded
-    if ((fabsf(gyroscope.axis.x) > ahrs->settings.gyroscopeRange) || (fabsf(gyroscope.axis.y) > ahrs->settings.gyroscopeRange) || (fabsf(gyroscope.axis.z) > ahrs->settings.gyroscopeRange)) {
+    if ((fabsf(gyroscope.axis.x) > ahrs->gyroscopeRange) || (fabsf(gyroscope.axis.y) > ahrs->gyroscopeRange) || (fabsf(gyroscope.axis.z) > ahrs->gyroscopeRange)) {
         const FusionQuaternion quaternion = ahrs->quaternion;
         FusionAhrsRestart(ahrs);
         ahrs->quaternion = quaternion;
@@ -138,8 +145,8 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     // Ramp down gain during startup
     if (ahrs->startup) {
         ahrs->rampedGain -= ahrs->rampedGainStep * ahrs->samplePeriod;
-        if ((ahrs->rampedGain < ahrs->settings.gain) || (ahrs->settings.gain == 0.0f)) {
-            ahrs->rampedGain = ahrs->settings.gain;
+        if ((ahrs->rampedGain < ahrs->gain) || (ahrs->gain == 0.0f)) {
+            ahrs->rampedGain = ahrs->gain;
             ahrs->startup = false;
             ahrs->angularRateRecovery = false;
         }
@@ -156,7 +163,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         ahrs->halfAccelerometerFeedback = Feedback(FusionVectorNormalise(accelerometer), ahrs->halfGravity);
 
         // Don't ignore accelerometer if acceleration error below threshold
-        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfAccelerometerFeedback) <= ahrs->settings.accelerationRejection)) {
+        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfAccelerometerFeedback) <= ahrs->accelerationRejection)) {
             ahrs->accelerometerIgnored = false;
             ahrs->accelerationRecoveryTrigger -= 9;
         } else {
@@ -189,7 +196,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         ahrs->halfMagnetometerFeedback = Feedback(FusionVectorNormalise(FusionVectorCross(ahrs->halfGravity, magnetometer)), halfMagnetic);
 
         // Don't ignore magnetometer if magnetic error below threshold
-        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerFeedback) <= ahrs->settings.magneticRejection)) {
+        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerFeedback) <= ahrs->magneticRejection)) {
             ahrs->magnetometerIgnored = false;
             ahrs->magneticRecoveryTrigger -= 9;
         } else {
@@ -231,7 +238,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
  */
 static inline FusionVector HalfGravity(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
-    switch (ahrs->settings.convention) {
+    switch (ahrs->convention) {
         case FusionConventionNwu:
         case FusionConventionEnu: {
             const FusionVector halfGravity = {
@@ -265,7 +272,7 @@ static inline FusionVector HalfGravity(const FusionAhrs *const ahrs) {
  */
 static inline FusionVector HalfMagnetic(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
-    switch (ahrs->settings.convention) {
+    switch (ahrs->convention) {
         case FusionConventionNwu: {
             const FusionVector halfMagnetic = {
                 .axis = {
@@ -430,7 +437,7 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
 #undef A
 
     // Remove gravity in the Earth frame
-    switch (ahrs->settings.convention) {
+    switch (ahrs->convention) {
         case FusionConventionNwu:
         case FusionConventionEnu:
             accelerometer.axis.z -= 1.0f;
