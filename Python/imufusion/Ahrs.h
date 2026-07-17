@@ -32,11 +32,6 @@ static void ahrs_free(Ahrs *self) {
     Py_TYPE(self)->tp_free(self);
 }
 
-static PyObject *ahrs_restart(Ahrs *self, PyObject *args) {
-    FusionAhrsRestart(&self->wrapped);
-    Py_RETURN_NONE;
-}
-
 static PyObject *ahrs_set_settings(Ahrs *self, PyObject *arg) {
     AhrsSettings *settings;
 
@@ -56,6 +51,11 @@ static PyObject *ahrs_set_sample_period(Ahrs *self, PyObject *arg) {
     }
 
     FusionAhrsSetSamplePeriod(&self->wrapped, sample_period);
+    Py_RETURN_NONE;
+}
+
+static PyObject *ahrs_restart(Ahrs *self, PyObject *args) {
+    FusionAhrsRestart(&self->wrapped);
     Py_RETURN_NONE;
 }
 
@@ -198,9 +198,9 @@ static PyObject *ahrs_set_heading(Ahrs *self, PyObject *arg) {
 }
 
 static PyMethodDef ahrs_methods[] = {
-    {"restart", (PyCFunction) ahrs_restart, METH_NOARGS, ""},
     {"set_settings", (PyCFunction) ahrs_set_settings, METH_O, ""},
     {"set_sample_period", (PyCFunction) ahrs_set_sample_period, METH_O, ""},
+    {"restart", (PyCFunction) ahrs_restart, METH_NOARGS, ""},
     {"update", (PyCFunction) ahrs_update, METH_VARARGS, ""},
     {"update_no_magnetometer", (PyCFunction) ahrs_update_no_magnetometer, METH_VARARGS, ""},
     {"update_external_heading", (PyCFunction) ahrs_update_external_heading, METH_VARARGS, ""},

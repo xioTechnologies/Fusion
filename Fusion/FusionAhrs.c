@@ -61,34 +61,6 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Restarts the AHRS algorithm.
- * @param ahrs AHRS structure.
- */
-void FusionAhrsRestart(FusionAhrs *const ahrs) {
-    // Outputs
-    ahrs->quaternion = FUSION_QUATERNION_IDENTITY;
-    ahrs->accelerometer = FUSION_VECTOR_ZERO;
-    ahrs->halfGravity = FUSION_VECTOR_ZERO;
-
-    // Startup
-    ahrs->startup = true;
-    ahrs->rampedGain = STARTUP_GAIN;
-
-    // Gyroscope overrange
-    ahrs->angularRateRecovery = false;
-
-    // Acceleration and magnetic rejection
-    ahrs->halfAccelerometerFeedback = FUSION_VECTOR_ZERO;
-    ahrs->halfMagnetometerFeedback = FUSION_VECTOR_ZERO;
-    ahrs->accelerometerIgnored = false;
-    ahrs->accelerationRecoveryTrigger = 0;
-    ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
-    ahrs->magnetometerIgnored = false;
-    ahrs->magneticRecoveryTrigger = 0;
-    ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
-}
-
-/**
  * @brief Sets the settings.
  * @param ahrs AHRS structure.
  * @param settings Settings.
@@ -121,6 +93,34 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
  */
 void FusionAhrsSetSamplePeriod(FusionAhrs *const ahrs, const float samplePeriod) {
     ahrs->samplePeriod = samplePeriod;
+}
+
+/**
+ * @brief Restarts the AHRS algorithm.
+ * @param ahrs AHRS structure.
+ */
+void FusionAhrsRestart(FusionAhrs *const ahrs) {
+    // Outputs
+    ahrs->quaternion = FUSION_QUATERNION_IDENTITY;
+    ahrs->accelerometer = FUSION_VECTOR_ZERO;
+    ahrs->halfGravity = FUSION_VECTOR_ZERO;
+
+    // Startup
+    ahrs->startup = true;
+    ahrs->rampedGain = STARTUP_GAIN;
+
+    // Gyroscope overrange
+    ahrs->angularRateRecovery = false;
+
+    // Acceleration and magnetic rejection
+    ahrs->halfAccelerometerFeedback = FUSION_VECTOR_ZERO;
+    ahrs->halfMagnetometerFeedback = FUSION_VECTOR_ZERO;
+    ahrs->accelerometerIgnored = false;
+    ahrs->accelerationRecoveryTrigger = 0;
+    ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
+    ahrs->magnetometerIgnored = false;
+    ahrs->magneticRecoveryTrigger = 0;
+    ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
 }
 
 /**
