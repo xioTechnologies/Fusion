@@ -45,7 +45,7 @@ const FusionAhrsSettings fusionAhrsDefaultSettings = {
     .gyroscopeRange = 0.0f,
     .accelerationRejection = 90.0f,
     .magneticRejection = 90.0f,
-    .recoveryTriggerPeriod = 0,
+    .rejectionTimeout = 0,
 };
 
 //------------------------------------------------------------------------------
@@ -82,10 +82,10 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
     ahrs->halfMagnetometerFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = false;
     ahrs->accelerationRecoveryTrigger = 0;
-    ahrs->accelerationRecoveryTimeout = ahrs->recoveryTriggerPeriod;
+    ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
     ahrs->magnetometerIgnored = false;
     ahrs->magneticRecoveryTrigger = 0;
-    ahrs->magneticRecoveryTimeout = ahrs->recoveryTriggerPeriod;
+    ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
 }
 
 /**
@@ -100,10 +100,10 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
     ahrs->gyroscopeRange = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
     ahrs->accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
     ahrs->magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
-    ahrs->recoveryTriggerPeriod = (int32_t) (settings->sampleRate * settings->recoveryTriggerPeriod);
-    ahrs->accelerationRecoveryTimeout = ahrs->recoveryTriggerPeriod;
-    ahrs->magneticRecoveryTimeout = ahrs->recoveryTriggerPeriod;
-    if ((settings->gain == 0.0f) || (settings->recoveryTriggerPeriod == 0)) {
+    ahrs->rejectionTimeout = (int32_t) (settings->sampleRate * settings->rejectionTimeout);
+    ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
+    ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
+    if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0)) {
         ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
         ahrs->magneticRejection = FLT_MAX;
     }
@@ -171,13 +171,13 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         }
 
         // Don't ignore accelerometer during acceleration recovery
-        if (ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryTimeout) {
-            ahrs->accelerationRecoveryTimeout = 0;
+        if (ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryThreshold) {
+            ahrs->accelerationRecoveryThreshold = 0;
             ahrs->accelerometerIgnored = false;
         } else {
-            ahrs->accelerationRecoveryTimeout = ahrs->recoveryTriggerPeriod;
+            ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
         }
-        ahrs->accelerationRecoveryTrigger = Clamp(ahrs->accelerationRecoveryTrigger, 0, ahrs->recoveryTriggerPeriod);
+        ahrs->accelerationRecoveryTrigger = Clamp(ahrs->accelerationRecoveryTrigger, 0, ahrs->rejectionTimeout);
 
         // Apply accelerometer feedback
         if (ahrs->accelerometerIgnored == false) {
@@ -204,13 +204,13 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         }
 
         // Don't ignore magnetometer during magnetic recovery
-        if (ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryTimeout) {
-            ahrs->magneticRecoveryTimeout = 0;
+        if (ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryThreshold) {
+            ahrs->magneticRecoveryThreshold = 0;
             ahrs->magnetometerIgnored = false;
         } else {
-            ahrs->magneticRecoveryTimeout = ahrs->recoveryTriggerPeriod;
+            ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
         }
-        ahrs->magneticRecoveryTrigger = Clamp(ahrs->magneticRecoveryTrigger, 0, ahrs->recoveryTriggerPeriod);
+        ahrs->magneticRecoveryTrigger = Clamp(ahrs->magneticRecoveryTrigger, 0, ahrs->rejectionTimeout);
 
         // Apply magnetometer feedback
         if (ahrs->magnetometerIgnored == false) {
@@ -458,10 +458,10 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
     const FusionAhrsInternalStates internalStates = {
         .accelerationError = FusionRadiansToDegrees(FusionArcSin(2.0f * FusionVectorNorm(ahrs->halfAccelerometerFeedback))),
         .accelerometerIgnored = ahrs->accelerometerIgnored,
-        .accelerationRecoveryTrigger = ahrs->recoveryTriggerPeriod == 0 ? 0.0f : (float) ahrs->accelerationRecoveryTrigger / (float) ahrs->recoveryTriggerPeriod,
+        .accelerationRecoveryTrigger = ahrs->rejectionTimeout == 0 ? 0.0f : (float) ahrs->accelerationRecoveryTrigger / (float) ahrs->rejectionTimeout,
         .magneticError = FusionRadiansToDegrees(FusionArcSin(2.0f * FusionVectorNorm(ahrs->halfMagnetometerFeedback))),
         .magnetometerIgnored = ahrs->magnetometerIgnored,
-        .magneticRecoveryTrigger = ahrs->recoveryTriggerPeriod == 0 ? 0.0f : (float) ahrs->magneticRecoveryTrigger / (float) ahrs->recoveryTriggerPeriod,
+        .magneticRecoveryTrigger = ahrs->rejectionTimeout == 0 ? 0.0f : (float) ahrs->magneticRecoveryTrigger / (float) ahrs->rejectionTimeout,
     };
     return internalStates;
 }
@@ -475,8 +475,8 @@ FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
     const FusionAhrsFlags flags = {
         .startup = ahrs->startup,
         .angularRateRecovery = ahrs->angularRateRecovery,
-        .accelerationRecovery = ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryTimeout,
-        .magneticRecovery = ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryTimeout,
+        .accelerationRecovery = ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryThreshold,
+        .magneticRecovery = ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryThreshold,
     };
     return flags;
 }
