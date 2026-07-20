@@ -100,11 +100,11 @@ extern const FusionAhrsSettings fusionAhrsDefaultSettings;
 
 void FusionAhrsInitialise(FusionAhrs *const ahrs);
 
-void FusionAhrsRestart(FusionAhrs *const ahrs);
-
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings);
 
 void FusionAhrsSetSamplePeriod(FusionAhrs *const ahrs, const float samplePeriod);
+
+void FusionAhrsRestart(FusionAhrs *const ahrs);
 
 void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer);
 
