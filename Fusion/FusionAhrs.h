@@ -35,16 +35,29 @@ typedef struct {
  * @brief AHRS structure. All members are private.
  */
 typedef struct {
-    FusionAhrsSettings settings;
+    // Settings
     float samplePeriod;
+    FusionConvention convention;
+    float gain;
+    float gyroscopeRange;
+    float accelerationRejection;
+    float magneticRejection;
     int32_t recoveryTriggerPeriod;
+
+    // Outputs
     FusionQuaternion quaternion;
     FusionVector accelerometer;
     FusionVector halfGravity;
+
+    // Startup
     bool startup;
     float rampedGain;
     float rampedGainStep;
+
+    // Gyroscope overrange
     bool angularRateRecovery;
+
+    // Acceleration and magnetic rejection
     FusionVector halfAccelerometerFeedback;
     FusionVector halfMagnetometerFeedback;
     bool accelerometerIgnored;
