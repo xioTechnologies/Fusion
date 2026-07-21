@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(Fusion)
 
+include(GNUInstallDirs)
+
 add_subdirectory("Fusion")
 add_subdirectory("Examples/C/Advanced")
 add_subdirectory("Examples/C/Simple")
