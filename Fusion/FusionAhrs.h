@@ -39,7 +39,7 @@ typedef struct {
     float samplePeriod;
     FusionConvention convention;
     float gain;
-    float gyroscopeRange;
+    float overrangeThreshold;
     float accelerationRejection;
     float magneticRejection;
     int32_t rejectionTimeout;
@@ -55,7 +55,7 @@ typedef struct {
     float rampedGainStep;
 
     // Gyroscope overrange
-    bool angularRateRecovery;
+    bool overrangeRecovery;
 
     // Acceleration and magnetic rejection
     FusionVector halfAccelerometerResidual;
@@ -85,7 +85,7 @@ typedef struct {
  */
 typedef struct {
     bool startup;
-    bool angularRateRecovery;
+    bool overrangeRecovery;
     bool accelerationRecovery;
     bool magneticRecovery;
 } FusionAhrsFlags;
