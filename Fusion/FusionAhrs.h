@@ -39,6 +39,7 @@ typedef struct {
     float samplePeriod;
     FusionConvention convention;
     float gain;
+    bool overrangeEnabled;
     float overrangeThreshold;
     float accelerationRejection;
     float magneticRejection;

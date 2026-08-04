@@ -27,6 +27,10 @@
 //------------------------------------------------------------------------------
 // Function declarations
 
+static inline void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope);
+
+static inline void SoftRestart(FusionAhrs *const ahrs);
+
 static inline FusionVector HalfGravity(const FusionAhrs *const ahrs);
 
 static inline FusionVector HalfWest(const FusionAhrs *const ahrs);
@@ -69,7 +73,10 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
     ahrs->samplePeriod = 1.0f / settings->sampleRate;
     ahrs->convention = settings->convention;
     ahrs->gain = settings->gain;
-    ahrs->overrangeThreshold = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
+
+    ahrs->overrangeEnabled = settings->gyroscopeRange > 0.0f;
+    ahrs->overrangeThreshold = 0.98f * settings->gyroscopeRange;
+
     ahrs->accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
     ahrs->magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
     ahrs->rejectionTimeout = (int32_t) (settings->sampleRate * settings->rejectionTimeout);
@@ -135,16 +142,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     ahrs->accelerometer = accelerometer;
 
     // Restart if gyroscope range exceeded
-    if ((fabsf(gyroscope.axis.x) > ahrs->overrangeThreshold) || (fabsf(gyroscope.axis.y) > ahrs->overrangeThreshold) || (fabsf(gyroscope.axis.z) > ahrs->overrangeThreshold)) {
-        const FusionQuaternion quaternion = ahrs->quaternion;
-        const FusionVector accelerometer_ = ahrs->accelerometer;
-        const FusionVector halfGravity = ahrs->halfGravity;
-        FusionAhrsRestart(ahrs);
-        ahrs->quaternion = quaternion;
-        ahrs->accelerometer = accelerometer_;
-        ahrs->halfGravity = halfGravity;
-        ahrs->overrangeRecovery = true;
-    }
+    Overrange(ahrs, gyroscope);
 
     // Ramp down gain during startup
     if (ahrs->startup) {
@@ -233,6 +231,42 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
 
     // Normalise quaternion
     ahrs->quaternion = FusionQuaternionNormalise(ahrs->quaternion);
+}
+
+/**
+ * @brief Triggers soft restart if overrange detected.
+ * @param ahrs AHRS structure.
+ * @param gyroscope Gyroscope in degrees per second.
+ */
+static inline void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope) {
+    if (ahrs->overrangeEnabled == false) {
+        return;
+    }
+
+    if ((fabsf(gyroscope.axis.x) <= ahrs->overrangeThreshold) &&
+        (fabsf(gyroscope.axis.y) <= ahrs->overrangeThreshold) &&
+        (fabsf(gyroscope.axis.z) <= ahrs->overrangeThreshold)) {
+        return;
+    }
+
+    SoftRestart(ahrs);
+    ahrs->overrangeRecovery = true;
+}
+
+/**
+ * @brief Restarts the AHRS algorithm while preserving outputs.
+ * @param ahrs AHRS structure.
+ */
+static inline void SoftRestart(FusionAhrs *const ahrs) {
+    const FusionQuaternion quaternion = ahrs->quaternion;
+    const FusionVector accelerometer = ahrs->accelerometer;
+    const FusionVector halfGravity = ahrs->halfGravity;
+
+    FusionAhrsRestart(ahrs);
+
+    ahrs->quaternion = quaternion;
+    ahrs->accelerometer = accelerometer;
+    ahrs->halfGravity = halfGravity;
 }
 
 /**
