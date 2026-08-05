@@ -58,8 +58,8 @@ typedef struct {
     bool angularRateRecovery;
 
     // Acceleration and magnetic rejection
-    FusionVector halfAccelerometerFeedback;
-    FusionVector halfMagnetometerFeedback;
+    FusionVector halfAccelerometerResidual;
+    FusionVector halfMagnetometerResidual;
     bool accelerometerIgnored;
     int32_t accelerationRecoveryTrigger;
     int32_t accelerationRecoveryThreshold;

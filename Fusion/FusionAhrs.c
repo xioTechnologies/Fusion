@@ -31,7 +31,7 @@ static inline FusionVector HalfGravity(const FusionAhrs *const ahrs);
 
 static inline FusionVector HalfMagnetic(const FusionAhrs *const ahrs);
 
-static inline FusionVector Feedback(const FusionVector sensor, const FusionVector reference);
+static inline FusionVector Residual(const FusionVector sensor, const FusionVector reference);
 
 static inline int32_t Clamp(const int32_t value, const int32_t min, const int32_t max);
 
@@ -113,8 +113,8 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
     ahrs->angularRateRecovery = false;
 
     // Acceleration and magnetic rejection
-    ahrs->halfAccelerometerFeedback = FUSION_VECTOR_ZERO;
-    ahrs->halfMagnetometerFeedback = FUSION_VECTOR_ZERO;
+    ahrs->halfAccelerometerResidual = FUSION_VECTOR_ZERO;
+    ahrs->halfMagnetometerResidual = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = false;
     ahrs->accelerationRecoveryTrigger = 0;
     ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
@@ -156,14 +156,14 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     ahrs->halfGravity = HalfGravity(ahrs);
 
     // Calculate accelerometer feedback
-    FusionVector halfAccelerometerFeedback = FUSION_VECTOR_ZERO;
+    FusionVector halfInclinationFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = true;
     if (FusionVectorIsZero(accelerometer) == false) {
-        // Calculate accelerometer feedback scaled by 0.5
-        ahrs->halfAccelerometerFeedback = Feedback(FusionVectorNormalise(accelerometer), ahrs->halfGravity);
+        // Calculate accelerometer residual scaled by 0.5
+        ahrs->halfAccelerometerResidual = Residual(FusionVectorNormalise(accelerometer), ahrs->halfGravity);
 
         // Don't ignore accelerometer if acceleration error below threshold
-        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfAccelerometerFeedback) <= ahrs->accelerationRejection)) {
+        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfAccelerometerResidual) <= ahrs->accelerationRejection)) {
             ahrs->accelerometerIgnored = false;
             ahrs->accelerationRecoveryTrigger -= 9;
         } else {
@@ -181,22 +181,22 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
 
         // Apply accelerometer feedback
         if (ahrs->accelerometerIgnored == false) {
-            halfAccelerometerFeedback = ahrs->halfAccelerometerFeedback;
+            halfInclinationFeedback = ahrs->halfAccelerometerResidual;
         }
     }
 
     // Calculate magnetometer feedback
-    FusionVector halfMagnetometerFeedback = FUSION_VECTOR_ZERO;
+    FusionVector halfHeadingFeedback = FUSION_VECTOR_ZERO;
     ahrs->magnetometerIgnored = true;
     if (FusionVectorIsZero(magnetometer) == false) {
         // Calculate direction of magnetic field indicated by algorithm
         const FusionVector halfMagnetic = HalfMagnetic(ahrs);
 
-        // Calculate magnetometer feedback scaled by 0.5
-        ahrs->halfMagnetometerFeedback = Feedback(FusionVectorNormalise(FusionVectorCross(ahrs->halfGravity, magnetometer)), halfMagnetic);
+        // Calculate magnetometer residual scaled by 0.5
+        ahrs->halfMagnetometerResidual = Residual(FusionVectorNormalise(FusionVectorCross(ahrs->halfGravity, magnetometer)), halfMagnetic);
 
         // Don't ignore magnetometer if magnetic error below threshold
-        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerFeedback) <= ahrs->magneticRejection)) {
+        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerResidual) <= ahrs->magneticRejection)) {
             ahrs->magnetometerIgnored = false;
             ahrs->magneticRecoveryTrigger -= 9;
         } else {
@@ -214,7 +214,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
 
         // Apply magnetometer feedback
         if (ahrs->magnetometerIgnored == false) {
-            halfMagnetometerFeedback = ahrs->halfMagnetometerFeedback;
+            halfHeadingFeedback = ahrs->halfMagnetometerResidual;
         }
     }
 
@@ -222,7 +222,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     const FusionVector halfGyroscope = FusionVectorScale(gyroscope, FusionDegreesToRadians(0.5f));
 
     // Apply feedback to gyroscope
-    const FusionVector adjustedHalfGyroscope = FusionVectorAdd(halfGyroscope, FusionVectorScale(FusionVectorAdd(halfAccelerometerFeedback, halfMagnetometerFeedback), ahrs->rampedGain));
+    const FusionVector adjustedHalfGyroscope = FusionVectorAdd(halfGyroscope, FusionVectorScale(FusionVectorAdd(halfInclinationFeedback, halfHeadingFeedback), ahrs->rampedGain));
 
     // Integrate rate of change of quaternion
     ahrs->quaternion = FusionQuaternionAdd(ahrs->quaternion, FusionQuaternionVectorProduct(ahrs->quaternion, FusionVectorScale(adjustedHalfGyroscope, ahrs->samplePeriod)));
@@ -309,12 +309,12 @@ static inline FusionVector HalfMagnetic(const FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Returns the feedback.
+ * @brief Returns the residual between the sensor and reference vector.
  * @param sensor Sensor.
  * @param reference Reference.
  * @return Feedback.
  */
-static inline FusionVector Feedback(const FusionVector sensor, const FusionVector reference) {
+static inline FusionVector Residual(const FusionVector sensor, const FusionVector reference) {
     if (FusionVectorDot(sensor, reference) < 0.0f) {
         return FusionVectorNormalise(FusionVectorCross(sensor, reference)); // if error is >90 degrees
     }
@@ -423,10 +423,9 @@ FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
  * @return Earth acceleration in g.
  */
 FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
-    // Calculate accelerometer in the Earth frame
 #define Q ahrs->quaternion.element
 #define A ahrs->accelerometer.axis
-    FusionVector accelerometer = {
+    FusionVector acceleration = {
         .axis = {
             .x = 2.0f * ((Q.w * Q.w - 0.5f + Q.x * Q.x) * A.x + (Q.x * Q.y - Q.w * Q.z) * A.y + (Q.x * Q.z + Q.w * Q.y) * A.z),
             .y = 2.0f * ((Q.x * Q.y + Q.w * Q.z) * A.x + (Q.w * Q.w - 0.5f + Q.y * Q.y) * A.y + (Q.y * Q.z - Q.w * Q.x) * A.z),
@@ -436,17 +435,16 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
 #undef Q
 #undef A
 
-    // Remove gravity in the Earth frame
     switch (ahrs->convention) {
         case FusionConventionNwu:
         case FusionConventionEnu:
-            accelerometer.axis.z -= 1.0f;
+            acceleration.axis.z -= 1.0f;
             break;
         case FusionConventionNed:
-            accelerometer.axis.z += 1.0f;
+            acceleration.axis.z += 1.0f;
             break;
     }
-    return accelerometer;
+    return acceleration;
 }
 
 /**
@@ -456,10 +454,10 @@ FusionVector FusionAhrsGetEarthAcceleration(const FusionAhrs *const ahrs) {
  */
 FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahrs) {
     const FusionAhrsInternalStates internalStates = {
-        .accelerationError = FusionRadiansToDegrees(FusionArcSin(2.0f * FusionVectorNorm(ahrs->halfAccelerometerFeedback))),
+        .accelerationError = FusionRadiansToDegrees(FusionArcSin(2.0f * FusionVectorNorm(ahrs->halfAccelerometerResidual))),
         .accelerometerIgnored = ahrs->accelerometerIgnored,
         .accelerationRecoveryTrigger = ahrs->rejectionTimeout == 0 ? 0.0f : (float) ahrs->accelerationRecoveryTrigger / (float) ahrs->rejectionTimeout,
-        .magneticError = FusionRadiansToDegrees(FusionArcSin(2.0f * FusionVectorNorm(ahrs->halfMagnetometerFeedback))),
+        .magneticError = FusionRadiansToDegrees(FusionArcSin(2.0f * FusionVectorNorm(ahrs->halfMagnetometerResidual))),
         .magnetometerIgnored = ahrs->magnetometerIgnored,
         .magneticRecoveryTrigger = ahrs->rejectionTimeout == 0 ? 0.0f : (float) ahrs->magneticRecoveryTrigger / (float) ahrs->rejectionTimeout,
     };
