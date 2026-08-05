@@ -9,6 +9,7 @@ static int ahrs_heading_mode_from(FusionAhrsHeadingMode *const heading_mode, con
         case FusionAhrsHeadingModeMagnetic:
         case FusionAhrsHeadingModeRelative:
         case FusionAhrsHeadingModeExternal:
+        case FusionAhrsHeadingModeAnchored:
             *heading_mode = (FusionAhrsHeadingMode) heading_mode_int;
             return 0;
     }

@@ -12,6 +12,7 @@
 
 #include "FusionConvention.h"
 #include "FusionMath.h"
+#include "FusionProgress.h"
 #include "FusionResult.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -26,6 +27,7 @@ typedef enum {
     FusionAhrsHeadingModeMagnetic,
     FusionAhrsHeadingModeRelative,
     FusionAhrsHeadingModeExternal,
+    FusionAhrsHeadingModeAnchored,
 } FusionAhrsHeadingMode;
 
 /**
@@ -40,6 +42,8 @@ typedef struct {
     float accelerationRejection; // degrees (0 = disabled)
     float magneticRejection; // degrees (0 = disabled)
     float rejectionTimeout; // seconds
+    float anchorCutoff; // Hz
+    float anchorDuration; // seconds
 } FusionAhrsSettings;
 
 /**
@@ -50,13 +54,15 @@ typedef struct {
     float samplePeriod;
     FusionConvention convention;
     FusionAhrsHeadingMode headingMode;
-    float gain;
+    float inclinationGain;
+    float headingGain;
     float startupGainRate;
     bool overrangeEnabled;
     float overrangeThreshold;
     float accelerationRejection;
     float magneticRejection;
     int32_t rejectionTimeout;
+    uint32_t anchorDuration;
 
     // Outputs
     FusionQuaternion quaternion;
@@ -80,6 +86,12 @@ typedef struct {
     int32_t magneticRecoveryTrigger;
     int32_t magneticRecoveryThreshold;
     bool magnetometerIgnored;
+
+    // Anchored heading
+    FusionProgressStatus anchorStatus;
+    bool anchorCompleted;
+    uint32_t anchorNumberOfSamples;
+    FusionVector anchorNorth;
 } FusionAhrs;
 
 /**
@@ -132,6 +144,8 @@ FusionResult FusionAhrsUpdateRelative(FusionAhrs *const ahrs, const FusionVector
 
 FusionResult FusionAhrsUpdateExternal(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading);
 
+FusionResult FusionAhrsUpdateAnchored(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer);
+
 FusionQuaternion FusionAhrsGetQuaternion(const FusionAhrs *const ahrs);
 
 void FusionAhrsSetQuaternion(FusionAhrs *const ahrs, const FusionQuaternion quaternion);
@@ -147,6 +161,16 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
 FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs);
 
 FusionResult FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading);
+
+FusionResult FusionAhrsAnchorStart(FusionAhrs *const ahrs);
+
+FusionProgress FusionAhrsAnchorGetProgress(const FusionAhrs *const ahrs);
+
+FusionResult FusionAhrsAnchorComplete(FusionAhrs *const ahrs);
+
+FusionResult FusionAhrsAnchorAbort(FusionAhrs *const ahrs);
+
+bool FusionAhrsAnchorCompleted(FusionAhrs *const ahrs);
 
 const char *FusionAhrsHeadingModeToString(const FusionAhrsHeadingMode headingMode);
 
