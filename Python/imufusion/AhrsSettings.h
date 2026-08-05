@@ -2,6 +2,7 @@
 #define AHRS_SETTINGS_H
 
 #include "../../Fusion/Fusion.h"
+#include "AhrsHeadingMode.h"
 #include "Convention.h"
 #include <Python.h>
 
@@ -12,11 +13,13 @@ typedef struct {
 
 static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds) {
     int convention_int = fusionAhrsDefaultSettings.convention;
+    int heading_mode_int = fusionAhrsDefaultSettings.headingMode;
     FusionAhrsSettings settings = fusionAhrsDefaultSettings;
 
     static char *kwlist[] = {
         "sample_rate",
         "convention",
+        "heading_mode",
         "gain",
         "gyroscope_range",
         "acceleration_rejection",
@@ -25,9 +28,10 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         NULL, /* sentinel */
     };
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fifffff", kwlist,
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fiifffff", kwlist,
                                     &settings.sampleRate,
                                     &convention_int,
+                                    &heading_mode_int,
                                     &settings.gain,
                                     &settings.gyroscopeRange,
                                     &settings.accelerationRejection,
@@ -41,6 +45,15 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
     if (convention_from(&convention, convention_int) != 0) {
         return NULL;
     }
+
+    FusionAhrsHeadingMode heading_mode;
+
+    if (ahrs_heading_mode_from(&heading_mode, heading_mode_int) != 0) {
+        return NULL;
+    }
+
+    settings.convention = convention;
+    settings.headingMode = heading_mode;
 
     AhrsSettings *const self = (AhrsSettings *) subtype->tp_alloc(subtype, 0);
 
@@ -89,6 +102,27 @@ static int ahrs_settings_set_convention(AhrsSettings *self, PyObject *value, voi
     }
 
     self->wrapped.convention = convention;
+    return 0;
+}
+
+static PyObject *ahrs_settings_get_heading_mode(AhrsSettings *self) {
+    return PyLong_FromLong(self->wrapped.headingMode);
+}
+
+static int ahrs_settings_set_heading_mode(AhrsSettings *self, PyObject *value, void *closure) {
+    const int heading_mode_int = (int) PyLong_AsUnsignedLong(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    FusionAhrsHeadingMode heading_mode;
+
+    if (ahrs_heading_mode_from(&heading_mode, heading_mode_int) != 0) {
+        return -1;
+    }
+
+    self->wrapped.headingMode = heading_mode;
     return 0;
 }
 
@@ -170,6 +204,7 @@ static int ahrs_settings_set_rejection_timeout(AhrsSettings *self, PyObject *val
 static PyGetSetDef ahrs_settings_get_set[] = {
     {"sample_rate", (getter) ahrs_settings_get_sample_rate, (setter) ahrs_settings_set_sample_rate, "", NULL},
     {"convention", (getter) ahrs_settings_get_convention, (setter) ahrs_settings_set_convention, "", NULL},
+    {"heading_mode", (getter) ahrs_settings_get_heading_mode, (setter) ahrs_settings_set_heading_mode, "", NULL},
     {"gain", (getter) ahrs_settings_get_gain, (setter) ahrs_settings_set_gain, "", NULL},
     {"gyroscope_range", (getter) ahrs_settings_get_gyroscope_range, (setter) ahrs_settings_set_gyroscope_range, "", NULL},
     {"acceleration_rejection", (getter) ahrs_settings_get_acceleration_rejection, (setter) ahrs_settings_set_acceleration_rejection, "", NULL},

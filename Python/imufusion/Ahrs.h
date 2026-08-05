@@ -74,7 +74,13 @@ static PyObject *ahrs_skip_startup(Ahrs *self, PyObject *args) {
     return (PyObject *) self;
 }
 
-static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
+static PyObject *ahrs_get_heading_mode(Ahrs *self, PyObject *args) {
+    const FusionAhrsHeadingMode heading_mode = FusionAhrsGetHeadingMode(&self->wrapped);
+
+    return PyLong_FromLong(heading_mode);
+}
+
+static PyObject *ahrs_update_magnetic(Ahrs *self, PyObject *args) {
     PyObject *gyroscope_object;
     PyObject *accelerometer_object;
     PyObject *magnetometer_object;
@@ -101,12 +107,18 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdate(&self->wrapped, gyroscope, accelerometer, magnetometer);
+    const FusionResult result = FusionAhrsUpdateMagnetic(&self->wrapped, gyroscope, accelerometer, magnetometer);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
     Py_INCREF(self);
     return (PyObject *) self;
 }
 
-static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
+static PyObject *ahrs_update_relative(Ahrs *self, PyObject *args) {
     PyObject *gyroscope_object;
     PyObject *accelerometer_object;
 
@@ -126,12 +138,18 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdateNoMagnetometer(&self->wrapped, gyroscope, accelerometer);
+    const FusionResult result = FusionAhrsUpdateRelative(&self->wrapped, gyroscope, accelerometer);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
     Py_INCREF(self);
     return (PyObject *) self;
 }
 
-static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
+static PyObject *ahrs_update_external(Ahrs *self, PyObject *args) {
     PyObject *gyroscope_object;
     PyObject *accelerometer_object;
     float heading;
@@ -152,7 +170,13 @@ static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
         return NULL;
     }
 
-    FusionAhrsUpdateExternalHeading(&self->wrapped, gyroscope, accelerometer, heading);
+    const FusionResult result = FusionAhrsUpdateExternal(&self->wrapped, gyroscope, accelerometer, heading);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
     Py_INCREF(self);
     return (PyObject *) self;
 }
@@ -212,7 +236,13 @@ static PyObject *ahrs_set_heading(Ahrs *self, PyObject *arg) {
         return NULL;
     }
 
-    FusionAhrsSetHeading(&self->wrapped, heading);
+    const FusionResult result = FusionAhrsSetHeading(&self->wrapped, heading);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
     Py_INCREF(self);
     return (PyObject *) self;
 }
@@ -223,9 +253,10 @@ static PyMethodDef ahrs_methods[] = {
     {"restart", (PyCFunction) ahrs_restart, METH_NOARGS, ""},
     {"soft_restart", (PyCFunction) ahrs_soft_restart, METH_NOARGS, ""},
     {"skip_startup", (PyCFunction) ahrs_skip_startup, METH_NOARGS, ""},
-    {"update", (PyCFunction) ahrs_update, METH_VARARGS, ""},
-    {"update_no_magnetometer", (PyCFunction) ahrs_update_no_magnetometer, METH_VARARGS, ""},
-    {"update_external_heading", (PyCFunction) ahrs_update_external_heading, METH_VARARGS, ""},
+    {"get_heading_mode", (PyCFunction) ahrs_get_heading_mode, METH_NOARGS, ""},
+    {"update_magnetic", (PyCFunction) ahrs_update_magnetic, METH_VARARGS, ""},
+    {"update_relative", (PyCFunction) ahrs_update_relative, METH_VARARGS, ""},
+    {"update_external", (PyCFunction) ahrs_update_external, METH_VARARGS, ""},
     {"get_quaternion", (PyCFunction) ahrs_get_quaternion, METH_NOARGS, ""},
     {"set_quaternion", (PyCFunction) ahrs_set_quaternion, METH_O, ""},
     {"get_gravity", (PyCFunction) ahrs_get_gravity, METH_NOARGS, ""},
