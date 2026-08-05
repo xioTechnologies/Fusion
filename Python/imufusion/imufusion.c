@@ -1,5 +1,6 @@
 #include "Ahrs.h"
 #include "AhrsFlags.h"
+#include "AhrsHeadingMode.h"
 #include "AhrsInternalStates.h"
 #include "AhrsSettings.h"
 #include "Bias.h"
@@ -69,11 +70,15 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddIntConstant(module, "CONVENTION_NWU", FusionConventionNwu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_ENU", FusionConventionEnu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
+        (PyModule_AddIntConstant(module, "HEADING_MODE_MAGNETIC", FusionAhrsHeadingModeMagnetic) == 0) &&
+        (PyModule_AddIntConstant(module, "HEADING_MODE_RELATIVE", FusionAhrsHeadingModeRelative) == 0) &&
+        (PyModule_AddIntConstant(module, "HEADING_MODE_EXTERNAL", FusionAhrsHeadingModeExternal) == 0) &&
         (PyModule_AddIntConstant(module, "PROGRESS_STATUS_NOT_STARTED", FusionProgressStatusNotStarted) == 0) &&
         (PyModule_AddIntConstant(module, "PROGRESS_STATUS_IN_PROGRESS", FusionProgressStatusInProgress) == 0) &&
         (PyModule_AddIntConstant(module, "PROGRESS_STATUS_COMPLETE", FusionProgressStatusComplete) == 0) &&
         (PyModule_AddIntConstant(module, "PROGRESS_STATUS_FAILED", FusionProgressStatusFailed) == 0) &&
         (PyModule_AddIntConstant(module, "PROGRESS_STATUS_ABORTED", FusionProgressStatusAborted) == 0) &&
+        (PyModule_AddFunctions(module, ahrs_heading_mode_methods) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
         (PyModule_AddFunctions(module, convention_methods) == 0) &&
         (PyModule_AddFunctions(module, convert_methods) == 0) &&

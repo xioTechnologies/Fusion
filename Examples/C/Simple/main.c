@@ -9,6 +9,7 @@ int main() {
 
     FusionAhrsSettings settings = fusionAhrsDefaultSettings;
     settings.sampleRate = 100.0f; // Hz
+    settings.headingMode = FusionAhrsHeadingModeMagnetic;
 
     FusionAhrsSetSettings(&ahrs, &settings);
 
@@ -19,7 +20,7 @@ int main() {
         const FusionVector accelerometer = {0.0f, 0.0f, 1.0f};
 
         // Update AHRS algorithm
-        FusionAhrsUpdateNoMagnetometer(&ahrs, gyroscope, accelerometer);
+        FusionAhrsUpdateRelative(&ahrs, gyroscope, accelerometer);
 
         // Print Euler angles
         const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&ahrs));

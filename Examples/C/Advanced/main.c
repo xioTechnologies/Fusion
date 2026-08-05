@@ -25,6 +25,7 @@ int main() {
     const FusionAhrsSettings settings = {
         .sampleRate = sampleRate,
         .convention = FusionConventionNwu,
+        .headingMode = FusionAhrsHeadingModeMagnetic,
         .gain = 0.5f,
         .gyroscopeRange = 2000.0f, /* replace with actual gyroscope range */
         .accelerationRejection = 10.0f,
@@ -71,7 +72,7 @@ int main() {
         FusionAhrsSetSamplePeriod(&ahrs, deltaTime);
 
         // Update AHRS algorithm
-        FusionAhrsUpdate(&ahrs, gyroscope, accelerometer, magnetometer);
+        FusionAhrsUpdateMagnetic(&ahrs, gyroscope, accelerometer, magnetometer);
 
         // Print AHRS outputs
         const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&ahrs));
