@@ -75,7 +75,7 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
     ahrs->rejectionTimeout = (int32_t) (settings->sampleRate * settings->rejectionTimeout);
     ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
     ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
-    if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0)) {
+    if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0.0f)) {
         ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
         ahrs->magneticRejection = FLT_MAX;
     }
