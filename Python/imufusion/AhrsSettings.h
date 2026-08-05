@@ -25,10 +25,12 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
         "acceleration_rejection",
         "magnetic_rejection",
         "rejection_timeout",
+        "anchor_cutoff",
+        "anchor_duration",
         NULL, /* sentinel */
     };
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fiifffff", kwlist,
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|fiifffffff", kwlist,
                                     &settings.sampleRate,
                                     &convention_int,
                                     &heading_mode_int,
@@ -36,7 +38,9 @@ static PyObject *ahrs_settings_new(PyTypeObject *subtype, PyObject *args, PyObje
                                     &settings.gyroscopeRange,
                                     &settings.accelerationRejection,
                                     &settings.magneticRejection,
-                                    &settings.rejectionTimeout) == 0) {
+                                    &settings.rejectionTimeout,
+                                    &settings.anchorCutoff,
+                                    &settings.anchorDuration) == 0) {
         return NULL;
     }
 
@@ -201,6 +205,36 @@ static int ahrs_settings_set_rejection_timeout(AhrsSettings *self, PyObject *val
     return 0;
 }
 
+static PyObject *ahrs_settings_get_anchor_cutoff(AhrsSettings *self) {
+    return PyFloat_FromDouble((double) self->wrapped.anchorCutoff);
+}
+
+static int ahrs_settings_set_anchor_cutoff(AhrsSettings *self, PyObject *value, void *closure) {
+    const float anchor_cutoff = (float) PyFloat_AsDouble(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    self->wrapped.anchorCutoff = anchor_cutoff;
+    return 0;
+}
+
+static PyObject *ahrs_settings_get_anchor_duration(AhrsSettings *self) {
+    return PyFloat_FromDouble((double) self->wrapped.anchorDuration);
+}
+
+static int ahrs_settings_set_anchor_duration(AhrsSettings *self, PyObject *value, void *closure) {
+    const float anchor_duration = (float) PyFloat_AsDouble(value);
+
+    if (PyErr_Occurred()) {
+        return -1;
+    }
+
+    self->wrapped.anchorDuration = anchor_duration;
+    return 0;
+}
+
 static PyGetSetDef ahrs_settings_get_set[] = {
     {"sample_rate", (getter) ahrs_settings_get_sample_rate, (setter) ahrs_settings_set_sample_rate, "", NULL},
     {"convention", (getter) ahrs_settings_get_convention, (setter) ahrs_settings_set_convention, "", NULL},
@@ -210,6 +244,8 @@ static PyGetSetDef ahrs_settings_get_set[] = {
     {"acceleration_rejection", (getter) ahrs_settings_get_acceleration_rejection, (setter) ahrs_settings_set_acceleration_rejection, "", NULL},
     {"magnetic_rejection", (getter) ahrs_settings_get_magnetic_rejection, (setter) ahrs_settings_set_magnetic_rejection, "", NULL},
     {"rejection_timeout", (getter) ahrs_settings_get_rejection_timeout, (setter) ahrs_settings_set_rejection_timeout, "", NULL},
+    {"anchor_cutoff", (getter) ahrs_settings_get_anchor_cutoff, (setter) ahrs_settings_set_anchor_cutoff, "", NULL},
+    {"anchor_duration", (getter) ahrs_settings_get_anchor_duration, (setter) ahrs_settings_set_anchor_duration, "", NULL},
     {NULL} /* sentinel */
 };
 
