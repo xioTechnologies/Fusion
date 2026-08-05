@@ -91,6 +91,21 @@ typedef union {
 #define FUSION_VECTOR_ONES ((FusionVector){ .array = {1.0f, 1.0f, 1.0f} })
 
 /**
+ * @brief Unit vector in X direction.
+ */
+#define FUSION_VECTOR_X ((FusionVector){ .array = {1.0f, 0.0f, 0.0f} })
+
+/**
+ * @brief Unit vector in Y direction.
+ */
+#define FUSION_VECTOR_Y ((FusionVector){ .array = {0.0f, 1.0f, 0.0f} })
+
+/**
+ * @brief Unit vector in Z direction.
+ */
+#define FUSION_VECTOR_Z ((FusionVector){ .array = {0.0f, 0.0f, 1.0f} })
+
+/**
  * @brief Identity quaternion.
  */
 #define FUSION_QUATERNION_IDENTITY ((FusionQuaternion){ .array = {1.0f, 0.0f, 0.0f, 0.0f} })
@@ -101,7 +116,7 @@ typedef union {
 #define FUSION_MATRIX_IDENTITY ((FusionMatrix){ .array = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f} })
 
 /**
- * @brief Euler angles of zero.
+ * @brief Zero Euler angles.
  */
 #define FUSION_EULER_ZERO ((FusionEuler){ .array = {0.0f, 0.0f, 0.0f} })
 

@@ -6,6 +6,7 @@
 #include "AhrsInternalStates.h"
 #include "AhrsSettings.h"
 #include "NpArray.h"
+#include "Progress.h"
 #include <Python.h>
 
 typedef struct {
@@ -181,6 +182,37 @@ static PyObject *ahrs_update_external(Ahrs *self, PyObject *args) {
     return (PyObject *) self;
 }
 
+static PyObject *ahrs_update_anchored(Ahrs *self, PyObject *args) {
+    PyObject *gyroscope_object;
+    PyObject *accelerometer_object;
+
+    if (PyArg_ParseTuple(args, "OO", &gyroscope_object, &accelerometer_object) == 0) {
+        return NULL;
+    }
+
+    FusionVector gyroscope;
+
+    if (np_array_1x3_to(gyroscope.array, gyroscope_object) != 0) {
+        return NULL;
+    }
+
+    FusionVector accelerometer;
+
+    if (np_array_1x3_to(accelerometer.array, accelerometer_object) != 0) {
+        return NULL;
+    }
+
+    const FusionResult result = FusionAhrsUpdateAnchored(&self->wrapped, gyroscope, accelerometer);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
+    Py_INCREF(self);
+    return (PyObject *) self;
+}
+
 static PyObject *ahrs_get_quaternion(Ahrs *self, PyObject *args) {
     const FusionQuaternion quaternion = FusionAhrsGetQuaternion(&self->wrapped);
 
@@ -247,6 +279,56 @@ static PyObject *ahrs_set_heading(Ahrs *self, PyObject *arg) {
     return (PyObject *) self;
 }
 
+static PyObject *ahrs_anchor_start(Ahrs *self, PyObject *args) {
+    const FusionResult result = FusionAhrsAnchorStart(&self->wrapped);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
+    Py_INCREF(self);
+    return (PyObject *) self;
+}
+
+static PyObject *ahrs_anchor_get_progress(Ahrs *self, PyObject *args) {
+    const FusionProgress progress = FusionAhrsAnchorGetProgress(&self->wrapped);
+
+    return progress_from(&progress);
+}
+
+static PyObject *ahrs_anchor_complete(Ahrs *self, PyObject *args) {
+    const FusionResult result = FusionAhrsAnchorComplete(&self->wrapped);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
+    Py_INCREF(self);
+    return (PyObject *) self;
+}
+
+static PyObject *ahrs_anchor_abort(Ahrs *self, PyObject *args) {
+    const FusionResult result = FusionAhrsAnchorAbort(&self->wrapped);
+
+    if (result != FusionResultOk) {
+        PyErr_SetString(PyExc_RuntimeError, FusionResultToString(result));
+        return NULL;
+    }
+
+    Py_INCREF(self);
+    return (PyObject *) self;
+}
+
+static PyObject *ahrs_anchor_completed(Ahrs *self, PyObject *args) {
+    if (FusionAhrsAnchorCompleted(&self->wrapped)) {
+        Py_RETURN_TRUE;
+    }
+
+    Py_RETURN_FALSE;
+}
+
 static PyMethodDef ahrs_methods[] = {
     {"set_settings", (PyCFunction) ahrs_set_settings, METH_O, ""},
     {"set_sample_period", (PyCFunction) ahrs_set_sample_period, METH_O, ""},
@@ -257,6 +339,7 @@ static PyMethodDef ahrs_methods[] = {
     {"update_magnetic", (PyCFunction) ahrs_update_magnetic, METH_VARARGS, ""},
     {"update_relative", (PyCFunction) ahrs_update_relative, METH_VARARGS, ""},
     {"update_external", (PyCFunction) ahrs_update_external, METH_VARARGS, ""},
+    {"update_anchored", (PyCFunction) ahrs_update_anchored, METH_VARARGS, ""},
     {"get_quaternion", (PyCFunction) ahrs_get_quaternion, METH_NOARGS, ""},
     {"set_quaternion", (PyCFunction) ahrs_set_quaternion, METH_O, ""},
     {"get_gravity", (PyCFunction) ahrs_get_gravity, METH_NOARGS, ""},
@@ -265,6 +348,11 @@ static PyMethodDef ahrs_methods[] = {
     {"get_internal_states", (PyCFunction) ahrs_get_internal_states, METH_NOARGS, ""},
     {"get_flags", (PyCFunction) ahrs_get_flags, METH_NOARGS, ""},
     {"set_heading", (PyCFunction) ahrs_set_heading, METH_O, ""},
+    {"anchor_start", (PyCFunction) ahrs_anchor_start, METH_NOARGS, ""},
+    {"anchor_get_progress", (PyCFunction) ahrs_anchor_get_progress, METH_NOARGS, ""},
+    {"anchor_complete", (PyCFunction) ahrs_anchor_complete, METH_NOARGS, ""},
+    {"anchor_abort", (PyCFunction) ahrs_anchor_abort, METH_NOARGS, ""},
+    {"anchor_completed", (PyCFunction) ahrs_anchor_completed, METH_NOARGS, ""},
     {NULL} /* sentinel */
 };
 

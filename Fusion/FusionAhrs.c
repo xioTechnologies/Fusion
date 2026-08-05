@@ -28,11 +28,13 @@
 //------------------------------------------------------------------------------
 // Function declarations
 
+static FUSION_INLINE FusionVector AnchorNorth(FusionAhrs *const ahrs);
+
 static FUSION_INLINE void Update(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer);
 
 static FUSION_INLINE void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope);
 
-static FUSION_INLINE float Startup(FusionAhrs *const ahrs);
+static FUSION_INLINE void Startup(FusionAhrs *const ahrs);
 
 static FUSION_INLINE FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector accelerometer);
 
@@ -46,6 +48,10 @@ static FUSION_INLINE FusionVector Residual(const FusionVector sensor, const Fusi
 
 static FUSION_INLINE int32_t Clamp(const int32_t value, const int32_t min, const int32_t max);
 
+static FUSION_INLINE FusionResult AddAnchorSample(FusionAhrs *const ahrs);
+
+static FUSION_INLINE FusionVector HalfNorth(const FusionAhrs *const ahrs);
+
 //------------------------------------------------------------------------------
 // Variables
 
@@ -58,6 +64,8 @@ const FusionAhrsSettings fusionAhrsDefaultSettings = {
     .accelerationRejection = 0.0f,
     .magneticRejection = 0.0f,
     .rejectionTimeout = 0.0f,
+    .anchorCutoff = 0.01f,
+    .anchorDuration = 5.0f,
 };
 
 //------------------------------------------------------------------------------
@@ -78,12 +86,19 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
  * @param settings Settings.
  */
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings) {
+    FusionAhrsAnchorAbort(ahrs); // TODO: fix UB when reading ahrs->headingMode and ahrs->anchorStatus
+
     ahrs->samplePeriod = 1.0f / settings->sampleRate;
     ahrs->convention = settings->convention;
     ahrs->headingMode = settings->headingMode;
 
-    ahrs->gain = settings->gain;
-    ahrs->startupGainRate = ((INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD) * ahrs->samplePeriod;
+    ahrs->inclinationGain = settings->gain;
+    ahrs->headingGain = settings->gain;
+    ahrs->startupGainRate = ((INITIAL_STARTUP_GAIN - ahrs->inclinationGain) / STARTUP_PERIOD) * ahrs->samplePeriod;
+
+    if (ahrs->headingMode == FusionAhrsHeadingModeAnchored) {
+        ahrs->headingGain = 2.0f * (float) M_PI * settings->anchorCutoff;
+    }
 
     ahrs->overrangeEnabled = settings->gyroscopeRange > 0.0f;
     ahrs->overrangeThreshold = 0.98f * settings->gyroscopeRange;
@@ -94,6 +109,8 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
 
     ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
     ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
+
+    ahrs->anchorDuration = (uint32_t) (settings->sampleRate * settings->anchorDuration);
 
     if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0.0f)) {
         ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
@@ -131,27 +148,43 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
 
     ahrs->halfAccelerometerResidual = FUSION_VECTOR_ZERO;
     ahrs->accelerationRecoveryTrigger = 0;
-    ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
+    ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout; // TODO: handle rejectionTimeout mutation by FusionAhrsSetSettings
     ahrs->accelerometerIgnored = false;
 
     ahrs->halfMagnetometerResidual = FUSION_VECTOR_ZERO;
     ahrs->magneticRecoveryTrigger = 0;
-    ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
+    ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout; // TODO: handle rejectionTimeout mutation by FusionAhrsSetSettings
     ahrs->magnetometerIgnored = false;
+
+    ahrs->anchorStatus = FusionProgressStatusNotStarted;
+    ahrs->anchorCompleted = false;
+    ahrs->anchorNumberOfSamples = 0;
+    ahrs->anchorNorth = FUSION_VECTOR_ZERO;
 }
 
 /**
- * @brief Restarts the AHRS algorithm while preserving outputs.
+ * @brief Restarts the AHRS algorithm while preserving outputs and anchored
+ * heading.
  * @param ahrs AHRS structure.
  */
 void FusionAhrsSoftRestart(FusionAhrs *const ahrs) {
     const FusionQuaternion quaternion = ahrs->quaternion;
     const FusionVector accelerometer = ahrs->accelerometer;
 
+    const FusionProgressStatus anchorStatus = ahrs->anchorStatus;
+    const bool anchorCompleted = ahrs->anchorCompleted;
+    const uint32_t anchorNumberOfSamples = ahrs->anchorNumberOfSamples;
+    const FusionVector anchorNorth = ahrs->anchorNorth;
+
     FusionAhrsRestart(ahrs);
 
     ahrs->quaternion = quaternion;
     ahrs->accelerometer = accelerometer;
+
+    ahrs->anchorStatus = anchorStatus;
+    ahrs->anchorCompleted = anchorCompleted;
+    ahrs->anchorNumberOfSamples = anchorNumberOfSamples;
+    ahrs->anchorNorth = anchorNorth;
 }
 
 /**
@@ -187,7 +220,8 @@ FusionResult FusionAhrsUpdateMagnetic(FusionAhrs *const ahrs, const FusionVector
     }
 
     Update(ahrs, gyroscope, accelerometer, magnetometer);
-    return FusionResultOk;
+
+    return AddAnchorSample(ahrs);
 }
 
 /**
@@ -207,7 +241,8 @@ FusionResult FusionAhrsUpdateRelative(FusionAhrs *const ahrs, const FusionVector
     if (ahrs->startup) {
         FusionAhrsSetHeading(ahrs, 0.0f);
     }
-    return FusionResultOk;
+
+    return AddAnchorSample(ahrs);
 }
 
 /**
@@ -239,7 +274,40 @@ FusionResult FusionAhrsUpdateExternal(FusionAhrs *const ahrs, const FusionVector
     };
 
     Update(ahrs, gyroscope, accelerometer, magnetometer);
+
+    return AddAnchorSample(ahrs);
+}
+
+/**
+ * @brief Updates the AHRS algorithm in anchored heading mode.
+ * @param ahrs AHRS structure.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @param accelerometer Accelerometer in g.
+ * @return Result.
+ */
+FusionResult FusionAhrsUpdateAnchored(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer) {
+    if (ahrs->headingMode != FusionAhrsHeadingModeAnchored) {
+        return FusionResultInvalidHeadingMode;
+    }
+
+    Update(ahrs, gyroscope, accelerometer, ahrs->anchorStatus == FusionProgressStatusComplete ? ahrs->anchorNorth : AnchorNorth(ahrs));
     return FusionResultOk;
+}
+
+/**
+ * @brief Returns the default direction of anchor north.
+ * @param ahrs AHRS structure.
+ * @return Default direction of anchor north.
+ */
+static FUSION_INLINE FusionVector AnchorNorth(FusionAhrs *const ahrs) {
+    switch (ahrs->convention) {
+        case FusionConventionNwu:
+        case FusionConventionNed:
+            return FUSION_VECTOR_X;
+        case FusionConventionEnu:
+            return FusionVectorScale(FUSION_VECTOR_Y, -1.0f);
+    }
+    return FUSION_VECTOR_ZERO; // avoid compiler warning
 }
 
 /**
@@ -254,15 +322,21 @@ static FUSION_INLINE void Update(FusionAhrs *const ahrs, const FusionVector gyro
 
     Overrange(ahrs, gyroscope);
 
-    const float gain = Startup(ahrs);
+    Startup(ahrs);
 
     const FusionVector halfGyroscope = FusionVectorScale(gyroscope, FusionDegreesToRadians(0.5f));
 
     const FusionVector halfGravity = HalfGravity(ahrs);
 
-    const FusionVector halfFeedback = FusionVectorAdd(HalfInclinationFeedback(ahrs, halfGravity, accelerometer), HalfHeadingFeedback(ahrs, halfGravity, magnetometer));
+    const FusionVector halfInclinationFeedback = HalfInclinationFeedback(ahrs, halfGravity, accelerometer);
 
-    const FusionVector halfAngularRate = FusionVectorAdd(halfGyroscope, FusionVectorScale(halfFeedback, gain));
+    const FusionVector halfHeadingFeedback = HalfHeadingFeedback(ahrs, halfGravity, magnetometer);
+
+    const FusionVector halfAppliedFeedback = ahrs->startup
+                                                 ? FusionVectorScale(FusionVectorAdd(halfInclinationFeedback, halfHeadingFeedback), ahrs->startupGain)
+                                                 : FusionVectorAdd(FusionVectorScale(halfInclinationFeedback, ahrs->inclinationGain), FusionVectorScale(halfHeadingFeedback, ahrs->headingGain));
+
+    const FusionVector halfAngularRate = FusionVectorAdd(halfGyroscope, halfAppliedFeedback);
 
     ahrs->quaternion = FusionQuaternionAdd(ahrs->quaternion, FusionQuaternionVectorProduct(ahrs->quaternion, FusionVectorScale(halfAngularRate, ahrs->samplePeriod)));
 
@@ -292,23 +366,20 @@ static FUSION_INLINE void Overrange(FusionAhrs *const ahrs, const FusionVector g
 /**
  * @brief Ramps down the gain during startup.
  * @param ahrs AHRS structure.
- * @return Gain.
  */
-static FUSION_INLINE float Startup(FusionAhrs *const ahrs) {
+static FUSION_INLINE void Startup(FusionAhrs *const ahrs) {
     if (ahrs->startup == false) {
-        return ahrs->gain;
+        return;
     }
 
     ahrs->startupGain -= ahrs->startupGainRate;
 
-    if (ahrs->startupGain > ahrs->gain) {
-        return ahrs->startupGain;
+    if (ahrs->startupGain > ahrs->inclinationGain) {
+        return;
     }
 
     ahrs->startup = false;
     ahrs->overrangeRecovery = false;
-
-    return ahrs->gain;
 }
 
 /**
@@ -478,16 +549,16 @@ static FUSION_INLINE FusionVector HalfWest(const FusionAhrs *const ahrs) {
  */
 static FUSION_INLINE FusionVector Residual(const FusionVector sensor, const FusionVector reference) {
     if (FusionVectorDot(sensor, reference) > 0.0f) {
-        return FusionVectorCross(sensor, reference); // if error is <90 degrees
+        return FusionVectorCross(sensor, reference); // when error is <90 degrees
     }
 
     const FusionVector cross = FusionVectorCross(sensor, reference);
 
     if (FusionVectorIsZero(cross)) {
-        return FUSION_VECTOR_ZERO;
+        return FUSION_VECTOR_ZERO; // when error is exactly 180 degrees
     }
 
-    return FusionVectorNormalise(cross);
+    return FusionVectorNormalise(cross); // when error is >=90 degrees
 }
 
 /**
@@ -505,6 +576,59 @@ static FUSION_INLINE int32_t Clamp(const int32_t value, const int32_t min, const
         return max;
     }
     return value;
+}
+
+/**
+ * @brief Adds anchor sample.
+ * @param ahrs AHRS structure.
+ * @return Result.
+ */
+static FUSION_INLINE FusionResult AddAnchorSample(FusionAhrs *const ahrs) {
+    if (ahrs->anchorStatus != FusionProgressStatusInProgress) {
+        return FusionResultOk;
+    }
+
+    ahrs->anchorNorth = FusionVectorAdd(ahrs->anchorNorth, HalfNorth(ahrs));
+
+    if (++ahrs->anchorNumberOfSamples >= ahrs->anchorDuration) {
+        return FusionAhrsAnchorComplete(ahrs);
+    }
+
+    return FusionResultOk;
+}
+
+/**
+ * @brief Returns the direction of north scaled by 0.5.
+ * @param ahrs AHRS structure.
+ * @return Direction of north scaled by 0.5.
+ */
+static FUSION_INLINE FusionVector HalfNorth(const FusionAhrs *const ahrs) {
+#define Q ahrs->quaternion.element
+    switch (ahrs->convention) {
+        case FusionConventionNwu:
+        case FusionConventionNed: {
+            const FusionVector halfNorth = {
+                .axis = {
+                    .x = Q.w * Q.w - 0.5f + Q.x * Q.x,
+                    .y = Q.x * Q.y - Q.w * Q.z,
+                    .z = Q.x * Q.z + Q.w * Q.y,
+                }
+            }; // first column of transposed rotation matrix scaled by 0.5
+            return halfNorth;
+        }
+        case FusionConventionEnu: {
+            const FusionVector halfNorth = {
+                .axis = {
+                    .x = Q.x * Q.y + Q.w * Q.z,
+                    .y = Q.w * Q.w - 0.5f + Q.y * Q.y,
+                    .z = Q.y * Q.z - Q.w * Q.x,
+                }
+            }; // second column of transposed rotation matrix scaled by 0.5
+            return halfNorth;
+        }
+    }
+#undef Q
+    return FUSION_VECTOR_ZERO; // avoid compiler warning
 }
 
 /**
@@ -632,6 +756,97 @@ FusionResult FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
 
     ahrs->quaternion = FusionQuaternionProduct(rotation, ahrs->quaternion);
     return FusionResultOk;
+}
+
+/**
+ * @brief Starts anchor sampling.
+ * @param ahrs AHRS structure.
+ * @return Result.
+ */
+FusionResult FusionAhrsAnchorStart(FusionAhrs *const ahrs) {
+    if (ahrs->headingMode == FusionAhrsHeadingModeAnchored) {
+        return FusionResultInvalidHeadingMode;
+    }
+
+    ahrs->anchorStatus = FusionProgressStatusInProgress;
+    ahrs->anchorCompleted = false;
+    ahrs->anchorNumberOfSamples = 0;
+    ahrs->anchorNorth = FUSION_VECTOR_ZERO;
+    return FusionResultOk;
+}
+
+/**
+ * @brief Returns the anchor sampling progress.
+ * @param ahrs AHRS structure.
+ * @return Anchor sampling progress.
+ */
+FusionProgress FusionAhrsAnchorGetProgress(const FusionAhrs *const ahrs) {
+    const uint32_t duration = ahrs->anchorDuration > 0 ? ahrs->anchorDuration : 1;
+    const unsigned int percentage = (unsigned int) ((100 * ahrs->anchorNumberOfSamples) / duration);
+
+    const FusionProgress progress = {
+        .status = ahrs->anchorStatus,
+        .percentage = percentage > 100 ? 100 : percentage,
+    };
+    return progress;
+}
+
+/**
+ * @brief Completes anchor sampling using the measurements processed so far.
+ * This function is not normally called by the application because anchor
+ * sampling completes automatically once the duration has elapsed.
+ * @param ahrs AHRS structure.
+ * @return Result.
+ */
+FusionResult FusionAhrsAnchorComplete(FusionAhrs *const ahrs) {
+    if (ahrs->headingMode == FusionAhrsHeadingModeAnchored) {
+        return FusionResultInvalidHeadingMode;
+    }
+
+    if (ahrs->anchorStatus != FusionProgressStatusInProgress) {
+        return FusionResultNotInProgress;
+    }
+
+    if (ahrs->anchorNumberOfSamples == 0) {
+        ahrs->anchorStatus = FusionProgressStatusFailed;
+        return FusionResultTooFewSamples;
+    }
+
+    ahrs->anchorNorth = FusionVectorScale(ahrs->anchorNorth, 1.0f / (float) ahrs->anchorNumberOfSamples);
+
+    ahrs->anchorStatus = FusionProgressStatusComplete;
+    ahrs->anchorCompleted = true;
+    return FusionResultOk;
+}
+
+/**
+ * @brief Aborts anchor sampling.
+ * @param ahrs AHRS structure.
+ * @return Result.
+ */
+FusionResult FusionAhrsAnchorAbort(FusionAhrs *const ahrs) {
+    if (ahrs->headingMode == FusionAhrsHeadingModeAnchored) {
+        return FusionResultInvalidHeadingMode;
+    }
+
+    if (ahrs->anchorStatus != FusionProgressStatusInProgress) {
+        return FusionResultNotInProgress;
+    }
+
+    ahrs->anchorStatus = FusionProgressStatusAborted;
+    return FusionResultOk;
+}
+
+/**
+ * @brief Returns true if anchor sampling has completed. Calling this function
+ * will reset the flag.
+ * @param ahrs AHRS structure.
+ * @return True if anchor sampling has completed.
+ */
+bool FusionAhrsAnchorCompleted(FusionAhrs *const ahrs) {
+    const bool completed = ahrs->anchorCompleted;
+    ahrs->anchorCompleted = false;
+    return completed;
 }
 
 //------------------------------------------------------------------------------
