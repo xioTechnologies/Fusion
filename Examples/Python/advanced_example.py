@@ -15,20 +15,17 @@ accelerometer = data[:, 4:7]
 magnetometer = data[:, 7:10]
 
 # Instantiate algorithms
-bias = imufusion.Bias()
-
-bias.set_settings(
+bias = imufusion.Bias().set_settings(
     imufusion.BiasSettings(
         sample_rate=sample_rate,
     )
 )
 
-ahrs = imufusion.Ahrs()
-
-ahrs.set_settings(
+ahrs = imufusion.Ahrs().set_settings(
     imufusion.AhrsSettings(
         sample_rate=sample_rate,
         convention=imufusion.CONVENTION_NWU,
+        heading_mode=imufusion.HEADING_MODE_MAGNETIC,
         gain=0.5,
         gyroscope_range=2000,
         acceleration_rejection=10,
@@ -50,7 +47,7 @@ for index in range(len(timestamp)):
 
     ahrs.set_sample_period(delta_time[index])
 
-    ahrs.update(gyroscope[index], accelerometer[index], magnetometer[index])
+    ahrs.update_magnetic(gyroscope[index], accelerometer[index], magnetometer[index])
 
     euler[index] = imufusion.quaternion_to_euler(ahrs.get_quaternion())
 

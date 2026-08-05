@@ -28,6 +28,8 @@
 //------------------------------------------------------------------------------
 // Function declarations
 
+static FUSION_INLINE void Update(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer);
+
 static FUSION_INLINE void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope);
 
 static FUSION_INLINE float Startup(FusionAhrs *const ahrs);
@@ -50,6 +52,7 @@ static FUSION_INLINE int32_t Clamp(const int32_t value, const int32_t min, const
 const FusionAhrsSettings fusionAhrsDefaultSettings = {
     .sampleRate = 100.0f,
     .convention = FusionConventionNwu,
+    .headingMode = FusionAhrsHeadingModeRelative,
     .gain = 0.5f,
     .gyroscopeRange = 0.0f,
     .accelerationRejection = 0.0f,
@@ -77,6 +80,7 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings) {
     ahrs->samplePeriod = 1.0f / settings->sampleRate;
     ahrs->convention = settings->convention;
+    ahrs->headingMode = settings->headingMode;
 
     ahrs->gain = settings->gain;
     ahrs->startupGainRate = ((INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD) * ahrs->samplePeriod;
@@ -93,6 +97,10 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
 
     if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0.0f)) {
         ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
+        ahrs->magneticRejection = FLT_MAX;
+    }
+
+    if (ahrs->headingMode != FusionAhrsHeadingModeMagnetic) {
         ahrs->magneticRejection = FLT_MAX;
     }
 }
@@ -157,14 +165,91 @@ void FusionAhrsSkipStartup(FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Updates the AHRS algorithm using the gyroscope, accelerometer, and
- * magnetometer.
+ * @brief Returns the heading mode.
+ * @param ahrs AHRS structure.
+ * @return Heading mode.
+ */
+FusionAhrsHeadingMode FusionAhrsGetHeadingMode(FusionAhrs *const ahrs) {
+    return ahrs->headingMode;
+}
+
+/**
+ * @brief Updates the AHRS algorithm in magnetic heading mode.
+ * @param ahrs AHRS structure.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @param accelerometer Accelerometer in g.
+ * @param magnetometer Magnetometer in any calibrated units.
+ * @return Result.
+ */
+FusionResult FusionAhrsUpdateMagnetic(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer) {
+    if (ahrs->headingMode != FusionAhrsHeadingModeMagnetic) {
+        return FusionResultInvalidHeadingMode;
+    }
+
+    Update(ahrs, gyroscope, accelerometer, magnetometer);
+    return FusionResultOk;
+}
+
+/**
+ * @brief Updates the AHRS algorithm in relative heading mode.
+ * @param ahrs AHRS structure.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @param accelerometer Accelerometer in g.
+ * @return Result.
+ */
+FusionResult FusionAhrsUpdateRelative(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer) {
+    if (ahrs->headingMode != FusionAhrsHeadingModeRelative) {
+        return FusionResultInvalidHeadingMode;
+    }
+
+    Update(ahrs, gyroscope, accelerometer, FUSION_VECTOR_ZERO);
+
+    if (ahrs->startup) {
+        FusionAhrsSetHeading(ahrs, 0.0f);
+    }
+    return FusionResultOk;
+}
+
+/**
+ * @brief Updates the AHRS algorithm in external heading mode.
+ * @param ahrs AHRS structure.
+ * @param gyroscope Gyroscope in degrees per second.
+ * @param accelerometer Accelerometer in g.
+ * @param heading Heading in degrees.
+ * @return Result.
+ */
+FusionResult FusionAhrsUpdateExternal(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading) {
+    if (ahrs->headingMode != FusionAhrsHeadingModeExternal) {
+        return FusionResultInvalidHeadingMode;
+    }
+
+#define Q ahrs->quaternion.element
+    const float roll = atan2f(Q.w * Q.x + Q.y * Q.z, 0.5f - Q.y * Q.y - Q.x * Q.x);
+#undef Q
+
+    const float headingRadians = FusionDegreesToRadians(heading);
+    const float sinHeadingRadians = sinf(headingRadians);
+
+    const FusionVector magnetometer = {
+        .axis = {
+            .x = cosf(headingRadians),
+            .y = -1.0f * cosf(roll) * sinHeadingRadians,
+            .z = sinHeadingRadians * sinf(roll),
+        }
+    };
+
+    Update(ahrs, gyroscope, accelerometer, magnetometer);
+    return FusionResultOk;
+}
+
+/**
+ * @brief Updates the AHRS algorithm.
  * @param ahrs AHRS structure.
  * @param gyroscope Gyroscope in degrees per second.
  * @param accelerometer Accelerometer in g.
  * @param magnetometer Magnetometer in any calibrated units.
  */
-void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer) {
+static FUSION_INLINE void Update(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer) {
     ahrs->accelerometer = accelerometer;
 
     Overrange(ahrs, gyroscope);
@@ -423,49 +508,6 @@ static FUSION_INLINE int32_t Clamp(const int32_t value, const int32_t min, const
 }
 
 /**
- * @brief Updates the AHRS algorithm using the gyroscope and accelerometer.
- * @param ahrs AHRS structure.
- * @param gyroscope Gyroscope in degrees per second.
- * @param accelerometer Accelerometer in g.
- */
-void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer) {
-    FusionAhrsUpdate(ahrs, gyroscope, accelerometer, FUSION_VECTOR_ZERO);
-
-    // Zero heading during startup
-    if (ahrs->startup) {
-        FusionAhrsSetHeading(ahrs, 0.0f);
-    }
-}
-
-/**
- * @brief Updates the AHRS algorithm using the gyroscope, accelerometer, and an
- * external measurement of heading.
- * @param ahrs AHRS structure.
- * @param gyroscope Gyroscope in degrees per second.
- * @param accelerometer Accelerometer in g.
- * @param heading Heading in degrees.
- */
-void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading) {
-#define Q ahrs->quaternion.element
-    const float roll = atan2f(Q.w * Q.x + Q.y * Q.z, 0.5f - Q.y * Q.y - Q.x * Q.x);
-#undef Q
-
-    // Calculate equivalent magnetometer
-    const float headingRadians = FusionDegreesToRadians(heading);
-    const float sinHeadingRadians = sinf(headingRadians);
-    const FusionVector magnetometer = {
-        .axis = {
-            .x = cosf(headingRadians),
-            .y = -1.0f * cosf(roll) * sinHeadingRadians,
-            .z = sinHeadingRadians * sinf(roll),
-        }
-    };
-
-    // Update algorithm
-    FusionAhrsUpdate(ahrs, gyroscope, accelerometer, magnetometer);
-}
-
-/**
  * @brief Returns the quaternion.
  * @param ahrs AHRS structure.
  * @return Quaternion.
@@ -564,11 +606,16 @@ FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Sets the heading.
+ * @brief Sets the heading in relative heading mode.
  * @param ahrs AHRS structure.
  * @param heading Heading in degrees.
+ * @return Result.
  */
-void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
+FusionResult FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
+    if (ahrs->headingMode != FusionAhrsHeadingModeRelative) {
+        return FusionResultInvalidHeadingMode;
+    }
+
 #define Q ahrs->quaternion.element
     const float yaw = atan2f(Q.w * Q.z + Q.x * Q.y, 0.5f - Q.y * Q.y - Q.z * Q.z);
 #undef Q
@@ -584,6 +631,7 @@ void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
     };
 
     ahrs->quaternion = FusionQuaternionProduct(rotation, ahrs->quaternion);
+    return FusionResultOk;
 }
 
 //------------------------------------------------------------------------------
