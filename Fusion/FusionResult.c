@@ -21,6 +21,8 @@ const char *FusionResultToString(const FusionResult result) {
     switch (result) {
         case FusionResultOk:
             return "Ok";
+        case FusionResultInvalidHeadingMode:
+            return "Invalid heading mode";
         case FusionResultNotInProgress:
             return "Not in progress";
         case FusionResultTooFewSamples:

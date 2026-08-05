@@ -12,6 +12,7 @@
 
 #include "FusionConvention.h"
 #include "FusionMath.h"
+#include "FusionResult.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -19,11 +20,21 @@
 // Definitions
 
 /**
+ * @brief Heading mode.
+ */
+typedef enum {
+    FusionAhrsHeadingModeMagnetic,
+    FusionAhrsHeadingModeRelative,
+    FusionAhrsHeadingModeExternal,
+} FusionAhrsHeadingMode;
+
+/**
  * @brief Settings.
  */
 typedef struct {
     float sampleRate; // Hz
     FusionConvention convention;
+    FusionAhrsHeadingMode headingMode;
     float gain;
     float gyroscopeRange; // degrees per second (0 = disabled)
     float accelerationRejection; // degrees (0 = disabled)
@@ -38,6 +49,7 @@ typedef struct {
     // Settings
     float samplePeriod;
     FusionConvention convention;
+    FusionAhrsHeadingMode headingMode;
     float gain;
     float startupGainRate;
     bool overrangeEnabled;
@@ -112,11 +124,13 @@ void FusionAhrsSoftRestart(FusionAhrs *const ahrs);
 
 void FusionAhrsSkipStartup(FusionAhrs *const ahrs);
 
-void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer);
+FusionAhrsHeadingMode FusionAhrsGetHeadingMode(FusionAhrs *const ahrs);
 
-void FusionAhrsUpdateNoMagnetometer(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer);
+FusionResult FusionAhrsUpdateMagnetic(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer);
 
-void FusionAhrsUpdateExternalHeading(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading);
+FusionResult FusionAhrsUpdateRelative(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer);
+
+FusionResult FusionAhrsUpdateExternal(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const float heading);
 
 FusionQuaternion FusionAhrsGetQuaternion(const FusionAhrs *const ahrs);
 
@@ -132,7 +146,9 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
 
 FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs);
 
-void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading);
+FusionResult FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading);
+
+const char *FusionAhrsHeadingModeToString(const FusionAhrsHeadingMode headingMode);
 
 #endif
 

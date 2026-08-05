@@ -31,18 +31,17 @@ axes[1].grid()
 axes[1].legend()
 
 # Process sensor data
-ahrs = imufusion.Ahrs()
-
-ahrs.set_settings(
+ahrs = imufusion.Ahrs().set_settings(
     imufusion.AhrsSettings(
         sample_rate=100,  # Hz
+        heading_mode=imufusion.HEADING_MODE_RELATIVE,
     )
 )
 
 euler = np.empty((len(timestamp), 3))
 
 for index in range(len(timestamp)):
-    ahrs.update_no_magnetometer(gyroscope[index], accelerometer[index])
+    ahrs.update_relative(gyroscope[index], accelerometer[index])
     euler[index] = imufusion.quaternion_to_euler(ahrs.get_quaternion())
 
 # Plot Euler angles
