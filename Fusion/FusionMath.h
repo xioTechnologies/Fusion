@@ -507,7 +507,7 @@ static inline FusionVector FusionMatrixMultiply(const FusionMatrix m, const Fusi
  */
 static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion q) {
 #define Q q.element
-    const float twoQw = 2.0f * Q.w;
+    const float twoQw = 2.0f * Q.w; // cannot rely on compiler CSE to optimise for these subexpressions
     const float twoQx = 2.0f * Q.x;
     const float twoQy = 2.0f * Q.y;
     const float twoQz = 2.0f * Q.z;
