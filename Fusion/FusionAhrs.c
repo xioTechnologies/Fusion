@@ -29,7 +29,7 @@
 
 static inline FusionVector HalfGravity(const FusionAhrs *const ahrs);
 
-static inline FusionVector HalfMagnetic(const FusionAhrs *const ahrs);
+static inline FusionVector HalfWest(const FusionAhrs *const ahrs);
 
 static inline FusionVector Residual(const FusionVector sensor, const FusionVector reference);
 
@@ -190,10 +190,10 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     ahrs->magnetometerIgnored = true;
     if (FusionVectorIsZero(magnetometer) == false) {
         // Calculate direction of magnetic field indicated by algorithm
-        const FusionVector halfMagnetic = HalfMagnetic(ahrs);
+        const FusionVector halfWest = HalfWest(ahrs);
 
         // Calculate magnetometer residual scaled by 0.5
-        ahrs->halfMagnetometerResidual = Residual(FusionVectorNormalise(FusionVectorCross(ahrs->halfGravity, magnetometer)), halfMagnetic);
+        ahrs->halfMagnetometerResidual = Residual(FusionVectorNormalise(FusionVectorCross(ahrs->halfGravity, magnetometer)), halfWest);
 
         // Don't ignore magnetometer if magnetic error below threshold
         if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerResidual) <= ahrs->magneticRejection)) {
@@ -266,42 +266,43 @@ static inline FusionVector HalfGravity(const FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Returns the direction of the magnetic field scaled by 0.5.
+ * @brief Returns the direction of west scaled by 0.5. The cross product of
+ * gravity and the magnetometer is west.
  * @param ahrs AHRS structure.
- * @return Direction of the magnetic field scaled by 0.5.
+ * @return Direction of west scaled by 0.5.
  */
-static inline FusionVector HalfMagnetic(const FusionAhrs *const ahrs) {
+static inline FusionVector HalfWest(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
     switch (ahrs->convention) {
         case FusionConventionNwu: {
-            const FusionVector halfMagnetic = {
+            const FusionVector halfWest = {
                 .axis = {
                     .x = Q.x * Q.y + Q.w * Q.z,
                     .y = Q.w * Q.w - 0.5f + Q.y * Q.y,
                     .z = Q.y * Q.z - Q.w * Q.x,
                 }
             }; // second column of transposed rotation matrix scaled by 0.5
-            return halfMagnetic;
+            return halfWest;
         }
         case FusionConventionEnu: {
-            const FusionVector halfMagnetic = {
+            const FusionVector halfWest = {
                 .axis = {
                     .x = 0.5f - Q.w * Q.w - Q.x * Q.x,
                     .y = Q.w * Q.z - Q.x * Q.y,
                     .z = -1.0f * (Q.x * Q.z + Q.w * Q.y),
                 }
             }; // first column of transposed rotation matrix scaled by -0.5
-            return halfMagnetic;
+            return halfWest;
         }
         case FusionConventionNed: {
-            const FusionVector halfMagnetic = {
+            const FusionVector halfWest = {
                 .axis = {
                     .x = -1.0f * (Q.x * Q.y + Q.w * Q.z),
                     .y = 0.5f - Q.w * Q.w - Q.y * Q.y,
                     .z = Q.w * Q.x - Q.y * Q.z,
                 }
             }; // second column of transposed rotation matrix scaled by -0.5
-            return halfMagnetic;
+            return halfWest;
         }
     }
 #undef Q
