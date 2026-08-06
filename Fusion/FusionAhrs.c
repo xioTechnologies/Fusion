@@ -137,8 +137,12 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     // Restart if gyroscope range exceeded
     if ((fabsf(gyroscope.axis.x) > ahrs->gyroscopeRange) || (fabsf(gyroscope.axis.y) > ahrs->gyroscopeRange) || (fabsf(gyroscope.axis.z) > ahrs->gyroscopeRange)) {
         const FusionQuaternion quaternion = ahrs->quaternion;
+        const FusionVector accelerometer_ = ahrs->accelerometer;
+        const FusionVector halfGravity = ahrs->halfGravity;
         FusionAhrsRestart(ahrs);
         ahrs->quaternion = quaternion;
+        ahrs->accelerometer = accelerometer_;
+        ahrs->halfGravity = halfGravity;
         ahrs->angularRateRecovery = true;
     }
 
