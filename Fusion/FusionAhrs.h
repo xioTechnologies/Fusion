@@ -52,8 +52,8 @@ typedef struct {
 
     // Startup
     bool startup;
-    float rampedGain;
-    float rampedGainStep;
+    float startupGain;
+    float startupGainRate;
 
     // Gyroscope overrange
     bool overrangeRecovery;

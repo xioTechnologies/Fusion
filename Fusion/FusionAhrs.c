@@ -15,9 +15,9 @@
 // Definitions
 
 /**
- * @brief Gain used during startup.
+ * @brief Initial startup gain.
  */
-#define STARTUP_GAIN (10.0f)
+#define INITIAL_STARTUP_GAIN (10.0f)
 
 /**
  * @brief Startup period in seconds.
@@ -30,6 +30,8 @@
 static inline void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope);
 
 static inline void SoftRestart(FusionAhrs *const ahrs);
+
+static inline float Startup(FusionAhrs *const ahrs);
 
 static inline FusionVector HalfGravity(const FusionAhrs *const ahrs);
 
@@ -86,10 +88,6 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
         ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
         ahrs->magneticRejection = FLT_MAX;
     }
-    if (ahrs->startup == false) {
-        ahrs->rampedGain = ahrs->gain;
-    }
-    ahrs->rampedGainStep = (STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD;
 }
 
 /**
@@ -114,7 +112,8 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
 
     // Startup
     ahrs->startup = true;
-    ahrs->rampedGain = STARTUP_GAIN;
+    ahrs->startupGain = INITIAL_STARTUP_GAIN;
+    ahrs->startupGainRate = (INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD;
 
     // Gyroscope overrange
     ahrs->overrangeRecovery = false;
@@ -145,14 +144,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     Overrange(ahrs, gyroscope);
 
     // Ramp down gain during startup
-    if (ahrs->startup) {
-        ahrs->rampedGain -= ahrs->rampedGainStep * ahrs->samplePeriod;
-        if ((ahrs->rampedGain < ahrs->gain) || (ahrs->gain == 0.0f)) {
-            ahrs->rampedGain = ahrs->gain;
-            ahrs->startup = false;
-            ahrs->overrangeRecovery = false;
-        }
-    }
+    const float gain = Startup(ahrs);
 
     // Calculate direction of gravity indicated by algorithm
     ahrs->halfGravity = HalfGravity(ahrs);
@@ -224,7 +216,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     const FusionVector halfGyroscope = FusionVectorScale(gyroscope, FusionDegreesToRadians(0.5f));
 
     // Apply feedback to gyroscope
-    const FusionVector adjustedHalfGyroscope = FusionVectorAdd(halfGyroscope, FusionVectorScale(FusionVectorAdd(halfInclinationFeedback, halfHeadingFeedback), ahrs->rampedGain));
+    const FusionVector adjustedHalfGyroscope = FusionVectorAdd(halfGyroscope, FusionVectorScale(FusionVectorAdd(halfInclinationFeedback, halfHeadingFeedback), gain));
 
     // Integrate rate of change of quaternion
     ahrs->quaternion = FusionQuaternionAdd(ahrs->quaternion, FusionQuaternionVectorProduct(ahrs->quaternion, FusionVectorScale(adjustedHalfGyroscope, ahrs->samplePeriod)));
@@ -267,6 +259,28 @@ static inline void SoftRestart(FusionAhrs *const ahrs) {
     ahrs->quaternion = quaternion;
     ahrs->accelerometer = accelerometer;
     ahrs->halfGravity = halfGravity;
+}
+
+/**
+ * @brief Ramps down the gain during startup.
+ * @param ahrs AHRS structure.
+ * @return Gain.
+ */
+static inline float Startup(FusionAhrs *const ahrs) {
+    if (ahrs->startup == false) {
+        return ahrs->gain;
+    }
+
+    ahrs->startupGain -= ahrs->startupGainRate * ahrs->samplePeriod;
+
+    if (ahrs->startupGain > ahrs->gain) {
+        return ahrs->startupGain;
+    }
+
+    ahrs->startup = false;
+    ahrs->overrangeRecovery = false;
+
+    return ahrs->gain;
 }
 
 /**
