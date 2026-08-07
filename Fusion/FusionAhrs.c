@@ -109,7 +109,6 @@ void FusionAhrsSetSamplePeriod(FusionAhrs *const ahrs, const float samplePeriod)
 void FusionAhrsRestart(FusionAhrs *const ahrs) {
     ahrs->quaternion = FUSION_QUATERNION_IDENTITY;
     ahrs->accelerometer = FUSION_VECTOR_ZERO;
-    ahrs->halfGravity = FUSION_VECTOR_ZERO;
 
     ahrs->startup = true;
     ahrs->startupGain = INITIAL_STARTUP_GAIN;
@@ -156,14 +155,14 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     const float gain = Startup(ahrs);
 
     // Calculate direction of gravity indicated by algorithm
-    ahrs->halfGravity = HalfGravity(ahrs);
+    const FusionVector halfGravity = HalfGravity(ahrs);
 
     // Calculate accelerometer feedback
     FusionVector halfInclinationFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = true;
     if (FusionVectorIsZero(accelerometer) == false) {
         // Calculate accelerometer residual scaled by 0.5
-        ahrs->halfAccelerometerResidual = Residual(FusionVectorNormalise(accelerometer), ahrs->halfGravity);
+        ahrs->halfAccelerometerResidual = Residual(FusionVectorNormalise(accelerometer), halfGravity);
 
         // Don't ignore accelerometer if acceleration error below threshold
         if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfAccelerometerResidual) <= ahrs->accelerationRejection)) {
@@ -196,7 +195,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         const FusionVector halfWest = HalfWest(ahrs);
 
         // Calculate magnetometer residual scaled by 0.5
-        ahrs->halfMagnetometerResidual = Residual(FusionVectorNormalise(FusionVectorCross(ahrs->halfGravity, magnetometer)), halfWest);
+        ahrs->halfMagnetometerResidual = Residual(FusionVectorNormalise(FusionVectorCross(halfGravity, magnetometer)), halfWest);
 
         // Don't ignore magnetometer if magnetic error below threshold
         if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerResidual) <= ahrs->magneticRejection)) {
@@ -261,13 +260,11 @@ static inline void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscop
 static inline void SoftRestart(FusionAhrs *const ahrs) {
     const FusionQuaternion quaternion = ahrs->quaternion;
     const FusionVector accelerometer = ahrs->accelerometer;
-    const FusionVector halfGravity = ahrs->halfGravity;
 
     FusionAhrsRestart(ahrs);
 
     ahrs->quaternion = quaternion;
     ahrs->accelerometer = accelerometer;
-    ahrs->halfGravity = halfGravity;
 }
 
 /**
@@ -467,7 +464,7 @@ void FusionAhrsSetQuaternion(FusionAhrs *const ahrs, const FusionQuaternion quat
  * @return Direction of gravity as a unit vector.
  */
 FusionVector FusionAhrsGetGravity(const FusionAhrs *const ahrs) {
-    return FusionVectorScale(ahrs->halfGravity, 2.0f);
+    return FusionVectorScale(HalfGravity(ahrs), 2.0f);
 }
 
 /**

@@ -48,7 +48,6 @@ typedef struct {
     // Outputs
     FusionQuaternion quaternion;
     FusionVector accelerometer;
-    FusionVector halfGravity;
 
     // Startup
     bool startup;
