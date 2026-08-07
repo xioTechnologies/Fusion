@@ -58,15 +58,17 @@ typedef struct {
     // Gyroscope overrange
     bool overrangeRecovery;
 
-    // Acceleration and magnetic rejection
+    // Acceleration rejection
     FusionVector halfAccelerometerResidual;
-    FusionVector halfMagnetometerResidual;
-    bool accelerometerIgnored;
     int32_t accelerationRecoveryTrigger;
     int32_t accelerationRecoveryThreshold;
-    bool magnetometerIgnored;
+    bool accelerometerIgnored;
+
+    // Magnetic rejection
+    FusionVector halfMagnetometerResidual;
     int32_t magneticRecoveryTrigger;
     int32_t magneticRecoveryThreshold;
+    bool magnetometerIgnored;
 } FusionAhrs;
 
 /**
