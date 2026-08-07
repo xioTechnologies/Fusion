@@ -65,7 +65,7 @@ for index in range(len(timestamp)):
     flags[index] = np.array(
         [
             ahrs_flags.startup,
-            ahrs_flags.angular_rate_recovery,
+            ahrs_flags.overrange_recovery,
             ahrs_flags.acceleration_recovery,
             ahrs_flags.magnetic_recovery,
         ]
@@ -95,8 +95,8 @@ axes[0].legend()
 # Plot startup flag
 plot_bool(axes[1], timestamp, flags[:, 0], "Startup")
 
-# Plot angular rate recovery flag
-plot_bool(axes[2], timestamp, flags[:, 1], "Angular rate recovery")
+# Plot overrange recovery flag
+plot_bool(axes[2], timestamp, flags[:, 1], "Overrange recovery")
 
 # Plot acceleration rejection internal states and flag
 axes[3].plot(timestamp, internal_states[:, 0], "tab:olive", label="Acceleration error")

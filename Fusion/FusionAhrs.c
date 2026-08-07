@@ -69,7 +69,7 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
     ahrs->samplePeriod = 1.0f / settings->sampleRate;
     ahrs->convention = settings->convention;
     ahrs->gain = settings->gain;
-    ahrs->gyroscopeRange = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
+    ahrs->overrangeThreshold = settings->gyroscopeRange == 0.0f ? FLT_MAX : 0.98f * settings->gyroscopeRange;
     ahrs->accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
     ahrs->magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
     ahrs->rejectionTimeout = (int32_t) (settings->sampleRate * settings->rejectionTimeout);
@@ -110,7 +110,7 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
     ahrs->rampedGain = STARTUP_GAIN;
 
     // Gyroscope overrange
-    ahrs->angularRateRecovery = false;
+    ahrs->overrangeRecovery = false;
 
     // Acceleration and magnetic rejection
     ahrs->halfAccelerometerResidual = FUSION_VECTOR_ZERO;
@@ -135,7 +135,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     ahrs->accelerometer = accelerometer;
 
     // Restart if gyroscope range exceeded
-    if ((fabsf(gyroscope.axis.x) > ahrs->gyroscopeRange) || (fabsf(gyroscope.axis.y) > ahrs->gyroscopeRange) || (fabsf(gyroscope.axis.z) > ahrs->gyroscopeRange)) {
+    if ((fabsf(gyroscope.axis.x) > ahrs->overrangeThreshold) || (fabsf(gyroscope.axis.y) > ahrs->overrangeThreshold) || (fabsf(gyroscope.axis.z) > ahrs->overrangeThreshold)) {
         const FusionQuaternion quaternion = ahrs->quaternion;
         const FusionVector accelerometer_ = ahrs->accelerometer;
         const FusionVector halfGravity = ahrs->halfGravity;
@@ -143,7 +143,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         ahrs->quaternion = quaternion;
         ahrs->accelerometer = accelerometer_;
         ahrs->halfGravity = halfGravity;
-        ahrs->angularRateRecovery = true;
+        ahrs->overrangeRecovery = true;
     }
 
     // Ramp down gain during startup
@@ -152,7 +152,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         if ((ahrs->rampedGain < ahrs->gain) || (ahrs->gain == 0.0f)) {
             ahrs->rampedGain = ahrs->gain;
             ahrs->startup = false;
-            ahrs->angularRateRecovery = false;
+            ahrs->overrangeRecovery = false;
         }
     }
 
@@ -477,7 +477,7 @@ FusionAhrsInternalStates FusionAhrsGetInternalStates(const FusionAhrs *const ahr
 FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
     const FusionAhrsFlags flags = {
         .startup = ahrs->startup,
-        .angularRateRecovery = ahrs->angularRateRecovery,
+        .overrangeRecovery = ahrs->overrangeRecovery,
         .accelerationRecovery = ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryThreshold,
         .magneticRecovery = ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryThreshold,
     };

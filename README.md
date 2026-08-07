@@ -18,11 +18,11 @@ The algorithm calculates the orientation as the integration of the gyroscope sum
 
 ### Startup
 
-Startup occurs when the algorithm starts for the first time and during angular rate recovery. During startup, the acceleration and magnetic rejection features are disabled and the gain is ramped down from 10 to the final value over a 3 second period. This allows the measurement of orientation to rapidly converge from an arbitrary initial value to the value indicated by the sensors.
+Startup occurs when the algorithm starts for the first time and during overrange recovery. During startup, the acceleration and magnetic rejection features are disabled and the gain is ramped down from 10 to the final value over a 3 second period. This allows the measurement of orientation to rapidly converge from an arbitrary initial value to the value indicated by the sensors.
 
-### Angular rate recovery
+### Overrange recovery
 
-Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an angular rate recovery. Angular rate recovery is activated when the angular rate exceeds 98% of the gyroscope measurement range and will trigger a restart of the algorithm.
+Angular rates that exceed the gyroscope measurement range cannot be tracked and will trigger an overrange recovery. Overrange recovery is activated when the angular rate exceeds 98% of the gyroscope measurement range and will trigger a restart of the algorithm.
 
 ### Acceleration rejection
 
@@ -42,15 +42,15 @@ The algorithm provides four outputs: quaternion, gravity, linear acceleration, a
 
 The AHRS algorithm settings are defined by the `FusionAhrsSettings` structure and set using the `FusionAhrsSetSettings` function.
 
-| Setting                 | Description                                                                                                                                                                                                                                                |
-|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `sampleRate`            | Sample rate (in Hz).                                                                                                                                                                                                                                       |
-| `convention`            | Earth axes convention (NWU, ENU, or NED).                                                                                                                                                                                                                  |
-| `gain`                  | Determines the influence of the gyroscope relative to other sensors. A value of zero will disable startup and the acceleration and magnetic rejection features. A value of 0.5 is appropriate for most applications.                                       |
-| `gyroscopeRange`        | Gyroscope range (in degrees per second). Angular rate recovery will activate if the gyroscope measurement exceeds 98% of this value. A value of zero will disable this feature. The value should be set to the range specified in the gyroscope datasheet. |
-| `accelerationRejection` | Threshold (in degrees) used by the acceleration rejection feature. A value of zero will disable this feature. A value of 10 degrees is appropriate for most applications.                                                                                  |
-| `magneticRejection`     | Threshold (in degrees) used by the magnetic rejection feature. A value of zero will disable the feature. A value of 10 degrees is appropriate for most applications.                                                                                       |
-| `rejectionTimeout`      | Acceleration and magnetic recovery trigger timeout (in seconds). A value of zero will disable the acceleration and magnetic rejection features. A period of 5 seconds is appropriate for most applications.                                                |
+| Setting                 | Description                                                                                                                                                                                                                                             |
+|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `sampleRate`            | Sample rate (in Hz).                                                                                                                                                                                                                                    |
+| `convention`            | Earth axes convention (NWU, ENU, or NED).                                                                                                                                                                                                               |
+| `gain`                  | Determines the influence of the gyroscope relative to other sensors. A value of zero will disable startup and the acceleration and magnetic rejection features. A value of 0.5 is appropriate for most applications.                                    |
+| `gyroscopeRange`        | Gyroscope range (in degrees per second). Overrange recovery will activate if the gyroscope measurement exceeds 98% of this value. A value of zero will disable this feature. The value should be set to the range specified in the gyroscope datasheet. |
+| `accelerationRejection` | Threshold (in degrees) used by the acceleration rejection feature. A value of zero will disable this feature. A value of 10 degrees is appropriate for most applications.                                                                               |
+| `magneticRejection`     | Threshold (in degrees) used by the magnetic rejection feature. A value of zero will disable the feature. A value of 10 degrees is appropriate for most applications.                                                                                    |
+| `rejectionTimeout`      | Acceleration and magnetic recovery trigger timeout (in seconds). A value of zero will disable the acceleration and magnetic rejection features. A period of 5 seconds is appropriate for most applications.                                             |
 
 ### Algorithm internal states
 
@@ -72,7 +72,7 @@ The AHRS algorithm flags are defined by the `FusionAhrsFlags` structure and obta
 | Flag                   | Description                          |
 |------------------------|--------------------------------------|
 | `startup`              | `true` during algorithm startup.     |
-| `angularRateRecovery`  | `true` during angular rate recovery. |
+| `overrangeRecovery`    | `true` during overrange recovery.    |
 | `accelerationRecovery` | `true` during acceleration recovery. |
 | `magneticRecovery`     | `true` during magnetic recovery.     |
 

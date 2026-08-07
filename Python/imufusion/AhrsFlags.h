@@ -17,8 +17,8 @@ static PyObject *ahrs_flags_get_startup(AhrsFlags *self) {
     return PyBool_FromLong((long) self->wrapped.startup);
 }
 
-static PyObject *ahrs_flags_get_angular_rate_recovery(AhrsFlags *self) {
-    return PyBool_FromLong((long) self->wrapped.angularRateRecovery);
+static PyObject *ahrs_flags_get_overrange_recovery(AhrsFlags *self) {
+    return PyBool_FromLong((long) self->wrapped.overrangeRecovery);
 }
 
 static PyObject *ahrs_flags_get_acceleration_recovery(AhrsFlags *self) {
@@ -31,7 +31,7 @@ static PyObject *ahrs_flags_get_magnetic_recovery(AhrsFlags *self) {
 
 static PyGetSetDef ahrs_flags_get_set[] = {
     {"startup", (getter) ahrs_flags_get_startup, NULL, "", NULL},
-    {"angular_rate_recovery", (getter) ahrs_flags_get_angular_rate_recovery, NULL, "", NULL},
+    {"overrange_recovery", (getter) ahrs_flags_get_overrange_recovery, NULL, "", NULL},
     {"acceleration_recovery", (getter) ahrs_flags_get_acceleration_recovery, NULL, "", NULL},
     {"magnetic_recovery", (getter) ahrs_flags_get_magnetic_recovery, NULL, "", NULL},
     {NULL} /* sentinel */
