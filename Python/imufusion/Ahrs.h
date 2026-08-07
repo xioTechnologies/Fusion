@@ -59,6 +59,11 @@ static PyObject *ahrs_restart(Ahrs *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
+static PyObject *ahrs_skip_startup(Ahrs *self, PyObject *args) {
+    FusionAhrsSkipStartup(&self->wrapped);
+    Py_RETURN_NONE;
+}
+
 static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
     PyObject *gyroscope_object;
     PyObject *accelerometer_object;
@@ -201,6 +206,7 @@ static PyMethodDef ahrs_methods[] = {
     {"set_settings", (PyCFunction) ahrs_set_settings, METH_O, ""},
     {"set_sample_period", (PyCFunction) ahrs_set_sample_period, METH_O, ""},
     {"restart", (PyCFunction) ahrs_restart, METH_NOARGS, ""},
+    {"skip_startup", (PyCFunction) ahrs_skip_startup, METH_NOARGS, ""},
     {"update", (PyCFunction) ahrs_update, METH_VARARGS, ""},
     {"update_no_magnetometer", (PyCFunction) ahrs_update_no_magnetometer, METH_VARARGS, ""},
     {"update_external_heading", (PyCFunction) ahrs_update_external_heading, METH_VARARGS, ""},

@@ -130,6 +130,16 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
 }
 
 /**
+ * @brief Skips startup. This function is intended to be called before the
+ * first algorithm update when the initial orientation is already known.
+ * @param ahrs AHRS structure.
+ */
+void FusionAhrsSkipStartup(FusionAhrs *const ahrs) {
+    ahrs->startup = false;
+    ahrs->overrangeRecovery = false;
+}
+
+/**
  * @brief Updates the AHRS algorithm using the gyroscope, accelerometer, and
  * magnetometer.
  * @param ahrs AHRS structure.
