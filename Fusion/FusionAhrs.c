@@ -223,11 +223,14 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     // Convert gyroscope to radians per second scaled by 0.5
     const FusionVector halfGyroscope = FusionVectorScale(gyroscope, FusionDegreesToRadians(0.5f));
 
+    // Calculate feedback
+    const FusionVector halfFeedback = FusionVectorAdd(halfInclinationFeedback, halfHeadingFeedback);
+
     // Apply feedback to gyroscope
-    const FusionVector adjustedHalfGyroscope = FusionVectorAdd(halfGyroscope, FusionVectorScale(FusionVectorAdd(halfInclinationFeedback, halfHeadingFeedback), gain));
+    const FusionVector halfAngularRate = FusionVectorAdd(halfGyroscope, FusionVectorScale(halfFeedback, gain));
 
     // Integrate rate of change of quaternion
-    ahrs->quaternion = FusionQuaternionAdd(ahrs->quaternion, FusionQuaternionVectorProduct(ahrs->quaternion, FusionVectorScale(adjustedHalfGyroscope, ahrs->samplePeriod)));
+    ahrs->quaternion = FusionQuaternionAdd(ahrs->quaternion, FusionQuaternionVectorProduct(ahrs->quaternion, FusionVectorScale(halfAngularRate, ahrs->samplePeriod)));
 
     // Normalise quaternion
     ahrs->quaternion = FusionQuaternionNormalise(ahrs->quaternion);
