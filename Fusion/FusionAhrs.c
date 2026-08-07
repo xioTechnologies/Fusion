@@ -82,8 +82,10 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
     ahrs->accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
     ahrs->magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
     ahrs->rejectionTimeout = (int32_t) (settings->sampleRate * settings->rejectionTimeout);
+
     ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
     ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
+
     if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0.0f)) {
         ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
         ahrs->magneticRejection = FLT_MAX;
@@ -105,28 +107,25 @@ void FusionAhrsSetSamplePeriod(FusionAhrs *const ahrs, const float samplePeriod)
  * @param ahrs AHRS structure.
  */
 void FusionAhrsRestart(FusionAhrs *const ahrs) {
-    // Outputs
     ahrs->quaternion = FUSION_QUATERNION_IDENTITY;
     ahrs->accelerometer = FUSION_VECTOR_ZERO;
     ahrs->halfGravity = FUSION_VECTOR_ZERO;
 
-    // Startup
     ahrs->startup = true;
     ahrs->startupGain = INITIAL_STARTUP_GAIN;
     ahrs->startupGainRate = (INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD;
 
-    // Gyroscope overrange
     ahrs->overrangeRecovery = false;
 
-    // Acceleration and magnetic rejection
     ahrs->halfAccelerometerResidual = FUSION_VECTOR_ZERO;
-    ahrs->halfMagnetometerResidual = FUSION_VECTOR_ZERO;
-    ahrs->accelerometerIgnored = false;
     ahrs->accelerationRecoveryTrigger = 0;
     ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
-    ahrs->magnetometerIgnored = false;
+    ahrs->accelerometerIgnored = false;
+
+    ahrs->halfMagnetometerResidual = FUSION_VECTOR_ZERO;
     ahrs->magneticRecoveryTrigger = 0;
     ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
+    ahrs->magnetometerIgnored = false;
 }
 
 /**
