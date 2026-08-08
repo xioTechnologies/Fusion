@@ -40,7 +40,8 @@ static PyObject *ahrs_set_settings(Ahrs *self, PyObject *arg) {
     }
 
     FusionAhrsSetSettings(&self->wrapped, &settings->wrapped);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_set_sample_period(Ahrs *self, PyObject *arg) {
@@ -51,17 +52,20 @@ static PyObject *ahrs_set_sample_period(Ahrs *self, PyObject *arg) {
     }
 
     FusionAhrsSetSamplePeriod(&self->wrapped, sample_period);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_restart(Ahrs *self, PyObject *args) {
     FusionAhrsRestart(&self->wrapped);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_skip_startup(Ahrs *self, PyObject *args) {
     FusionAhrsSkipStartup(&self->wrapped);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
@@ -92,7 +96,8 @@ static PyObject *ahrs_update(Ahrs *self, PyObject *args) {
     }
 
     FusionAhrsUpdate(&self->wrapped, gyroscope, accelerometer, magnetometer);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
@@ -116,7 +121,8 @@ static PyObject *ahrs_update_no_magnetometer(Ahrs *self, PyObject *args) {
     }
 
     FusionAhrsUpdateNoMagnetometer(&self->wrapped, gyroscope, accelerometer);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
@@ -141,7 +147,8 @@ static PyObject *ahrs_update_external_heading(Ahrs *self, PyObject *args) {
     }
 
     FusionAhrsUpdateExternalHeading(&self->wrapped, gyroscope, accelerometer, heading);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_get_quaternion(Ahrs *self, PyObject *args) {
@@ -158,7 +165,8 @@ static PyObject *ahrs_set_quaternion(Ahrs *self, PyObject *arg) {
     }
 
     FusionAhrsSetQuaternion(&self->wrapped, quaternion);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *ahrs_get_gravity(Ahrs *self, PyObject *args) {
@@ -199,7 +207,8 @@ static PyObject *ahrs_set_heading(Ahrs *self, PyObject *arg) {
     }
 
     FusionAhrsSetHeading(&self->wrapped, heading);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyMethodDef ahrs_methods[] = {
