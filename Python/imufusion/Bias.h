@@ -38,7 +38,8 @@ static PyObject *bias_set_settings(Bias *self, PyObject *arg) {
     }
 
     FusionBiasSetSettings(&self->wrapped, &settings->wrapped);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyObject *bias_update(Bias *self, PyObject *arg) {
@@ -67,7 +68,8 @@ static PyObject *bias_set_offset(Bias *self, PyObject *arg) {
     }
 
     FusionBiasSetOffset(&self->wrapped, offset);
-    Py_RETURN_NONE;
+    Py_INCREF(self);
+    return (PyObject *) self;
 }
 
 static PyMethodDef bias_methods[] = {
