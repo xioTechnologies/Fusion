@@ -575,6 +575,7 @@ void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
     const float yaw = atan2f(Q.w * Q.z + Q.x * Q.y, 0.5f - Q.y * Q.y - Q.z * Q.z);
 #undef Q
     const float halfYawMinusHeading = 0.5f * (yaw - FusionDegreesToRadians(heading));
+
     const FusionQuaternion rotation = {
         .element = {
             .w = cosf(halfYawMinusHeading),
@@ -583,6 +584,7 @@ void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
             .z = -1.0f * sinf(halfYawMinusHeading),
         }
     };
+
     ahrs->quaternion = FusionQuaternionProduct(rotation, ahrs->quaternion);
 }
 
