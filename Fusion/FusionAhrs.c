@@ -30,8 +30,6 @@
 
 static FUSION_INLINE void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope);
 
-static FUSION_INLINE void SoftRestart(FusionAhrs *const ahrs);
-
 static FUSION_INLINE float Startup(FusionAhrs *const ahrs);
 
 static FUSION_INLINE FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector accelerometer);
@@ -135,6 +133,20 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
 }
 
 /**
+ * @brief Restarts the AHRS algorithm while preserving outputs.
+ * @param ahrs AHRS structure.
+ */
+void FusionAhrsSoftRestart(FusionAhrs *const ahrs) {
+    const FusionQuaternion quaternion = ahrs->quaternion;
+    const FusionVector accelerometer = ahrs->accelerometer;
+
+    FusionAhrsRestart(ahrs);
+
+    ahrs->quaternion = quaternion;
+    ahrs->accelerometer = accelerometer;
+}
+
+/**
  * @brief Skips startup. This function is intended to be called before the
  * first algorithm update when the initial orientation is already known.
  * @param ahrs AHRS structure.
@@ -188,22 +200,8 @@ static FUSION_INLINE void Overrange(FusionAhrs *const ahrs, const FusionVector g
         return;
     }
 
-    SoftRestart(ahrs);
+    FusionAhrsSoftRestart(ahrs);
     ahrs->overrangeRecovery = true;
-}
-
-/**
- * @brief Restarts the AHRS algorithm while preserving outputs.
- * @param ahrs AHRS structure.
- */
-static FUSION_INLINE void SoftRestart(FusionAhrs *const ahrs) {
-    const FusionQuaternion quaternion = ahrs->quaternion;
-    const FusionVector accelerometer = ahrs->accelerometer;
-
-    FusionAhrsRestart(ahrs);
-
-    ahrs->quaternion = quaternion;
-    ahrs->accelerometer = accelerometer;
 }
 
 /**
