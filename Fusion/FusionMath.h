@@ -193,6 +193,18 @@ static inline bool FusionVectorIsZero(const FusionVector v) {
 }
 
 /**
+ * @brief Returns true if the vectors are equal.
+ * @param a Vector a.
+ * @param b Vector b.
+ * @return True if the vectors are equal.
+ */
+static inline bool FusionVectorEqual(const FusionVector a, const FusionVector b) {
+    return (a.axis.x == b.axis.x) &&
+           (a.axis.y == b.axis.y) &&
+           (a.axis.z == b.axis.z);
+}
+
+/**
  * @brief Returns the sum of two vectors.
  * @param a Vector a.
  * @param b Vector b.
