@@ -97,8 +97,9 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
 }
 
 /**
- * @brief Sets the sample period. This function is intended to be called before
- * each algorithm update to compensate for gyroscope sample clock errors.
+ * @brief Sets the sample period. The sample period must be approximately equal
+ * to the current settings. This function is intended to be called before each
+ * algorithm update to compensate for gyroscope sample clock errors.
  * @param ahrs AHRS structure.
  * @param samplePeriod Sample period in seconds.
  */
