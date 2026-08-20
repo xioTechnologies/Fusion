@@ -78,7 +78,9 @@ void FusionAhrsInitialise(FusionAhrs *const ahrs) {
 void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *const settings) {
     ahrs->samplePeriod = 1.0f / settings->sampleRate;
     ahrs->convention = settings->convention;
+
     ahrs->gain = settings->gain;
+    ahrs->startupGainRate = ((INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD) * ahrs->samplePeriod;
 
     ahrs->overrangeEnabled = settings->gyroscopeRange > 0.0f;
     ahrs->overrangeThreshold = 0.98f * settings->gyroscopeRange;
@@ -117,7 +119,6 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
 
     ahrs->startup = true;
     ahrs->startupGain = INITIAL_STARTUP_GAIN;
-    ahrs->startupGainRate = ((INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD) * ahrs->samplePeriod;
 
     ahrs->overrangeRecovery = false;
 
