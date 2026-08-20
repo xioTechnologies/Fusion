@@ -39,6 +39,7 @@ typedef struct {
     float samplePeriod;
     FusionConvention convention;
     float gain;
+    float startupGainRate;
     bool overrangeEnabled;
     float overrangeThreshold;
     float accelerationRejection;
@@ -52,7 +53,6 @@ typedef struct {
     // Startup
     bool startup;
     float startupGain;
-    float startupGainRate;
 
     // Gyroscope overrange
     bool overrangeRecovery;
