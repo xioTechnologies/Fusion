@@ -7,7 +7,6 @@
 //------------------------------------------------------------------------------
 // Includes
 
-#include <float.h>
 #include "FusionAhrs.h"
 #include "FusionInline.h"
 #include <math.h>
@@ -63,7 +62,7 @@ const FusionAhrsSettings fusionAhrsDefaultSettings = {
     .gyroscopeRange = 0.0f,
     .accelerationRejection = 0.0f,
     .magneticRejection = 0.0f,
-    .rejectionTimeout = 0.0f,
+    .rejectionTimeout = 10.0f,
     .anchorCutoff = 0.01f,
     .anchorDuration = 5.0f,
 };
@@ -103,23 +102,17 @@ void FusionAhrsSetSettings(FusionAhrs *const ahrs, const FusionAhrsSettings *con
     ahrs->overrangeEnabled = settings->gyroscopeRange > 0.0f;
     ahrs->overrangeThreshold = 0.98f * settings->gyroscopeRange;
 
-    ahrs->accelerationRejection = settings->accelerationRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
-    ahrs->magneticRejection = settings->magneticRejection == 0.0f ? FLT_MAX : powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
-    ahrs->rejectionTimeout = (int32_t) (settings->sampleRate * settings->rejectionTimeout);
+    ahrs->accelerationRejectionEnabled = (settings->accelerationRejection > 0.0f) && (settings->gain > 0.0f);
+    ahrs->accelerationRejectionThreshold = powf(0.5f * sinf(FusionDegreesToRadians(settings->accelerationRejection)), 2);
 
+    ahrs->magneticRejectionEnabled = (settings->magneticRejection > 0.0f) && (settings->gain > 0.0f) && (settings->headingMode == FusionAhrsHeadingModeMagnetic);
+    ahrs->magneticRejectionThreshold = powf(0.5f * sinf(FusionDegreesToRadians(settings->magneticRejection)), 2);
+
+    ahrs->rejectionTimeout = (int32_t) (settings->sampleRate * settings->rejectionTimeout);
     ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
     ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
 
     ahrs->anchorDuration = (uint32_t) (settings->sampleRate * settings->anchorDuration);
-
-    if ((settings->gain == 0.0f) || (settings->rejectionTimeout == 0.0f)) {
-        ahrs->accelerationRejection = FLT_MAX; // disable acceleration and magnetic rejection features if gain is zero
-        ahrs->magneticRejection = FLT_MAX;
-    }
-
-    if (ahrs->headingMode != FusionAhrsHeadingModeMagnetic) {
-        ahrs->magneticRejection = FLT_MAX;
-    }
 }
 
 /**
@@ -390,35 +383,37 @@ static FUSION_INLINE void Startup(FusionAhrs *const ahrs) {
  * @return Inclination feedback scaled by 0.5.
  */
 static FUSION_INLINE FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector accelerometer) {
-    FusionVector halfInclinationFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = true;
-    if (FusionVectorIsZero(accelerometer) == false) {
-        // Calculate accelerometer residual scaled by 0.5
-        ahrs->halfAccelerometerResidual = Residual(FusionVectorNormalise(accelerometer), halfGravity);
 
-        // Don't ignore accelerometer if acceleration error below threshold
-        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfAccelerometerResidual) <= ahrs->accelerationRejection)) {
-            ahrs->accelerometerIgnored = false;
-            ahrs->accelerationRecoveryTrigger -= 9;
-        } else {
-            ahrs->accelerationRecoveryTrigger += 1;
-        }
-
-        // Don't ignore accelerometer during acceleration recovery
-        if (ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryThreshold) {
-            ahrs->accelerationRecoveryThreshold = 0;
-            ahrs->accelerometerIgnored = false;
-        } else {
-            ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
-        }
-        ahrs->accelerationRecoveryTrigger = Clamp(ahrs->accelerationRecoveryTrigger, 0, ahrs->rejectionTimeout);
-
-        // Apply accelerometer feedback
-        if (ahrs->accelerometerIgnored == false) {
-            halfInclinationFeedback = ahrs->halfAccelerometerResidual;
-        }
+    if (FusionVectorIsZero(accelerometer)) {
+        return FUSION_VECTOR_ZERO;
     }
-    return halfInclinationFeedback;
+
+    ahrs->halfAccelerometerResidual = Residual(FusionVectorNormalise(accelerometer), halfGravity);
+
+    if (ahrs->accelerationRejectionEnabled == false) {
+        ahrs->accelerometerIgnored = false;
+        return ahrs->halfAccelerometerResidual;
+    }
+
+    // Don't ignore accelerometer if acceleration error below threshold
+    if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfAccelerometerResidual) <= ahrs->accelerationRejectionThreshold)) {
+        ahrs->accelerometerIgnored = false;
+        ahrs->accelerationRecoveryTrigger -= 9;
+    } else {
+        ahrs->accelerationRecoveryTrigger += 1;
+    }
+
+    // Don't ignore accelerometer during acceleration recovery
+    if (ahrs->accelerationRecoveryTrigger > ahrs->accelerationRecoveryThreshold) {
+        ahrs->accelerationRecoveryThreshold = 0;
+        ahrs->accelerometerIgnored = false;
+    } else {
+        ahrs->accelerationRecoveryThreshold = ahrs->rejectionTimeout;
+    }
+    ahrs->accelerationRecoveryTrigger = Clamp(ahrs->accelerationRecoveryTrigger, 0, ahrs->rejectionTimeout);
+
+    return ahrs->accelerometerIgnored ? FUSION_VECTOR_ZERO : ahrs->halfAccelerometerResidual;
 }
 
 /**
@@ -429,38 +424,37 @@ static FUSION_INLINE FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs
  * @return Heading feedback scaled by 0.5.
  */
 static FUSION_INLINE FusionVector HalfHeadingFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector magnetometer) {
-    FusionVector halfHeadingFeedback = FUSION_VECTOR_ZERO;
     ahrs->magnetometerIgnored = true;
-    if (FusionVectorIsZero(magnetometer) == false) {
-        // Calculate direction of magnetic field indicated by algorithm
-        const FusionVector halfWest = HalfWest(ahrs);
 
-        // Calculate magnetometer residual scaled by 0.5
-        ahrs->halfMagnetometerResidual = Residual(FusionVectorNormalise(FusionVectorCross(halfGravity, magnetometer)), halfWest);
-
-        // Don't ignore magnetometer if magnetic error below threshold
-        if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerResidual) <= ahrs->magneticRejection)) {
-            ahrs->magnetometerIgnored = false;
-            ahrs->magneticRecoveryTrigger -= 9;
-        } else {
-            ahrs->magneticRecoveryTrigger += 1;
-        }
-
-        // Don't ignore magnetometer during magnetic recovery
-        if (ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryThreshold) {
-            ahrs->magneticRecoveryThreshold = 0;
-            ahrs->magnetometerIgnored = false;
-        } else {
-            ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
-        }
-        ahrs->magneticRecoveryTrigger = Clamp(ahrs->magneticRecoveryTrigger, 0, ahrs->rejectionTimeout);
-
-        // Apply magnetometer feedback
-        if (ahrs->magnetometerIgnored == false) {
-            halfHeadingFeedback = ahrs->halfMagnetometerResidual;
-        }
+    if (FusionVectorIsZero(magnetometer)) {
+        return FUSION_VECTOR_ZERO;
     }
-    return halfHeadingFeedback;
+
+    ahrs->halfMagnetometerResidual = Residual(FusionVectorNormalise(FusionVectorCross(halfGravity, magnetometer)), HalfWest(ahrs));
+
+    if (ahrs->magneticRejectionEnabled == false) {
+        ahrs->magnetometerIgnored = false;
+        return ahrs->halfMagnetometerResidual;
+    }
+
+    // Don't ignore magnetometer if magnetic error below threshold
+    if (ahrs->startup || (FusionVectorNormSquared(ahrs->halfMagnetometerResidual) <= ahrs->magneticRejectionThreshold)) {
+        ahrs->magnetometerIgnored = false;
+        ahrs->magneticRecoveryTrigger -= 9;
+    } else {
+        ahrs->magneticRecoveryTrigger += 1;
+    }
+
+    // Don't ignore magnetometer during magnetic recovery
+    if (ahrs->magneticRecoveryTrigger > ahrs->magneticRecoveryThreshold) {
+        ahrs->magneticRecoveryThreshold = 0;
+        ahrs->magnetometerIgnored = false;
+    } else {
+        ahrs->magneticRecoveryThreshold = ahrs->rejectionTimeout;
+    }
+    ahrs->magneticRecoveryTrigger = Clamp(ahrs->magneticRecoveryTrigger, 0, ahrs->rejectionTimeout);
+
+    return ahrs->magnetometerIgnored ? FUSION_VECTOR_ZERO : ahrs->halfMagnetometerResidual;
 }
 
 /**
