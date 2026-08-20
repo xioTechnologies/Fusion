@@ -8,9 +8,16 @@
 #define FUSION_INLINE_H
 
 //------------------------------------------------------------------------------
+// Includes
+
+#include "FusionConfig.h"
+
+//------------------------------------------------------------------------------
 // Definitions
 
-#if defined _MSC_VER
+#if defined FUSION_NO_INLINE
+#define FUSION_INLINE inline
+#elif defined _MSC_VER
 #define FUSION_INLINE __forceinline
 #elif defined __GNUC__
 #define FUSION_INLINE inline __attribute__((always_inline))
