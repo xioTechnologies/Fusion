@@ -53,9 +53,9 @@ const FusionAhrsSettings fusionAhrsDefaultSettings = {
     .convention = FusionConventionNwu,
     .gain = 0.5f,
     .gyroscopeRange = 0.0f,
-    .accelerationRejection = 90.0f,
-    .magneticRejection = 90.0f,
-    .rejectionTimeout = 0,
+    .accelerationRejection = 0.0f,
+    .magneticRejection = 0.0f,
+    .rejectionTimeout = 0.0f,
 };
 
 //------------------------------------------------------------------------------
