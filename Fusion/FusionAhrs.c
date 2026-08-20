@@ -394,10 +394,17 @@ static FUSION_INLINE FusionVector HalfWest(const FusionAhrs *const ahrs) {
  * @return Residual between the sensor and reference vector.
  */
 static FUSION_INLINE FusionVector Residual(const FusionVector sensor, const FusionVector reference) {
-    if (FusionVectorDot(sensor, reference) < 0.0f) {
-        return FusionVectorNormalise(FusionVectorCross(sensor, reference)); // if error is >90 degrees
+    if (FusionVectorDot(sensor, reference) > 0.0f) {
+        return FusionVectorCross(sensor, reference); // if error is <90 degrees
     }
-    return FusionVectorCross(sensor, reference);
+
+    const FusionVector cross = FusionVectorCross(sensor, reference);
+
+    if (FusionVectorIsZero(cross)) {
+        return FUSION_VECTOR_ZERO;
+    }
+
+    return FusionVectorNormalise(cross);
 }
 
 /**
