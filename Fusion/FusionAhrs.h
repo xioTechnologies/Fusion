@@ -108,6 +108,8 @@ void FusionAhrsSetSamplePeriod(FusionAhrs *const ahrs, const float samplePeriod)
 
 void FusionAhrsRestart(FusionAhrs *const ahrs);
 
+void FusionAhrsSoftRestart(FusionAhrs *const ahrs);
+
 void FusionAhrsSkipStartup(FusionAhrs *const ahrs);
 
 void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, const FusionVector accelerometer, const FusionVector magnetometer);
