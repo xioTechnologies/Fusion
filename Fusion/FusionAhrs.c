@@ -116,7 +116,7 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
 
     ahrs->startup = true;
     ahrs->startupGain = INITIAL_STARTUP_GAIN;
-    ahrs->startupGainRate = (INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD;
+    ahrs->startupGainRate = ((INITIAL_STARTUP_GAIN - ahrs->gain) / STARTUP_PERIOD) * ahrs->samplePeriod;
 
     ahrs->overrangeRecovery = false;
 
@@ -213,7 +213,7 @@ static inline float Startup(FusionAhrs *const ahrs) {
         return ahrs->gain;
     }
 
-    ahrs->startupGain -= ahrs->startupGainRate * ahrs->samplePeriod;
+    ahrs->startupGain -= ahrs->startupGainRate;
 
     if (ahrs->startupGain > ahrs->gain) {
         return ahrs->startupGain;
