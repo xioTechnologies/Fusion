@@ -50,7 +50,7 @@ The AHRS algorithm settings are defined by the `FusionAhrsSettings` structure an
 | `gyroscopeRange`        | Gyroscope range (in degrees per second). Overrange recovery will activate if the gyroscope measurement exceeds 98% of this value. A value of zero will disable this feature. The value should be set to the range specified in the gyroscope datasheet. |
 | `accelerationRejection` | Threshold (in degrees) used by the acceleration rejection feature. A value of zero will disable this feature. A value of 10 degrees is appropriate for most applications.                                                                               |
 | `magneticRejection`     | Threshold (in degrees) used by the magnetic rejection feature. A value of zero will disable the feature. A value of 10 degrees is appropriate for most applications.                                                                                    |
-| `rejectionTimeout`      | Acceleration and magnetic recovery trigger timeout (in seconds). A value of zero will disable the acceleration and magnetic rejection features. A period of 5 seconds is appropriate for most applications.                                             |
+| `rejectionTimeout`      | Acceleration and magnetic recovery trigger timeout (in seconds). A period of 10 seconds is appropriate for most applications.                                                                                                                           |
 
 ### Algorithm internal states
 
