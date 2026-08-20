@@ -59,8 +59,10 @@ typedef struct {
     float startupGainRate;
     bool overrangeEnabled;
     float overrangeThreshold;
-    float accelerationRejection;
-    float magneticRejection;
+    bool accelerationRejectionEnabled;
+    float accelerationRejectionThreshold;
+    bool magneticRejectionEnabled;
+    float magneticRejectionThreshold;
     int32_t rejectionTimeout;
     uint32_t anchorDuration;
 
