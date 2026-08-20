@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 // Includes
 
+#include "FusionConfig.h"
 #include "FusionInline.h"
 #include <math.h>
 #include <stdbool.h>
@@ -110,12 +111,6 @@ typedef union {
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
 #endif
-
-/**
- * @brief Include this definition or add as a preprocessor definition to use
- * normal square root operations.
- */
-//#define FUSION_USE_NORMAL_SQRT
 
 //------------------------------------------------------------------------------
 // Inline functions - Degrees and radians conversion
