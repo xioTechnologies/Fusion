@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 // Includes
 
+#include "FusionInline.h"
 #include "FusionMath.h"
 
 //------------------------------------------------------------------------------
@@ -23,7 +24,7 @@
  * @param offset Offset.
  * @return Calibrated gyroscope or accelerometer.
  */
-static inline FusionVector FusionModelInertial(const FusionVector uncalibrated, const FusionMatrix misalignment, const FusionVector sensitivity, const FusionVector offset) {
+static FUSION_INLINE FusionVector FusionModelInertial(const FusionVector uncalibrated, const FusionMatrix misalignment, const FusionVector sensitivity, const FusionVector offset) {
     return FusionMatrixMultiply(misalignment, FusionVectorHadamard(FusionVectorSubtract(uncalibrated, offset), sensitivity));
 }
 
@@ -34,7 +35,7 @@ static inline FusionVector FusionModelInertial(const FusionVector uncalibrated, 
  * @param hardIronOffset Hard-iron offset.
  * @return Calibrated magnetometer.
  */
-static inline FusionVector FusionModelMagnetic(const FusionVector uncalibrated, const FusionMatrix softIronMatrix, const FusionVector hardIronOffset) {
+static FUSION_INLINE FusionVector FusionModelMagnetic(const FusionVector uncalibrated, const FusionMatrix softIronMatrix, const FusionVector hardIronOffset) {
     return FusionMatrixMultiply(softIronMatrix, FusionVectorSubtract(uncalibrated, hardIronOffset));
 }
 

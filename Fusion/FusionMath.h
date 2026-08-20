@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 // Includes
 
+#include "FusionInline.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -124,7 +125,7 @@ typedef union {
  * @param degrees Degrees.
  * @return Radians.
  */
-static inline float FusionDegreesToRadians(const float degrees) {
+static FUSION_INLINE float FusionDegreesToRadians(const float degrees) {
     return degrees * ((float) M_PI / 180.0f);
 }
 
@@ -133,7 +134,7 @@ static inline float FusionDegreesToRadians(const float degrees) {
  * @param radians Radians.
  * @return Degrees.
  */
-static inline float FusionRadiansToDegrees(const float radians) {
+static FUSION_INLINE float FusionRadiansToDegrees(const float radians) {
     return radians * (180.0f / (float) M_PI);
 }
 
@@ -146,7 +147,7 @@ static inline float FusionRadiansToDegrees(const float radians) {
  * @param value Value.
  * @return Arc sine of the value.
  */
-static inline float FusionArcSin(const float value) {
+static FUSION_INLINE float FusionArcSin(const float value) {
     if (value <= -1.0f) {
         return (float) M_PI / -2.0f;
     }
@@ -167,7 +168,7 @@ static inline float FusionArcSin(const float value) {
  * @param x Operand.
  * @return Reciprocal of the square root of x.
  */
-static inline float FusionFastInverseSqrt(const float x) {
+static FUSION_INLINE float FusionFastInverseSqrt(const float x) {
     typedef union {
         float f;
         int32_t i;
@@ -188,7 +189,7 @@ static inline float FusionFastInverseSqrt(const float x) {
  * @param v Vector.
  * @return True if the vector is zero.
  */
-static inline bool FusionVectorIsZero(const FusionVector v) {
+static FUSION_INLINE bool FusionVectorIsZero(const FusionVector v) {
     return (v.axis.x == 0.0f) && (v.axis.y == 0.0f) && (v.axis.z == 0.0f);
 }
 
@@ -198,7 +199,7 @@ static inline bool FusionVectorIsZero(const FusionVector v) {
  * @param b Vector b.
  * @return True if the vectors are equal.
  */
-static inline bool FusionVectorEqual(const FusionVector a, const FusionVector b) {
+static FUSION_INLINE bool FusionVectorEqual(const FusionVector a, const FusionVector b) {
     return (a.axis.x == b.axis.x) &&
            (a.axis.y == b.axis.y) &&
            (a.axis.z == b.axis.z);
@@ -210,7 +211,7 @@ static inline bool FusionVectorEqual(const FusionVector a, const FusionVector b)
  * @param b Vector b.
  * @return Sum of two vectors.
  */
-static inline FusionVector FusionVectorAdd(const FusionVector a, const FusionVector b) {
+static FUSION_INLINE FusionVector FusionVectorAdd(const FusionVector a, const FusionVector b) {
     const FusionVector result = {
         .axis = {
             .x = a.axis.x + b.axis.x,
@@ -227,7 +228,7 @@ static inline FusionVector FusionVectorAdd(const FusionVector a, const FusionVec
  * @param b Vector b.
  * @return Subtraction of two vectors.
  */
-static inline FusionVector FusionVectorSubtract(const FusionVector a, const FusionVector b) {
+static FUSION_INLINE FusionVector FusionVectorSubtract(const FusionVector a, const FusionVector b) {
     const FusionVector result = {
         .axis = {
             .x = a.axis.x - b.axis.x,
@@ -244,7 +245,7 @@ static inline FusionVector FusionVectorSubtract(const FusionVector a, const Fusi
  * @param s Scalar.
  * @return Scaled vector.
  */
-static inline FusionVector FusionVectorScale(const FusionVector v, const float s) {
+static FUSION_INLINE FusionVector FusionVectorScale(const FusionVector v, const float s) {
     const FusionVector result = {
         .axis = {
             .x = v.axis.x * s,
@@ -260,7 +261,7 @@ static inline FusionVector FusionVectorScale(const FusionVector v, const float s
  * @param v Vector.
  * @return Sum of the elements.
  */
-static inline float FusionVectorSum(const FusionVector v) {
+static FUSION_INLINE float FusionVectorSum(const FusionVector v) {
     return v.axis.x + v.axis.y + v.axis.z;
 }
 
@@ -270,7 +271,7 @@ static inline float FusionVectorSum(const FusionVector v) {
  * @param b Vector b.
  * @return Hadamard (element-wise) product.
  */
-static inline FusionVector FusionVectorHadamard(const FusionVector a, const FusionVector b) {
+static FUSION_INLINE FusionVector FusionVectorHadamard(const FusionVector a, const FusionVector b) {
     const FusionVector result = {
         .axis = {
             .x = a.axis.x * b.axis.x,
@@ -287,7 +288,7 @@ static inline FusionVector FusionVectorHadamard(const FusionVector a, const Fusi
  * @param b Vector b.
  * @return Cross product.
  */
-static inline FusionVector FusionVectorCross(const FusionVector a, const FusionVector b) {
+static FUSION_INLINE FusionVector FusionVectorCross(const FusionVector a, const FusionVector b) {
     const FusionVector result = {
         .axis = {
             .x = a.axis.y * b.axis.z - a.axis.z * b.axis.y,
@@ -304,7 +305,7 @@ static inline FusionVector FusionVectorCross(const FusionVector a, const FusionV
  * @param b Vector b.
  * @return Dot product.
  */
-static inline float FusionVectorDot(const FusionVector a, const FusionVector b) {
+static FUSION_INLINE float FusionVectorDot(const FusionVector a, const FusionVector b) {
     return FusionVectorSum(FusionVectorHadamard(a, b));
 }
 
@@ -313,7 +314,7 @@ static inline float FusionVectorDot(const FusionVector a, const FusionVector b) 
  * @param v Vector.
  * @return Vector magnitude squared.
  */
-static inline float FusionVectorNormSquared(const FusionVector v) {
+static FUSION_INLINE float FusionVectorNormSquared(const FusionVector v) {
     return FusionVectorSum(FusionVectorHadamard(v, v));
 }
 
@@ -322,7 +323,7 @@ static inline float FusionVectorNormSquared(const FusionVector v) {
  * @param v Vector.
  * @return Vector magnitude.
  */
-static inline float FusionVectorNorm(const FusionVector v) {
+static FUSION_INLINE float FusionVectorNorm(const FusionVector v) {
     return sqrtf(FusionVectorNormSquared(v));
 }
 
@@ -331,7 +332,7 @@ static inline float FusionVectorNorm(const FusionVector v) {
  * @param v Vector.
  * @return Normalised vector.
  */
-static inline FusionVector FusionVectorNormalise(const FusionVector v) {
+static FUSION_INLINE FusionVector FusionVectorNormalise(const FusionVector v) {
 #ifdef FUSION_USE_NORMAL_SQRT
     return FusionVectorScale(v, 1.0f / FusionVectorNorm(v));
 #else
@@ -348,7 +349,7 @@ static inline FusionVector FusionVectorNormalise(const FusionVector v) {
  * @param b Quaternion b.
  * @return Sum of two quaternions.
  */
-static inline FusionQuaternion FusionQuaternionAdd(const FusionQuaternion a, const FusionQuaternion b) {
+static FUSION_INLINE FusionQuaternion FusionQuaternionAdd(const FusionQuaternion a, const FusionQuaternion b) {
     const FusionQuaternion result = {
         .element = {
             .w = a.element.w + b.element.w,
@@ -366,7 +367,7 @@ static inline FusionQuaternion FusionQuaternionAdd(const FusionQuaternion a, con
  * @param s Scalar.
  * @return Scaled quaternion.
  */
-static inline FusionQuaternion FusionQuaternionScale(const FusionQuaternion q, const float s) {
+static FUSION_INLINE FusionQuaternion FusionQuaternionScale(const FusionQuaternion q, const float s) {
     const FusionQuaternion result = {
         .element = {
             .w = q.element.w * s,
@@ -383,7 +384,7 @@ static inline FusionQuaternion FusionQuaternionScale(const FusionQuaternion q, c
  * @param q Quaternion.
  * @return Sum of the elements.
  */
-static inline float FusionQuaternionSum(const FusionQuaternion q) {
+static FUSION_INLINE float FusionQuaternionSum(const FusionQuaternion q) {
     return q.element.w + q.element.x + q.element.y + q.element.z;
 }
 
@@ -393,7 +394,7 @@ static inline float FusionQuaternionSum(const FusionQuaternion q) {
  * @param b Quaternion b.
  * @return Hadamard (element-wise) product.
  */
-static inline FusionQuaternion FusionQuaternionHadamard(const FusionQuaternion a, const FusionQuaternion b) {
+static FUSION_INLINE FusionQuaternion FusionQuaternionHadamard(const FusionQuaternion a, const FusionQuaternion b) {
     const FusionQuaternion result = {
         .element = {
             .w = a.element.w * b.element.w,
@@ -411,7 +412,7 @@ static inline FusionQuaternion FusionQuaternionHadamard(const FusionQuaternion a
  * @param b Quaternion b.
  * @return Quaternion product.
  */
-static inline FusionQuaternion FusionQuaternionProduct(const FusionQuaternion a, const FusionQuaternion b) {
+static FUSION_INLINE FusionQuaternion FusionQuaternionProduct(const FusionQuaternion a, const FusionQuaternion b) {
 #define A a.element
 #define B b.element
     const FusionQuaternion result = {
@@ -434,7 +435,7 @@ static inline FusionQuaternion FusionQuaternionProduct(const FusionQuaternion a,
  * @param v Vector.
  * @return Quaternion-vector product.
  */
-static inline FusionQuaternion FusionQuaternionVectorProduct(const FusionQuaternion q, const FusionVector v) {
+static FUSION_INLINE FusionQuaternion FusionQuaternionVectorProduct(const FusionQuaternion q, const FusionVector v) {
 #define Q q.element
 #define V v.axis
     const FusionQuaternion result = {
@@ -455,7 +456,7 @@ static inline FusionQuaternion FusionQuaternionVectorProduct(const FusionQuatern
  * @param q Quaternion.
  * @return Quaternion norm squared.
  */
-static inline float FusionQuaternionNormSquared(const FusionQuaternion q) {
+static FUSION_INLINE float FusionQuaternionNormSquared(const FusionQuaternion q) {
     return FusionQuaternionSum(FusionQuaternionHadamard(q, q));
 }
 
@@ -464,7 +465,7 @@ static inline float FusionQuaternionNormSquared(const FusionQuaternion q) {
  * @param q Quaternion.
  * @return Quaternion norm.
  */
-static inline float FusionQuaternionNorm(const FusionQuaternion q) {
+static FUSION_INLINE float FusionQuaternionNorm(const FusionQuaternion q) {
     return sqrtf(FusionQuaternionNormSquared(q));
 }
 
@@ -473,7 +474,7 @@ static inline float FusionQuaternionNorm(const FusionQuaternion q) {
  * @param q Quaternion.
  * @return Normalised quaternion.
  */
-static inline FusionQuaternion FusionQuaternionNormalise(const FusionQuaternion q) {
+static FUSION_INLINE FusionQuaternion FusionQuaternionNormalise(const FusionQuaternion q) {
 #ifdef FUSION_USE_NORMAL_SQRT
     return FusionQuaternionScale(q, 1.0f / FusionQuaternionNorm(q));
 #else
@@ -490,7 +491,7 @@ static inline FusionQuaternion FusionQuaternionNormalise(const FusionQuaternion 
  * @param v Vector.
  * @return Multiplication of a matrix and a vector.
  */
-static inline FusionVector FusionMatrixMultiply(const FusionMatrix m, const FusionVector v) {
+static FUSION_INLINE FusionVector FusionMatrixMultiply(const FusionMatrix m, const FusionVector v) {
 #define M m.element
 #define V v.axis
     const FusionVector result = {
@@ -517,7 +518,7 @@ static inline FusionVector FusionMatrixMultiply(const FusionMatrix m, const Fusi
  * @param q Quaternion.
  * @return Rotation matrix.
  */
-static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion q) {
+static FUSION_INLINE FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion q) {
 #define Q q.element
     const float twoQw = 2.0f * Q.w; // compiler CSE may not optimise these subexpressions
     const float twoQx = 2.0f * Q.x;
@@ -549,7 +550,7 @@ static inline FusionMatrix FusionQuaternionToMatrix(const FusionQuaternion q) {
  * @param q Quaternion.
  * @return Euler angles.
  */
-static inline FusionEuler FusionQuaternionToEuler(const FusionQuaternion q) {
+static FUSION_INLINE FusionEuler FusionQuaternionToEuler(const FusionQuaternion q) {
 #define Q q.element
     const FusionEuler euler = {
         .angle = {

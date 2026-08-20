@@ -9,6 +9,7 @@
 
 #include <float.h>
 #include "FusionAhrs.h"
+#include "FusionInline.h"
 #include <math.h>
 
 //------------------------------------------------------------------------------
@@ -27,23 +28,23 @@
 //------------------------------------------------------------------------------
 // Function declarations
 
-static inline void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope);
+static FUSION_INLINE void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope);
 
-static inline void SoftRestart(FusionAhrs *const ahrs);
+static FUSION_INLINE void SoftRestart(FusionAhrs *const ahrs);
 
-static inline float Startup(FusionAhrs *const ahrs);
+static FUSION_INLINE float Startup(FusionAhrs *const ahrs);
 
-static inline FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector accelerometer);
+static FUSION_INLINE FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector accelerometer);
 
-static inline FusionVector HalfHeadingFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector magnetometer);
+static FUSION_INLINE FusionVector HalfHeadingFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector magnetometer);
 
-static inline FusionVector HalfGravity(const FusionAhrs *const ahrs);
+static FUSION_INLINE FusionVector HalfGravity(const FusionAhrs *const ahrs);
 
-static inline FusionVector HalfWest(const FusionAhrs *const ahrs);
+static FUSION_INLINE FusionVector HalfWest(const FusionAhrs *const ahrs);
 
-static inline FusionVector Residual(const FusionVector sensor, const FusionVector reference);
+static FUSION_INLINE FusionVector Residual(const FusionVector sensor, const FusionVector reference);
 
-static inline int32_t Clamp(const int32_t value, const int32_t min, const int32_t max);
+static FUSION_INLINE int32_t Clamp(const int32_t value, const int32_t min, const int32_t max);
 
 //------------------------------------------------------------------------------
 // Variables
@@ -176,7 +177,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
  * @param ahrs AHRS structure.
  * @param gyroscope Gyroscope in degrees per second.
  */
-static inline void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope) {
+static FUSION_INLINE void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscope) {
     if (ahrs->overrangeEnabled == false) {
         return;
     }
@@ -195,7 +196,7 @@ static inline void Overrange(FusionAhrs *const ahrs, const FusionVector gyroscop
  * @brief Restarts the AHRS algorithm while preserving outputs.
  * @param ahrs AHRS structure.
  */
-static inline void SoftRestart(FusionAhrs *const ahrs) {
+static FUSION_INLINE void SoftRestart(FusionAhrs *const ahrs) {
     const FusionQuaternion quaternion = ahrs->quaternion;
     const FusionVector accelerometer = ahrs->accelerometer;
 
@@ -210,7 +211,7 @@ static inline void SoftRestart(FusionAhrs *const ahrs) {
  * @param ahrs AHRS structure.
  * @return Gain.
  */
-static inline float Startup(FusionAhrs *const ahrs) {
+static FUSION_INLINE float Startup(FusionAhrs *const ahrs) {
     if (ahrs->startup == false) {
         return ahrs->gain;
     }
@@ -234,7 +235,7 @@ static inline float Startup(FusionAhrs *const ahrs) {
  * @param accelerometer Accelerometer in g.
  * @return Inclination feedback scaled by 0.5.
  */
-static inline FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector accelerometer) {
+static FUSION_INLINE FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector accelerometer) {
     FusionVector halfInclinationFeedback = FUSION_VECTOR_ZERO;
     ahrs->accelerometerIgnored = true;
     if (FusionVectorIsZero(accelerometer) == false) {
@@ -273,7 +274,7 @@ static inline FusionVector HalfInclinationFeedback(FusionAhrs *const ahrs, const
  * @param magnetometer Magnetometer in any calibrated units.
  * @return Heading feedback scaled by 0.5.
  */
-static inline FusionVector HalfHeadingFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector magnetometer) {
+static FUSION_INLINE FusionVector HalfHeadingFeedback(FusionAhrs *const ahrs, const FusionVector halfGravity, const FusionVector magnetometer) {
     FusionVector halfHeadingFeedback = FUSION_VECTOR_ZERO;
     ahrs->magnetometerIgnored = true;
     if (FusionVectorIsZero(magnetometer) == false) {
@@ -313,7 +314,7 @@ static inline FusionVector HalfHeadingFeedback(FusionAhrs *const ahrs, const Fus
  * @param ahrs AHRS structure.
  * @return Direction of gravity scaled by 0.5.
  */
-static inline FusionVector HalfGravity(const FusionAhrs *const ahrs) {
+static FUSION_INLINE FusionVector HalfGravity(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
     switch (ahrs->convention) {
         case FusionConventionNwu:
@@ -348,7 +349,7 @@ static inline FusionVector HalfGravity(const FusionAhrs *const ahrs) {
  * @param ahrs AHRS structure.
  * @return Direction of west scaled by 0.5.
  */
-static inline FusionVector HalfWest(const FusionAhrs *const ahrs) {
+static FUSION_INLINE FusionVector HalfWest(const FusionAhrs *const ahrs) {
 #define Q ahrs->quaternion.element
     switch (ahrs->convention) {
         case FusionConventionNwu: {
@@ -392,7 +393,7 @@ static inline FusionVector HalfWest(const FusionAhrs *const ahrs) {
  * @param reference Reference.
  * @return Residual between the sensor and reference vector.
  */
-static inline FusionVector Residual(const FusionVector sensor, const FusionVector reference) {
+static FUSION_INLINE FusionVector Residual(const FusionVector sensor, const FusionVector reference) {
     if (FusionVectorDot(sensor, reference) < 0.0f) {
         return FusionVectorNormalise(FusionVectorCross(sensor, reference)); // if error is >90 degrees
     }
@@ -406,7 +407,7 @@ static inline FusionVector Residual(const FusionVector sensor, const FusionVecto
  * @param max Maximum value.
  * @return Value limited to maximum and minimum.
  */
-static inline int32_t Clamp(const int32_t value, const int32_t min, const int32_t max) {
+static FUSION_INLINE int32_t Clamp(const int32_t value, const int32_t min, const int32_t max) {
     if (value < min) {
         return min;
     }

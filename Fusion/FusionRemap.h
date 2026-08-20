@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 // Includes
 
+#include "FusionInline.h"
 #include "FusionMath.h"
 
 //------------------------------------------------------------------------------
@@ -57,7 +58,7 @@ typedef enum {
  * @param alignment Alignment.
  * @return Sensor remapped to the body frame.
  */
-static inline FusionVector FusionRemap(const FusionVector sensor, const FusionRemapAlignment alignment) {
+static FUSION_INLINE FusionVector FusionRemap(const FusionVector sensor, const FusionRemapAlignment alignment) {
     FusionVector result;
     switch (alignment) {
         case FusionRemapAlignmentPXPYPZ:
