@@ -62,6 +62,12 @@ static PyObject *ahrs_restart(Ahrs *self, PyObject *args) {
     return (PyObject *) self;
 }
 
+static PyObject *ahrs_soft_restart(Ahrs *self, PyObject *args) {
+    FusionAhrsSoftRestart(&self->wrapped);
+    Py_INCREF(self);
+    return (PyObject *) self;
+}
+
 static PyObject *ahrs_skip_startup(Ahrs *self, PyObject *args) {
     FusionAhrsSkipStartup(&self->wrapped);
     Py_INCREF(self);
@@ -215,6 +221,7 @@ static PyMethodDef ahrs_methods[] = {
     {"set_settings", (PyCFunction) ahrs_set_settings, METH_O, ""},
     {"set_sample_period", (PyCFunction) ahrs_set_sample_period, METH_O, ""},
     {"restart", (PyCFunction) ahrs_restart, METH_NOARGS, ""},
+    {"soft_restart", (PyCFunction) ahrs_soft_restart, METH_NOARGS, ""},
     {"skip_startup", (PyCFunction) ahrs_skip_startup, METH_NOARGS, ""},
     {"update", (PyCFunction) ahrs_update, METH_VARARGS, ""},
     {"update_no_magnetometer", (PyCFunction) ahrs_update_no_magnetometer, METH_VARARGS, ""},
