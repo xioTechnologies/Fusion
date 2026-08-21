@@ -504,7 +504,7 @@ FusionVector FusionAhrsGetLinearAcceleration(const FusionAhrs *const ahrs) {
 }
 
 /**
- * @brief Returns the Earth acceleration.
+ * @brief Returns the earth acceleration.
  * @param ahrs AHRS structure.
  * @return Earth acceleration in g.
  */

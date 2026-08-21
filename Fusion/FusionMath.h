@@ -101,7 +101,7 @@ typedef union {
 #define FUSION_MATRIX_IDENTITY ((FusionMatrix){ .array = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f} })
 
 /**
- * @brief Euler angles of zero.
+ * @brief Zero Euler angles.
  */
 #define FUSION_EULER_ZERO ((FusionEuler){ .array = {0.0f, 0.0f, 0.0f} })
 
