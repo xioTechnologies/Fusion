@@ -1,0 +1,20 @@
+{
+  "name": "Fusion",
+  "version": "1.2.12",
+  "description": "Sensor Fusion library for Inertial Measurement Units",
+  "keywords": "sensors, imu, ahrs, fusion",
+  "authors": {
+    "name": "xioTechnologies"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xioTechnologies/Fusion"
+  },
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "srcDir": "Fusion",
+    "includeDir": "."
+  }
+}
