@@ -17,4 +17,19 @@ static int convention_from(FusionConvention *const convention, const int convent
     return -1;
 }
 
+static PyObject *convention_to_string(PyObject *null, PyObject *arg) {
+    const long convention = PyLong_AsLong(arg);
+
+    if (PyErr_Occurred()) {
+        return NULL;
+    }
+
+    return PyUnicode_FromString(FusionConventionToString((FusionConvention) convention));
+}
+
+static PyMethodDef convention_methods[] = {
+    {"convention_to_string", (PyCFunction) convention_to_string, METH_O, ""},
+    {NULL} /* sentinel */
+};
+
 #endif

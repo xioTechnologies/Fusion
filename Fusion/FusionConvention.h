@@ -20,6 +20,11 @@ typedef enum {
     FusionConventionNed, /* North, East, Down (NED) */
 } FusionConvention;
 
+//------------------------------------------------------------------------------
+// Function declarations
+
+const char *FusionConventionToString(const FusionConvention convention);
+
 #endif
 
 //------------------------------------------------------------------------------

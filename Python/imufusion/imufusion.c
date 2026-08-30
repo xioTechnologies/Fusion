@@ -5,6 +5,7 @@
 #include "Bias.h"
 #include "BiasSettings.h"
 #include "Compass.h"
+#include "Convention.h"
 #include "Convert.h"
 #include "Model.h"
 #include <Python.h>
@@ -66,6 +67,7 @@ PyMODINIT_FUNC PyInit_imufusion() {
         (PyModule_AddIntConstant(module, "CONVENTION_ENU", FusionConventionEnu) == 0) &&
         (PyModule_AddIntConstant(module, "CONVENTION_NED", FusionConventionNed) == 0) &&
         (PyModule_AddFunctions(module, compass_methods) == 0) &&
+        (PyModule_AddFunctions(module, convention_methods) == 0) &&
         (PyModule_AddFunctions(module, convert_methods) == 0) &&
         (PyModule_AddFunctions(module, model_methods) == 0) &&
         (PyModule_AddFunctions(module, remap_methods) == 0) &&
