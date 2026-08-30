@@ -50,6 +50,11 @@ typedef enum {
 } FusionRemapAlignment;
 
 //------------------------------------------------------------------------------
+// Function declarations
+
+const char *FusionRemapAlignmentToString(const FusionRemapAlignment alignment);
+
+//------------------------------------------------------------------------------
 // Inline functions
 
 /**

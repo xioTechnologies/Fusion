@@ -64,8 +64,19 @@ static PyObject *remap(PyObject *self, PyObject *args) {
     return np_array_1x3_from(remapped_sensor.array);
 }
 
+static PyObject *alignment_to_string(PyObject *null, PyObject *arg) {
+    const long alignment = PyLong_AsLong(arg);
+
+    if (PyErr_Occurred()) {
+        return NULL;
+    }
+
+    return PyUnicode_FromString(FusionRemapAlignmentToString((FusionRemapAlignment) alignment));
+}
+
 static PyMethodDef remap_methods[] = {
     {"remap", (PyCFunction) remap, METH_VARARGS, ""},
+    {"alignment_to_string", (PyCFunction) alignment_to_string, METH_O, ""},
     {NULL} /* sentinel */
 };
 
