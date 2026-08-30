@@ -25,9 +25,9 @@ typedef struct {
     float sampleRate; // Hz
     FusionConvention convention;
     float gain;
-    float gyroscopeRange; // degrees per second
-    float accelerationRejection; // degrees
-    float magneticRejection; // degrees
+    float gyroscopeRange; // degrees per second (0 = disabled)
+    float accelerationRejection; // degrees (0 = disabled)
+    float magneticRejection; // degrees (0 = disabled)
     float rejectionTimeout; // seconds
 } FusionAhrsSettings;
 
