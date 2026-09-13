@@ -42,6 +42,7 @@ void FusionBiasInitialise(FusionBias *const bias) {
     bias->correctedGyroscope = FUSION_VECTOR_ZERO;
     bias->offset = FUSION_VECTOR_ZERO;
     bias->status = FusionProgressStatusNotStarted;
+    bias->error = FusionResultOk;
     bias->completed = false;
     bias->durationTimer = 0;
     bias->holdoffTimer = 0;
@@ -79,6 +80,7 @@ FusionResult FusionBiasUpdate(FusionBias *const bias, const FusionVector gyrosco
 
         if (bias->status == FusionProgressStatusInProgress) {
             bias->status = FusionProgressStatusFailed;
+            bias->error = FusionResultNotStationary;
             return FusionResultNotStationary;
         }
         return FusionResultOk;
@@ -141,6 +143,7 @@ void FusionBiasSetOffset(FusionBias *const bias, const FusionVector offset) {
  */
 void FusionBiasStart(FusionBias *const bias) {
     bias->status = FusionProgressStatusInProgress;
+    bias->error = FusionResultOk;
     bias->completed = false;
     bias->durationTimer = 0;
 }
@@ -157,6 +160,7 @@ FusionProgress FusionBiasGetProgress(const FusionBias *const bias) {
     const FusionProgress progress = {
         .status = bias->status,
         .percentage = percentage > 100 ? 100 : percentage,
+        .error = bias->error,
     };
     return progress;
 }

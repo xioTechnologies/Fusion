@@ -91,6 +91,7 @@ typedef struct {
 
     // Anchored heading
     FusionProgressStatus anchorStatus;
+    FusionResult anchorError;
     bool anchorCompleted;
     uint32_t anchorNumberOfSamples;
     FusionVector anchorNorth;

@@ -150,6 +150,7 @@ void FusionAhrsRestart(FusionAhrs *const ahrs) {
     ahrs->magnetometerIgnored = false;
 
     ahrs->anchorStatus = FusionProgressStatusNotStarted;
+    ahrs->anchorError = FusionResultOk;
     ahrs->anchorCompleted = false;
     ahrs->anchorNumberOfSamples = 0;
     ahrs->anchorNorth = FUSION_VECTOR_ZERO;
@@ -165,6 +166,7 @@ void FusionAhrsSoftRestart(FusionAhrs *const ahrs) {
     const FusionVector accelerometer = ahrs->accelerometer;
 
     const FusionProgressStatus anchorStatus = ahrs->anchorStatus;
+    const FusionResult anchorError = ahrs->anchorError;
     const bool anchorCompleted = ahrs->anchorCompleted;
     const uint32_t anchorNumberOfSamples = ahrs->anchorNumberOfSamples;
     const FusionVector anchorNorth = ahrs->anchorNorth;
@@ -175,6 +177,7 @@ void FusionAhrsSoftRestart(FusionAhrs *const ahrs) {
     ahrs->accelerometer = accelerometer;
 
     ahrs->anchorStatus = anchorStatus;
+    ahrs->anchorError = anchorError;
     ahrs->anchorCompleted = anchorCompleted;
     ahrs->anchorNumberOfSamples = anchorNumberOfSamples;
     ahrs->anchorNorth = anchorNorth;
@@ -763,6 +766,7 @@ FusionResult FusionAhrsAnchorStart(FusionAhrs *const ahrs) {
     }
 
     ahrs->anchorStatus = FusionProgressStatusInProgress;
+    ahrs->anchorError = FusionResultOk;
     ahrs->anchorCompleted = false;
     ahrs->anchorNumberOfSamples = 0;
     ahrs->anchorNorth = FUSION_VECTOR_ZERO;
@@ -781,6 +785,7 @@ FusionProgress FusionAhrsAnchorGetProgress(const FusionAhrs *const ahrs) {
     const FusionProgress progress = {
         .status = ahrs->anchorStatus,
         .percentage = percentage > 100 ? 100 : percentage,
+        .error = ahrs->anchorError,
     };
     return progress;
 }
@@ -803,6 +808,7 @@ FusionResult FusionAhrsAnchorComplete(FusionAhrs *const ahrs) {
 
     if (ahrs->anchorNumberOfSamples == 0) {
         ahrs->anchorStatus = FusionProgressStatusFailed;
+        ahrs->anchorError = FusionResultTooFewSamples;
         return FusionResultTooFewSamples;
     }
 

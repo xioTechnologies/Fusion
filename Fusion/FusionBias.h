@@ -47,6 +47,7 @@ typedef struct {
 
     // Internal states
     FusionProgressStatus status;
+    FusionResult error;
     bool completed;
     uint32_t durationTimer;
     uint32_t holdoffTimer;

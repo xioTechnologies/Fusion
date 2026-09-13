@@ -21,9 +21,14 @@ static PyObject *progress_get_percentage(Progress *self) {
     return PyLong_FromUnsignedLong((unsigned long) self->wrapped.percentage);
 }
 
+static PyObject *progress_get_error(Progress *self) {
+    return PyUnicode_FromString(FusionResultToString(self->wrapped.error));
+}
+
 static PyGetSetDef progress_get_set[] = {
     {"status", (getter) progress_get_status, NULL, "", NULL},
     {"percentage", (getter) progress_get_percentage, NULL, "", NULL},
+    {"error", (getter) progress_get_error, NULL, "", NULL},
     {NULL} /* sentinel */
 };
 

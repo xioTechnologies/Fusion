@@ -8,6 +8,11 @@
 #define FUSION_PROGRESS_H
 
 //------------------------------------------------------------------------------
+// Includes
+
+#include "FusionResult.h"
+
+//------------------------------------------------------------------------------
 // Definitions
 
 /**
@@ -26,7 +31,8 @@ typedef enum {
  */
 typedef struct {
     FusionProgressStatus status;
-    unsigned int percentage;
+    unsigned int percentage; // only valid for FusionProgressStatusInProgress
+    FusionResult error; // only valid for FusionProgressStatusFailed
 } FusionProgress;
 
 //------------------------------------------------------------------------------
