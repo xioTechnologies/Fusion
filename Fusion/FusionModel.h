@@ -25,7 +25,7 @@
  * @return Calibrated gyroscope or accelerometer.
  */
 static FUSION_INLINE FusionVector FusionModelInertial(const FusionVector uncalibrated, const FusionMatrix misalignment, const FusionVector sensitivity, const FusionVector offset) {
-    return FusionMatrixMultiply(misalignment, FusionVectorHadamard(FusionVectorSubtract(uncalibrated, offset), sensitivity));
+    return FusionMatrixMultiply(misalignment, FusionVectorHadamard(sensitivity, FusionVectorSubtract(uncalibrated, offset)));
 }
 
 /**
