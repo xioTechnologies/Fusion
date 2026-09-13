@@ -95,6 +95,7 @@ void FusionHardIronInitialise(FusionHardIron *const hardIron) {
     hardIron->magnetometer = FUSION_VECTOR_ZERO;
     hardIron->offset = FUSION_VECTOR_ZERO;
     hardIron->status = FusionProgressStatusNotStarted;
+    hardIron->error = FusionResultOk;
     hardIron->completed = false;
     hardIron->timer = 0;
     hardIron->numberOfSamples = 0;
@@ -133,6 +134,7 @@ FusionResult FusionHardIronUpdate(FusionHardIron *const hardIron, const FusionVe
 
     if (++hardIron->timer >= hardIron->timeout) {
         hardIron->status = FusionProgressStatusFailed;
+        hardIron->error = FusionResultTimeout;
         return FusionResultTimeout;
     }
 
@@ -219,6 +221,7 @@ void FusionHardIronSetOffset(FusionHardIron *const hardIron, const FusionVector 
  */
 void FusionHardIronStart(FusionHardIron *const hardIron) {
     hardIron->status = FusionProgressStatusInProgress;
+    hardIron->error = FusionResultOk;
     hardIron->completed = false;
     hardIron->timer = 0;
     hardIron->numberOfSamples = 0;
@@ -236,6 +239,7 @@ FusionProgress FusionHardIronGetProgress(const FusionHardIron *const hardIron) {
     const FusionProgress progress = {
         .status = hardIron->status,
         .percentage = percentage > 100 ? 100 : percentage,
+        .error = hardIron->error,
     };
     return progress;
 }
@@ -259,6 +263,7 @@ FusionResult FusionHardIronComplete(FusionHardIron *const hardIron) {
 
     if (result != FusionResultOk) {
         hardIron->status = FusionProgressStatusFailed;
+        hardIron->error = result;
         return result;
     }
 
@@ -266,6 +271,7 @@ FusionResult FusionHardIronComplete(FusionHardIron *const hardIron) {
 
     if (result != FusionResultOk) {
         hardIron->status = FusionProgressStatusFailed;
+        hardIron->error = result;
         return result;
     }
 

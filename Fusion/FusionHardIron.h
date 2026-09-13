@@ -53,6 +53,7 @@ typedef struct {
 
     // Internal states
     FusionProgressStatus status;
+    FusionResult error;
     bool completed;
     uint32_t timer;
     FusionVector samples[FUSION_HARD_IRON_NUMBER_OF_SAMPLES];
