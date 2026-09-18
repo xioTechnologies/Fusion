@@ -481,6 +481,29 @@ static FUSION_INLINE FusionQuaternion FusionQuaternionNormalise(const FusionQuat
 // Inline functions - Matrix operations
 
 /**
+ * @brief Returns a scaled matrix.
+ * @param m Matrix.
+ * @param s Scalar.
+ * @return Scaled matrix.
+ */
+static FUSION_INLINE FusionMatrix FusionMatrixScale(const FusionMatrix m, const float s) {
+    const FusionMatrix result = {
+        .element = {
+            .xx = m.element.xx * s,
+            .xy = m.element.xy * s,
+            .xz = m.element.xz * s,
+            .yx = m.element.yx * s,
+            .yy = m.element.yy * s,
+            .yz = m.element.yz * s,
+            .zx = m.element.zx * s,
+            .zy = m.element.zy * s,
+            .zz = m.element.zz * s,
+        }
+    };
+    return result;
+}
+
+/**
  * @brief Returns the multiplication of a matrix and a vector: M * v.
  * @param m Matrix.
  * @param v Vector.
