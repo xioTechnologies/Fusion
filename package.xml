@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>fusion</name>
+  <version>1.2.11</version>
+  <description>Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems.</description>
+  <maintainer email="info@x-io.co.uk">x-io Technologies Limited</maintainer>
+  <license>MIT</license>
+  <url>https://github.com/xioTechnologies/Fusion</url>
+  <author>Seb Madgwick</author>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
