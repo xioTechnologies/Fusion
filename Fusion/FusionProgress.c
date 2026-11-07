@@ -30,7 +30,7 @@ const char *FusionProgressStatusToString(const FusionProgressStatus status) {
         case FusionProgressStatusAborted:
             return "Aborted";
     }
-    return ""; // avoid compiler warning
+    return ""; // unreachable code: -Werror=switch
 }
 
 //------------------------------------------------------------------------------

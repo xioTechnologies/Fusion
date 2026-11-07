@@ -26,7 +26,7 @@ const char *FusionConventionToString(const FusionConvention convention) {
         case FusionConventionNed:
             return "North, East, Down (NED)";
     }
-    return ""; // avoid compiler warning
+    return ""; // unreachable code: -Werror=switch
 }
 
 //------------------------------------------------------------------------------

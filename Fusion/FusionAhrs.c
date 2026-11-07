@@ -303,7 +303,7 @@ static FUSION_INLINE FusionVector AnchorNorth(FusionAhrs *const ahrs) {
         case FusionConventionEnu:
             return FusionVectorScale(FUSION_VECTOR_Y, -1.0f);
     }
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
+    return FUSION_VECTOR_ZERO; // unreachable code: -Werror=switch
 }
 
 /**
@@ -491,7 +491,7 @@ static FUSION_INLINE FusionVector HalfGravity(const FusionAhrs *const ahrs) {
         }
     }
 #undef Q
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
+    return FUSION_VECTOR_ZERO; // unreachable code: -Werror=switch
 }
 
 /**
@@ -535,7 +535,7 @@ static FUSION_INLINE FusionVector HalfWest(const FusionAhrs *const ahrs) {
         }
     }
 #undef Q
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
+    return FUSION_VECTOR_ZERO; // unreachable code: -Werror=switch
 }
 
 /**
@@ -625,7 +625,7 @@ static FUSION_INLINE FusionVector HalfNorth(const FusionAhrs *const ahrs) {
         }
     }
 #undef Q
-    return FUSION_VECTOR_ZERO; // avoid compiler warning
+    return FUSION_VECTOR_ZERO; // unreachable code: -Werror=switch
 }
 
 /**
@@ -865,7 +865,7 @@ const char *FusionAhrsHeadingModeToString(const FusionAhrsHeadingMode headingMod
         case FusionAhrsHeadingModeAnchored:
             return "Anchored";
     }
-    return ""; // avoid compiler warning
+    return ""; // unreachable code: -Werror=switch
 }
 
 //------------------------------------------------------------------------------

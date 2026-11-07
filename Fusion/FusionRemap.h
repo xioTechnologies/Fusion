@@ -67,7 +67,7 @@ static FUSION_INLINE FusionVector FusionRemap(const FusionVector sensor, const F
     FusionVector result;
     switch (alignment) {
         case FusionRemapAlignmentPXPYPZ:
-            break;
+            return sensor;
         case FusionRemapAlignmentPXPZNY:
             result.axis.x = +sensor.axis.x;
             result.axis.y = +sensor.axis.z;
@@ -184,7 +184,7 @@ static FUSION_INLINE FusionVector FusionRemap(const FusionVector sensor, const F
             result.axis.z = +sensor.axis.z;
             return result;
     }
-    return sensor; // avoid compiler warning
+    return FUSION_VECTOR_ZERO; // unreachable code: -Werror=switch
 }
 
 #endif

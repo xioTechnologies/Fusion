@@ -68,7 +68,7 @@ const char *FusionRemapAlignmentToString(const FusionRemapAlignment alignment) {
         case FusionRemapAlignmentNXNYPZ:
             return "-X-Y+Z";
     }
-    return ""; // avoid compiler warning
+    return ""; // unreachable code: -Werror=switch
 }
 
 //------------------------------------------------------------------------------

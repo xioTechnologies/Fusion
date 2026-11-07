@@ -36,7 +36,7 @@ const char *FusionResultToString(const FusionResult result) {
         case FusionResultSingularMatrix:
             return "Singular matrix";
     }
-    return ""; // avoid compiler warning
+    return ""; // unreachable code: -Werror=switch
 }
 
 //------------------------------------------------------------------------------
