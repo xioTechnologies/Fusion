@@ -23,30 +23,30 @@
  * alignment is +Y-X+Z.
  */
 typedef enum {
-    FusionRemapAlignmentPXPYPZ, /* +X+Y+Z (remap disabled) */
-    FusionRemapAlignmentPXPZNY, /* +X+Z-Y */
-    FusionRemapAlignmentPXNZPY, /* +X-Z+Y */
-    FusionRemapAlignmentPXNYNZ, /* +X-Y-Z */
-    FusionRemapAlignmentPYPXNZ, /* +Y+X-Z */
-    FusionRemapAlignmentPYPZPX, /* +Y+Z+X */
-    FusionRemapAlignmentPYNZNX, /* +Y-Z-X */
-    FusionRemapAlignmentPYNXPZ, /* +Y-X+Z */
-    FusionRemapAlignmentPZPXPY, /* +Z+X+Y */
-    FusionRemapAlignmentPZPYNX, /* +Z+Y-X */
-    FusionRemapAlignmentPZNYPX, /* +Z-Y+X */
-    FusionRemapAlignmentPZNXNY, /* +Z-X-Y */
-    FusionRemapAlignmentNZPXNY, /* -Z+X-Y */
-    FusionRemapAlignmentNZPYPX, /* -Z+Y+X */
-    FusionRemapAlignmentNZNYNX, /* -Z-Y-X */
-    FusionRemapAlignmentNZNXPY, /* -Z-X+Y */
-    FusionRemapAlignmentNYPXPZ, /* -Y+X+Z */
-    FusionRemapAlignmentNYPZNX, /* -Y+Z-X */
-    FusionRemapAlignmentNYNZPX, /* -Y-Z+X */
-    FusionRemapAlignmentNYNXNZ, /* -Y-X-Z */
-    FusionRemapAlignmentNXPYNZ, /* -X+Y-Z */
-    FusionRemapAlignmentNXPZPY, /* -X+Z+Y */
-    FusionRemapAlignmentNXNZNY, /* -X-Z-Y */
-    FusionRemapAlignmentNXNYPZ, /* -X-Y+Z */
+    FusionRemapAlignmentPXPYPZ, // +X+Y+Z (remap disabled)
+    FusionRemapAlignmentPXPZNY, // +X+Z-Y
+    FusionRemapAlignmentPXNZPY, // +X-Z+Y
+    FusionRemapAlignmentPXNYNZ, // +X-Y-Z
+    FusionRemapAlignmentPYPXNZ, // +Y+X-Z
+    FusionRemapAlignmentPYPZPX, // +Y+Z+X
+    FusionRemapAlignmentPYNZNX, // +Y-Z-X
+    FusionRemapAlignmentPYNXPZ, // +Y-X+Z
+    FusionRemapAlignmentPZPXPY, // +Z+X+Y
+    FusionRemapAlignmentPZPYNX, // +Z+Y-X
+    FusionRemapAlignmentPZNYPX, // +Z-Y+X
+    FusionRemapAlignmentPZNXNY, // +Z-X-Y
+    FusionRemapAlignmentNZPXNY, // -Z+X-Y
+    FusionRemapAlignmentNZPYPX, // -Z+Y+X
+    FusionRemapAlignmentNZNYNX, // -Z-Y-X
+    FusionRemapAlignmentNZNXPY, // -Z-X+Y
+    FusionRemapAlignmentNYPXPZ, // -Y+X+Z
+    FusionRemapAlignmentNYPZNX, // -Y+Z-X
+    FusionRemapAlignmentNYNZPX, // -Y-Z+X
+    FusionRemapAlignmentNYNXNZ, // -Y-X-Z
+    FusionRemapAlignmentNXPYNZ, // -X+Y-Z
+    FusionRemapAlignmentNXPZPY, // -X+Z+Y
+    FusionRemapAlignmentNXNZNY, // -X-Z-Y
+    FusionRemapAlignmentNXNYPZ, // -X-Y+Z
 } FusionRemapAlignment;
 
 //------------------------------------------------------------------------------

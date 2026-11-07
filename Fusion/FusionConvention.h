@@ -15,9 +15,9 @@
  * Z axes. For example, NWU means that X is pointing north, Y west, and Z up.
  */
 typedef enum {
-    FusionConventionNwu, /* North, West, Up (NWU) */
-    FusionConventionEnu, /* East, North, Up (ENU) */
-    FusionConventionNed, /* North, East, Down (NED) */
+    FusionConventionNwu, // North, West, Up (NWU)
+    FusionConventionEnu, // East, North, Up (ENU)
+    FusionConventionNed, // North, East, Down (NED)
 } FusionConvention;
 
 //------------------------------------------------------------------------------
